@@ -6,17 +6,18 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import proyectojuego.pantallas.Pantalla;
 import proyectojuego.pantallas.PantallaJuego;
+import proyectojuego.pantallas.PantallaMenu;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Juego extends Game {
 
-	public static final int ANCHO_JUEGO = 750;
-	public static final int ALTO_JUEGO = 900;
-	public static final String 	NOMBRE_JUEGO = "Prueba";
+	public static final int 	ANCHO_JUEGO		= 750;
+	public static final int 	ALTO_JUEGO		= 900;
+	public static final String 	NOMBRE_JUEGO	= "Prueba";
 
-	private OrthographicCamera orthographicCamera;
-	private FitViewport fitViewport;
-	private SpriteBatch spriteBatch;
+	private OrthographicCamera	orthographicCamera;
+	private FitViewport 		fitViewport;
+	private SpriteBatch 		spriteBatch;
 
 
 // CONSTRUCTOR
@@ -35,10 +36,11 @@ public class Juego extends Game {
 // METODOS
 	@Override
 	public void create() {
-		orthographicCamera = new OrthographicCamera();
-		fitViewport = new FitViewport(ANCHO_JUEGO, ALTO_JUEGO, orthographicCamera);
-		spriteBatch = new SpriteBatch();
+		orthographicCamera	= new OrthographicCamera();
+		fitViewport 		= new FitViewport(ANCHO_JUEGO, ALTO_JUEGO, orthographicCamera);
+		spriteBatch 		= new SpriteBatch();
 
+		//setScreen(new PantallaMenu());
 		setScreen(new PantallaJuego());
 	}
 
