@@ -6,11 +6,18 @@ import com.badlogic.gdx.math.Vector2;
 
 public class PantallaMenu extends Pantalla {
 
-    private Texture fondoJuego			= new Texture("ui\\fondoJuego.png");
-    private Vector2 posicionZonaJuego	= new Vector2(Gdx.graphics.getWidth() / 2 - fondoJuego.getWidth() / 2, Gdx.graphics.getHeight() / 2 - fondoJuego.getHeight() / 2);
+    private Texture fondoJuego = new Texture("ui\\fondoJuego.png");
 
-    public PantallaMenu() { super(); }
+    private final Vector2 posicionZonaJuego	= new Vector2(Gdx.graphics.getWidth() / 2 - fondoJuego.getWidth() / 2, Gdx.graphics.getHeight() / 2 - fondoJuego.getHeight() / 2);
 
+
+// CONSTRUCTOR
+    public PantallaMenu() {
+        super();
+    }
+
+
+// METODOS
     @Override
     public void gestionarInput(float delta) {
 

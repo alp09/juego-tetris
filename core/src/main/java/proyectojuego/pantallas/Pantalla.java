@@ -8,7 +8,7 @@ import proyectojuego.Juego;
 
 public abstract class Pantalla implements Screen {
 
-	protected Juego 		juego;
+	protected Juego			juego;
 	protected SpriteBatch	spriteBatch;
 
 
@@ -20,7 +20,7 @@ public abstract class Pantalla implements Screen {
 
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor( 0, 0, 0, 1 );
+		Gdx.gl.glClearColor( (float)90/255, (float)90/255, (float)90/255, 1 );
 		Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT );
 
 		gestionarInput(delta);

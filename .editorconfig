@@ -1,0 +1,7 @@
+# Indica que es el archivo .editorconfig padre
+root = true
+
+# Establece que el metodo de indentacion será tabulacion y le da un tamaño de 4 espacios
+[*]
+indent_style = tab
+indent_size = 4

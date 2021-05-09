@@ -7,6 +7,10 @@ import com.badlogic.gdx.math.Vector2;
 
 public class PantallaJuego extends Pantalla {
 
+	/*
+		ESTAS VARIABLES ESTAN PARA HACER PRUEBAS PERO MAS TARDE SE CARGARAN DINAMICAMENTE
+		EN VARIABLES COMO: piezaJugable, piezaGuardada, primeraPieza, segundaPieza y terceraPieza
+	 */
 	private Texture piezaRoja = new Texture("piezas\\PiezaRojaRecortada.png");
 	private Texture piezaNaranja = new Texture("piezas\\PiezaNaranjaRecortada.png");
 	private Texture piezaAmarilla = new Texture("piezas\\PiezaAmarillaRecortada.png");
@@ -26,10 +30,13 @@ public class PantallaJuego extends Pantalla {
 	private final Vector2 posicionFondoTereceraPieza	= new Vector2(posicionZonaJuego.x + fondoJuego.getWidth() + 20, posicionZonaJuego.y + fondoJuego.getHeight() - fondoPieza.getHeight() * 3);
 
 
+// CONSTRUCTOR
 	public PantallaJuego() {
 		super();
 	}
 
+
+// METODOS
 	@Override
 	public void gestionarInput(float delta) {
 		// ToDo: comprobar pulsaciones de teclas
