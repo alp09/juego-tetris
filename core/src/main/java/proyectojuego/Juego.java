@@ -40,8 +40,8 @@ public class Juego extends Game {
 		fitViewport 		= new FitViewport(ANCHO_JUEGO, ALTO_JUEGO, orthographicCamera);
 		spriteBatch 		= new SpriteBatch();
 
-		setScreen(new PantallaMenu());
-		//setScreen(new PantallaJuego());
+		//setScreen(new PantallaMenu());
+		setScreen(new PantallaJuego());
 	}
 
 	public void cambiarPantalla(Pantalla pantallaAntigua, Pantalla pantallaNueva) {
