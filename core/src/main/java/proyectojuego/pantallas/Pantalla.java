@@ -14,6 +14,7 @@ public abstract class Pantalla implements Screen {
 	protected SpriteBatch	spriteBatch;
 
 
+// CONSTRUCTOR
 	public Pantalla() {
 		this.juego 			= (Juego) Gdx.app.getApplicationListener();
 		this.assetManager	= juego.getAssetManager();
@@ -21,6 +22,7 @@ public abstract class Pantalla implements Screen {
 	}
 
 
+// METODOS
 	@Override
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
