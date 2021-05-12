@@ -1,0 +1,125 @@
+
+texturas.png
+size: 1024, 1024
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+BloqueAmarillo
+  rotate: false
+  xy: 2, 36
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+BloqueAzul
+  rotate: false
+  xy: 262, 166
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+BloqueCian
+  rotate: false
+  xy: 906, 938
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+BloqueMorado
+  rotate: false
+  xy: 392, 296
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+BloqueNaranja
+  rotate: false
+  xy: 646, 678
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+BloqueRojo
+  rotate: false
+  xy: 2, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+BloqueVerde
+  rotate: false
+  xy: 776, 808
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+FondoJuego
+  rotate: false
+  xy: 2, 330
+  size: 320, 640
+  orig: 320, 640
+  offset: 0, 0
+  index: -1
+FondoPieza
+  rotate: false
+  xy: 2, 70
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+Grid
+  rotate: false
+  xy: 324, 330
+  size: 320, 640
+  orig: 320, 640
+  offset: 0, 0
+  index: -1
+PiezaAmarilla
+  rotate: false
+  xy: 132, 200
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+PiezaAzul
+  rotate: false
+  xy: 132, 70
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+PiezaCian
+  rotate: false
+  xy: 776, 842
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+PiezaMorada
+  rotate: false
+  xy: 646, 712
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+PiezaNaranja
+  rotate: false
+  xy: 2, 200
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+PiezaRoja
+  rotate: false
+  xy: 646, 842
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+PiezaVerde
+  rotate: false
+  xy: 262, 200
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1

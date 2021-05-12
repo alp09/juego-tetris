@@ -1,12 +1,15 @@
 package proyectojuego;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import proyectojuego.pantallas.Pantalla;
 import proyectojuego.pantallas.PantallaJuego;
 import proyectojuego.pantallas.PantallaMenu;
+import proyectojuego.pantallas.PantallaSplash;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Juego extends Game {
@@ -17,7 +20,9 @@ public class Juego extends Game {
 
 	private OrthographicCamera	orthographicCamera;
 	private FitViewport 		fitViewport;
+	private AssetManager		assetManager;
 	private SpriteBatch 		spriteBatch;
+	private TextureAtlas		textureAtlas;
 
 
 // CONSTRUCTOR
@@ -30,17 +35,23 @@ public class Juego extends Game {
 	public FitViewport getFitViewport() {
 		return fitViewport;
 	}
-	public SpriteBatch getSpriteBatch() { return spriteBatch; }
+	public SpriteBatch getSpriteBatch() {
+		return spriteBatch;
+	}
+	public AssetManager getAssetManager() {
+		return assetManager;
+	}
 
-
-// METODOS
+	// METODOS
 	@Override
 	public void create() {
 		orthographicCamera	= new OrthographicCamera();
 		fitViewport 		= new FitViewport(ANCHO_JUEGO, ALTO_JUEGO, orthographicCamera);
+		assetManager		= new AssetManager();
 		spriteBatch 		= new SpriteBatch();
 
-		setScreen(new PantallaMenu());
+		setScreen(new PantallaSplash());
+		//setScreen(new PantallaMenu());
 		//setScreen(new PantallaJuego());
 	}
 
