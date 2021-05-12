@@ -16,13 +16,12 @@ public class Juego extends Game {
 
 	public static final int 	ANCHO_JUEGO		= 750;
 	public static final int 	ALTO_JUEGO		= 900;
-	public static final String 	NOMBRE_JUEGO	= "Prueba";
+	public static final String 	NOMBRE_JUEGO	= "Tetris";
 
 	private OrthographicCamera	orthographicCamera;
 	private FitViewport 		fitViewport;
 	private AssetManager		assetManager;
 	private SpriteBatch 		spriteBatch;
-	private TextureAtlas		textureAtlas;
 
 
 // CONSTRUCTOR
@@ -32,9 +31,6 @@ public class Juego extends Game {
 
 
 // GETTERS
-	public FitViewport getFitViewport() {
-		return fitViewport;
-	}
 	public SpriteBatch getSpriteBatch() {
 		return spriteBatch;
 	}
@@ -42,7 +38,8 @@ public class Juego extends Game {
 		return assetManager;
 	}
 
-	// METODOS
+
+// METODOS
 	@Override
 	public void create() {
 		orthographicCamera	= new OrthographicCamera();
