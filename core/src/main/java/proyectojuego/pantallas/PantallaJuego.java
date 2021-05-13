@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
+import proyectojuego.Pieza;
 
 
 public class PantallaJuego extends Pantalla {
@@ -17,6 +18,12 @@ public class PantallaJuego extends Pantalla {
 	private final Sprite	spriteFondoSegundaPieza;
 	private final Sprite	spriteFondoTerceraPieza;
 	private final Sprite	spriteGridZonaJuego;
+
+	private Pieza			piezaJugable;
+	private Pieza			piezaGuardada;
+	private Pieza			primeraPiezaSiguiente;
+	private Pieza			segundaPiezaSiguiente;
+	private Pieza			terceraPiezaSiguiente;
 
 
 // CONSTRUCTOR
@@ -39,10 +46,21 @@ public class PantallaJuego extends Pantalla {
 		spriteFondoSegundaPieza.setPosition(spriteFondoJuego.getX() + spriteFondoJuego.getWidth() + 20, spriteFondoJuego.getY() + spriteFondoJuego.getHeight() - spriteFondoSegundaPieza.getHeight() * 2);
 		spriteFondoTerceraPieza.setPosition(spriteFondoJuego.getX() + spriteFondoJuego.getWidth() + 20, spriteFondoJuego.getY() + spriteFondoJuego.getHeight() - spriteFondoTerceraPieza.getHeight() * 3);
 
+		piezaJugable				= new Pieza();
+		piezaGuardada				= null;
+		primeraPiezaSiguiente		= new Pieza();
+		segundaPiezaSiguiente		= new Pieza();
+		terceraPiezaSiguiente		= new Pieza();
+
 	}
 
 
 // METODOS
+	@Override
+	public void show() {
+
+	}
+
 	@Override
 	public void gestionarInput(float delta) {
 		// ToDo: comprobar pulsaciones de teclas
@@ -72,11 +90,6 @@ public class PantallaJuego extends Pantalla {
 		// ToDo: Dibujar la pieza que esta moviendo el jugador y las que estaban en el tablero
 
 		spriteBatch.end();
-	}
-
-	@Override
-	public void show() {
-
 	}
 
 	@Override
