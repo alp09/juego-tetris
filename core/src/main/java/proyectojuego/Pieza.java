@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.Array;
 
 public class Pieza {
 	//Piezas que componen el juego
-	public static enum tipoDePieza {T,O,I,L,Z,J,S};
+	public  enum tipoDePieza {T,O,I,L,Z,J,S};
 
 	private static Vector2[][] piezas = {
 
@@ -61,7 +61,7 @@ public class Pieza {
 
 	//Obtener pieza
 
-	public Array<Vector2> getPiezaElegida() {
-		return new Array<Vector2>(piezaElegida);
-	}
+//	public Array<Vector2> getPiezaElegida() {
+//		return new Array<Vector2>(piezaElegida);
+//	}
 }
