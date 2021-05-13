@@ -3,6 +3,7 @@ package proyectojuego.pantallas;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -14,9 +15,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 public class PantallaMenu extends Pantalla {
 
-    private final Texture fondoJuego;
-    private final Vector2 posicionZonaJuego;
-	private final Vector2 posicionBotonJugar;
+	private TextureAtlas	textureAtlas;
+	private final Sprite	spriteFondoJuego;
+	private final Vector2	posicionBotonJugar;
 
     private Skin skin;
     private TextButton boton;
@@ -27,17 +28,18 @@ public class PantallaMenu extends Pantalla {
     public PantallaMenu() {
         super();
 
-        fondoJuego = new Texture("ui\\fondoJuego.png");
-        posicionZonaJuego = new Vector2(Gdx.graphics.getWidth() / 2 - fondoJuego.getWidth() / 2, Gdx.graphics.getHeight() / 2 - fondoJuego.getHeight() / 2);
+        textureAtlas = assetManager.get("ui/texturas.atlas", TextureAtlas.class);
+        spriteFondoJuego = new Sprite(textureAtlas.findRegion("FondoJuego"));
+		spriteFondoJuego.setPosition(Gdx.graphics.getWidth() * .5f - spriteFondoJuego.getWidth() * .5f, Gdx.graphics.getHeight() * .5f - spriteFondoJuego.getHeight() * .5f);
 
 		stage = new Stage();
 		Gdx.input.setInputProcessor(stage);
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
 
 		boton = new TextButton("Jugar", skin, "default");
-		boton.setWidth(fondoJuego.getWidth() * .4f);
+		boton.setWidth(spriteFondoJuego.getWidth() * .4f);
 		boton.setHeight(50);
-		posicionBotonJugar = new Vector2(posicionZonaJuego.x + fondoJuego.getWidth() * .5f - boton.getWidth() * .5f, posicionZonaJuego.y + fondoJuego.getHeight() * .8f);
+		posicionBotonJugar = new Vector2(spriteFondoJuego.getX() + spriteFondoJuego.getWidth() * .5f - boton.getWidth() * .5f, spriteFondoJuego.getY() + spriteFondoJuego.getHeight() * .8f);
 		boton.setPosition(posicionBotonJugar.x, posicionBotonJugar.y);
 		boton.addListener(new ClickListener() {
 			@Override
@@ -66,7 +68,7 @@ public class PantallaMenu extends Pantalla {
     @Override
     public void dibujarPantalla(float delta) {
         spriteBatch.begin();
-        spriteBatch.draw(fondoJuego, posicionZonaJuego.x, posicionZonaJuego.y);
+        spriteFondoJuego.draw(spriteBatch);
         spriteBatch.end();
 		stage.draw();
     }

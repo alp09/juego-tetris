@@ -19,22 +19,24 @@ public class PantallaSplash extends Pantalla {
 	private float	progresoAnimacionFadeOut 	= 1;					// LA ANIMACION COMIENZA CON EL VALOR ALPHA A 1.
 	private float	tiempoEntreAnimaciones		= 0;					// DEFINE EL TIEMPO QUE HA TRANSCURRIDO DESDE QUE LA ANIMACION FADE IN TERMINÓ.
 
-	private final Texture	texturaPantallaSplash;
 	private final Sprite	spritePantallaSplash;
 
+
+// CONSTRUCTOR
 	public PantallaSplash() {
 
 		assetManager.load("ui/imagenIntro.png", Texture.class);
 		assetManager.finishLoading();
 
-		texturaPantallaSplash = assetManager.get("ui/imagenIntro.png", Texture.class);
-		spritePantallaSplash = new Sprite(texturaPantallaSplash);
+		spritePantallaSplash = new Sprite(assetManager.get("ui/imagenIntro.png", Texture.class));
 		spritePantallaSplash.setAlpha(0);
 
 		assetManager.load("ui/texturas.atlas", TextureAtlas.class);
 
 	}
 
+
+// METODOS
 	@Override
 	public void gestionarInput(float delta) {
 
