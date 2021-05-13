@@ -19,9 +19,9 @@ public abstract class Pantalla implements Screen {
 // CONSTRUCTOR
 	public Pantalla() {
 		this.juego 			= (Juego) Gdx.app.getApplicationListener();
-		this.fitViewport	= juego.getFitViewport();
-		this.assetManager	= juego.getAssetManager();
-		this.spriteBatch	= juego.getSpriteBatch();
+		this.fitViewport	= this.juego.getFitViewport();
+		this.assetManager	= this.juego.getAssetManager();
+		this.spriteBatch	= this.juego.getSpriteBatch();
 	}
 
 

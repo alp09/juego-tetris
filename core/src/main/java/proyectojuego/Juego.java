@@ -2,6 +2,7 @@ package proyectojuego;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import proyectojuego.pantallas.PantallaSplash;
@@ -13,6 +14,7 @@ public class Juego extends Game {
 	public static final int 	ALTO_JUEGO		= 900;
 	public static final String 	NOMBRE_JUEGO	= "Tetris";
 
+	private OrthographicCamera	orthographicCamera;
 	private FitViewport 		fitViewport;
 	private AssetManager		assetManager;
 	private SpriteBatch 		spriteBatch;
@@ -39,10 +41,10 @@ public class Juego extends Game {
 // METODOS
 	@Override
 	public void create() {
-		fitViewport 	= new FitViewport(ANCHO_JUEGO, ALTO_JUEGO);
-		fitViewport.apply(true);
-		assetManager	= new AssetManager();
-		spriteBatch 	= new SpriteBatch();
+		orthographicCamera	= new OrthographicCamera();
+		fitViewport		 	= new FitViewport(ANCHO_JUEGO, ALTO_JUEGO, orthographicCamera);
+		assetManager		= new AssetManager();
+		spriteBatch 		= new SpriteBatch();
 
 		setScreen(new PantallaSplash());
 	}

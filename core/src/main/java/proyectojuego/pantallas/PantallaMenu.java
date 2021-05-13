@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import proyectojuego.Juego;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -34,15 +35,21 @@ public class PantallaMenu extends Pantalla {
         // CARGA LAS TEXTURAS Y LAS POSICIONA
         textureAtlas = assetManager.get("ui/texturas.atlas", TextureAtlas.class);
         spriteFondoJuego = new Sprite(textureAtlas.findRegion("FondoJuego"));
-		spriteFondoJuego.setPosition(Gdx.graphics.getWidth() * .5f - spriteFondoJuego.getWidth() * .5f, Gdx.graphics.getHeight() * .5f - spriteFondoJuego.getHeight() * .5f);
+		System.out.println(Gdx.graphics.getWidth());
+		System.out.println(Gdx.graphics.getHeight());
+		System.out.println(spriteFondoJuego.getWidth());
+		System.out.println(spriteFondoJuego.getHeight());
 
+		spriteFondoJuego.setPosition(Juego.ANCHO_JUEGO * .5f - spriteFondoJuego.getWidth() * .5f, Juego.ALTO_JUEGO * .5f - spriteFondoJuego.getHeight() * .5f);
+		System.out.println(spriteFondoJuego.getX());
+		System.out.println(spriteFondoJuego.getY());
 
 		// CARGA LA SKIN, QUE CONTIENE LA FUENTE DE TEXTO Y BOTONES
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
 
 
 		// CREA EL STAGE, DONDE SE COLOCARÁ LA TABLA
-		stage = new Stage(fitViewport);
+		stage = new Stage(this.fitViewport);
 		Gdx.input.setInputProcessor(stage);
 
 
@@ -141,7 +148,7 @@ public class PantallaMenu extends Pantalla {
 
     @Override
     public void resize(int width, int height) {
-
+		stage.getViewport().update(width, height);
     }
 
     @Override

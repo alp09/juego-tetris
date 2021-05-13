@@ -12,9 +12,9 @@ public class PantallaSplash extends Pantalla {
 		AL USAR EL DELTA, LA ANIMACION DURA 1s PUESTO QUE VA SUMANDO ms A progresoAnimacion HASTA LLEGAR AL TOPE (1).
 		SE PODRIA MODIFICAR MULTIPLICANDO progresoAnimacion, POR EJEMPLO, AL MULTIPLICARLO POR .5, TARDARÍA 2s EN LLEGAR AL TOPE DE 1.
 	 */
-	public static final float TIEMPO_MINIMO_ENTRE_ANIMACIONES	= 0;	// TIEMPO EN SEGUNDOS MINIMO ENTRE LAS ANIMACIONES
-	public static final float MULTIPLICADOR_ANIMACION_FADE_IN	= 4;	// <1 --> ANIMACION MAS LENTA
-	public static final float MULTIPLICADOR_ANIMACION_FADE_OUT	= 4;	//	1 --> VELOCIDAD NORMAL
+	public static final float TIEMPO_MINIMO_ENTRE_ANIMACIONES	= 2;	// TIEMPO EN SEGUNDOS MINIMO ENTRE LAS ANIMACIONES
+	public static final float MULTIPLICADOR_ANIMACION_FADE_IN	= 1;	// <1 --> ANIMACION MAS LENTA
+	public static final float MULTIPLICADOR_ANIMACION_FADE_OUT	= 1;	//	1 --> VELOCIDAD NORMAL
 																		// >1 --> ANIMACION MAS RAPIDA
 
 	private float 	progresoAnimacionFadeIn 	= 0;					// LA ANIMACION FADE IN COMIENZA CON EL VALOR ALPHA A 0.
@@ -83,7 +83,7 @@ public class PantallaSplash extends Pantalla {
 
 	@Override
 	public void resize(int width, int height) {
-
+		fitViewport.update(width, height);
 	}
 
 	@Override

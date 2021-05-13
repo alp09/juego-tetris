@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
+import proyectojuego.Juego;
 import proyectojuego.Pieza;
 
 
@@ -39,7 +40,7 @@ public class PantallaJuego extends Pantalla {
 		spriteFondoSegundaPieza 	= new Sprite(textureAtlas.findRegion("FondoPieza"));
 		spriteFondoTerceraPieza		= new Sprite(textureAtlas.findRegion("FondoPieza"));
 
-		spriteFondoJuego.setPosition(Gdx.graphics.getWidth() * .5f - spriteFondoJuego.getWidth() * .5f, Gdx.graphics.getHeight() * .5f - spriteFondoJuego.getHeight() * .5f);
+		spriteFondoJuego.setPosition(Juego.ANCHO_JUEGO * .5f - spriteFondoJuego.getWidth() * .5f, Juego.ALTO_JUEGO * .5f - spriteFondoJuego.getHeight() * .5f);
 		spriteGridZonaJuego.setPosition(spriteFondoJuego.getX(), spriteFondoJuego.getY());
 		spriteFondoPiezaGuardada.setPosition(spriteFondoJuego.getX() - 20 - spriteFondoPiezaGuardada.getWidth(), spriteFondoJuego.getY() + spriteFondoJuego.getHeight() - spriteFondoPiezaGuardada.getHeight());
 		spriteFondoPrimeraPieza.setPosition(spriteFondoJuego.getX() + spriteFondoJuego.getWidth() + 20, spriteFondoJuego.getY() + spriteFondoJuego.getHeight() - spriteFondoPrimeraPieza.getHeight());
@@ -94,7 +95,7 @@ public class PantallaJuego extends Pantalla {
 
 	@Override
 	public void resize(int width, int height) {
-
+		fitViewport.update(width, height);
 	}
 
 	@Override
