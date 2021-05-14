@@ -1,7 +1,5 @@
 package proyectojuego.pantallas;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
@@ -10,6 +8,8 @@ import proyectojuego.Pieza;
 
 
 public class PantallaJuego extends Pantalla {
+
+	public static final int ESCALA_PIEZA_UI = 96;
 
 	private TextureAtlas	textureAtlas;
 
@@ -22,12 +22,21 @@ public class PantallaJuego extends Pantalla {
 
 	private Pieza			piezaJugable;
 	private Pieza			piezaGuardada;
-	private Pieza			primeraPiezaSiguiente;
-	private Pieza			segundaPiezaSiguiente;
-	private Pieza			terceraPiezaSiguiente;
+	private Pieza 			primeraPieza;
+	private Pieza 			segundaPieza;
+	private Pieza 			terceraPieza;
+
+	private Sprite			spritePiezaJugable;
+	private Sprite			spritePiezaGuardada;
+	private Sprite			spritePrimeraPieza;
+	private Sprite			spriteSegundaPieza;
+	private Sprite			spriteTerceraPieza;
+
+	private Vector2			posicionPiezaJugable;
+	private Vector2			posicionPiezaGuardada;
 
 
-// CONSTRUCTOR
+	// CONSTRUCTOR
 	public PantallaJuego() {
 		super();
 
@@ -49,9 +58,21 @@ public class PantallaJuego extends Pantalla {
 
 		piezaJugable				= new Pieza();
 		piezaGuardada				= null;
-		primeraPiezaSiguiente		= new Pieza();
-		segundaPiezaSiguiente		= new Pieza();
-		terceraPiezaSiguiente		= new Pieza();
+		primeraPieza 				= new Pieza();
+		segundaPieza 				= new Pieza();
+		terceraPieza 				= new Pieza();
+
+		spritePiezaJugable			= new Sprite(textureAtlas.findRegion(piezaJugable.getTipoPieza().texturaPieza));
+		spritePiezaGuardada			= null;
+		spritePrimeraPieza 			= new Sprite(textureAtlas.findRegion(primeraPieza.getTipoPieza().texturaPieza));
+		spriteSegundaPieza 			= new Sprite(textureAtlas.findRegion(segundaPieza.getTipoPieza().texturaPieza));
+		spriteTerceraPieza			= new Sprite(textureAtlas.findRegion(terceraPieza.getTipoPieza().texturaPieza));
+
+		// spritePiezaJugable.setPosition();	// Centro del tablero, arriba del tablero
+		posicionPiezaGuardada		= new Vector2(spriteFondoPiezaGuardada.getX() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPiezaGuardada.getY() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
+		spritePrimeraPieza.setPosition(spriteFondoPrimeraPieza.getX() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPrimeraPieza.getY() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
+		spriteSegundaPieza.setPosition(spriteFondoSegundaPieza.getX() + spriteFondoSegundaPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoSegundaPieza.getY() + spriteFondoSegundaPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
+		spriteTerceraPieza.setPosition(spriteFondoTerceraPieza.getX() + spriteFondoTerceraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoTerceraPieza.getY() + spriteFondoTerceraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
 
 	}
 
@@ -82,11 +103,15 @@ public class PantallaJuego extends Pantalla {
 
 		// DIBUJA EL FONDO DE LA PIEZA GUARDADA Y LA PIEZA EN SÍ CAMBIAR piezaPrueba POR LA PIZA QUE ESTE GUARDADA
 		spriteFondoPiezaGuardada.draw(spriteBatch);
+		if (piezaGuardada != null) spritePiezaGuardada.draw(spriteBatch);
 
 		// DIBUJA EL FONDO DE LAS PIEZAS SIGUIENTES Y LA PIEZA EN SÍ SUSTITUIR LAS PIEZAS POR PIEZAS GENERADAS ALEATORIAMENTE
 		spriteFondoPrimeraPieza.draw(spriteBatch);
 		spriteFondoSegundaPieza.draw(spriteBatch);
 		spriteFondoTerceraPieza.draw(spriteBatch);
+		spriteBatch.draw(spritePrimeraPieza, spritePrimeraPieza.getX(), spritePrimeraPieza.getY(), ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
+		spriteBatch.draw(spriteSegundaPieza, spriteSegundaPieza.getX(), spriteSegundaPieza.getY(), ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
+		spriteBatch.draw(spriteTerceraPieza, spriteTerceraPieza.getX(), spriteTerceraPieza.getY(), ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
 
 		// ToDo: Dibujar la pieza que esta moviendo el jugador y las que estaban en el tablero
 
