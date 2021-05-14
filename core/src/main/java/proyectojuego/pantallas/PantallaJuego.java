@@ -11,6 +11,8 @@ import proyectojuego.jugabilidad.Pieza;
 
 public class PantallaJuego extends Pantalla {
 
+	public static final int ANCHO_TABLERO	= 10;
+	public static final int ALTO_TABLERO	= 24;
 	public static final int ESCALA_PIEZA_UI = 96;
 
 	private TextureAtlas	textureAtlas;
@@ -29,11 +31,11 @@ public class PantallaJuego extends Pantalla {
 	private Pieza 			terceraPieza;
 
 	private Vector2			posicionPiezaJugable;			// Posicion actual de la pieza
-	private Vector2			posicionInicioPiezaJugable;		// Posicion desde donde la pieza jugable aparece al comienzo
-	private Vector2			posicionPiezaGuardada;			// Posicion en la UI de la pieza guardada
-	private Vector2			posicionPrimeraPieza;			// Posicion en la UI de la primera pieza de la lista
-	private Vector2			posicionSegundaPieza;			// Posicion en la UI de la segunda pieza de la lista
-	private Vector2			posicionTerceraPieza;			// Posicion en la UI de la tercera pieza de la lista
+	private final Vector2	posicionInicioPiezaJugable;		// Posicion desde donde la pieza jugable aparece al comienzo
+	private final Vector2	posicionPiezaGuardada;			// Posicion en la UI de la pieza guardada
+	private final Vector2	posicionPrimeraPieza;			// Posicion en la UI de la primera pieza de la lista
+	private final Vector2	posicionSegundaPieza;			// Posicion en la UI de la segunda pieza de la lista
+	private final Vector2	posicionTerceraPieza;			// Posicion en la UI de la tercera pieza de la lista
 
 
 // CONSTRUCTOR
@@ -62,7 +64,8 @@ public class PantallaJuego extends Pantalla {
 		segundaPieza 				= new Pieza();
 		terceraPieza 				= new Pieza();
 
-		posicionInicioPiezaJugable	= new Vector2(1,1); // Centro del tablero, arriba del tablero
+		posicionInicioPiezaJugable	= new Vector2(ANCHO_TABLERO * .5f,ALTO_TABLERO * .5f); // Centro del tablero, arriba del tablero
+		posicionPiezaJugable		= new Vector2(posicionInicioPiezaJugable.x, posicionInicioPiezaJugable.y); // Coloca la primera pieza en la posicion de inicio
 		posicionPiezaGuardada		= new Vector2(spriteFondoPiezaGuardada.getX() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPiezaGuardada.getY() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
 		posicionPrimeraPieza		= new Vector2(spriteFondoPrimeraPieza.getX() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPrimeraPieza.getY() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
 		posicionSegundaPieza		= new Vector2(spriteFondoSegundaPieza.getX() + spriteFondoSegundaPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoSegundaPieza.getY() + spriteFondoSegundaPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
@@ -96,15 +99,19 @@ public class PantallaJuego extends Pantalla {
 		}
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-			posicionInicioPiezaJugable.add(new Vector2(-1,0));
+			posicionPiezaJugable.add(new Vector2(-1,0));
 		}
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-			posicionInicioPiezaJugable.add(new Vector2(1,0));
+			posicionPiezaJugable.add(new Vector2(1,0));
 		}
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-			posicionInicioPiezaJugable.add(new Vector2(0,1));
+			posicionPiezaJugable.add(new Vector2(0,-1));
+		}
+
+		if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+			// ToDo: se coloca abajo del todo
 		}
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
@@ -113,6 +120,10 @@ public class PantallaJuego extends Pantalla {
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
 			piezaJugable.rotarContraReloj();
+		}
+
+		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+			jugarSiguientePieza();
 		}
 
 	}
@@ -143,7 +154,12 @@ public class PantallaJuego extends Pantalla {
 		spriteBatch.draw(terceraPieza.spritePieza, posicionTerceraPieza.x, posicionTerceraPieza.y, ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
 
 		// ToDo: Dibujar la pieza que esta moviendo el jugador y las que estaban en el tablero
-		for(Vector2 vectores:piezaJugable.tipoPieza.formaPieza){
+		for (Vector2 vector: piezaJugable.formaPieza) {
+			spriteBatch.draw(piezaJugable.spriteBloquePieza, spriteFondoJuego.getX() + (posicionPiezaJugable.x + vector.x) * 32, spriteFondoJuego.getY() + (posicionPiezaJugable.y + vector.y) * 32);
+		}
+
+
+		for(Vector2 vectores:piezaJugable.formaPieza){
 			System.out.println(vectores);
 		}
 
