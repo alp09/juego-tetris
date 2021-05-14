@@ -62,7 +62,7 @@ public class PantallaJuego extends Pantalla {
 		segundaPieza 				= new Pieza();
 		terceraPieza 				= new Pieza();
 
-		posicionInicioPiezaJugable	= new Vector2(); // Centro del tablero, arriba del tablero
+		posicionInicioPiezaJugable	= new Vector2(1,1); // Centro del tablero, arriba del tablero
 		posicionPiezaGuardada		= new Vector2(spriteFondoPiezaGuardada.getX() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPiezaGuardada.getY() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
 		posicionPrimeraPieza		= new Vector2(spriteFondoPrimeraPieza.getX() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPrimeraPieza.getY() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
 		posicionSegundaPieza		= new Vector2(spriteFondoSegundaPieza.getX() + spriteFondoSegundaPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoSegundaPieza.getY() + spriteFondoSegundaPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
@@ -95,6 +95,26 @@ public class PantallaJuego extends Pantalla {
 
 		}
 
+		if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+			posicionInicioPiezaJugable.add(new Vector2(-1,0));
+		}
+
+		if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+			posicionInicioPiezaJugable.add(new Vector2(1,0));
+		}
+
+		if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+			posicionInicioPiezaJugable.add(new Vector2(0,1));
+		}
+
+		if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+			piezaJugable.rotarReloj();
+		}
+
+		if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
+			piezaJugable.rotarContraReloj();
+		}
+
 	}
 
 	@Override
@@ -110,7 +130,7 @@ public class PantallaJuego extends Pantalla {
 		spriteFondoJuego.draw(spriteBatch);
 		spriteGridZonaJuego.draw(spriteBatch);
 
-		// DIBUJA EL FONDO DE LA PIEZA GUARDADA Y LA PIEZA EN SÍ CAMBIAR piezaPrueba POR LA PIZA QUE ESTE GUARDADA
+		// DIBUJA EL FONDO DE LA PIEZA GUARDADA Y LA PIEZA EN SÍ CAMBIAR piezaPrueba POR LA PIEZA QUE ESTE GUARDADA
 		spriteFondoPiezaGuardada.draw(spriteBatch);
 		if (piezaGuardada != null) spriteBatch.draw(piezaGuardada.spritePieza, posicionPiezaGuardada.x, posicionPiezaGuardada.y, ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
 
@@ -123,7 +143,9 @@ public class PantallaJuego extends Pantalla {
 		spriteBatch.draw(terceraPieza.spritePieza, posicionTerceraPieza.x, posicionTerceraPieza.y, ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
 
 		// ToDo: Dibujar la pieza que esta moviendo el jugador y las que estaban en el tablero
-		System.out.println(piezaJugable.tipoPieza);
+		for(Vector2 vectores:piezaJugable.tipoPieza.formaPieza){
+			System.out.println(vectores);
+		}
 
 		spriteBatch.end();
 	}
