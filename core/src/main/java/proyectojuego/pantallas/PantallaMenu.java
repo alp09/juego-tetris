@@ -90,13 +90,13 @@ public class PantallaMenu extends Pantalla {
 			for (int i = 0; i < PUNTUACIONES_MAXIMAS_MOSTRADAS; i++) listaMejoresPuntuaciones.add(lector.readInt());
 		} catch (EOFException e) {
 			System.out.println("No hay mas puntuaciones registradas.");
-			e.printStackTrace();
+//			e.printStackTrace();
 		} catch (FileNotFoundException e) {
 			System.out.println("No se encontro el archivo.");
-			e.printStackTrace();
+//			e.printStackTrace();
 		} catch (IOException e) {
 			System.out.println("Error en la lectura del archivo.");
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 
 

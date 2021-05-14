@@ -28,14 +28,12 @@ public class PantallaJuego extends Pantalla {
 	private Pieza 			segundaPieza;
 	private Pieza 			terceraPieza;
 
-	private Sprite			spritePiezaJugable;
-	private Sprite			spritePiezaGuardada;
-	private Sprite			spritePrimeraPieza;
-	private Sprite			spriteSegundaPieza;
-	private Sprite			spriteTerceraPieza;
-
-	private Vector2			posicionPiezaJugable;
-	private Vector2			posicionPiezaGuardada;
+	private Vector2			posicionPiezaJugable;			// Posicion actual de la pieza
+	private Vector2			posicionInicioPiezaJugable;		// Posicion desde donde la pieza jugable aparece al comienzo
+	private Vector2			posicionPiezaGuardada;			// Posicion en la UI de la pieza guardada
+	private Vector2			posicionPrimeraPieza;			// Posicion en la UI de la primera pieza de la lista
+	private Vector2			posicionSegundaPieza;			// Posicion en la UI de la segunda pieza de la lista
+	private Vector2			posicionTerceraPieza;			// Posicion en la UI de la tercera pieza de la lista
 
 
 // CONSTRUCTOR
@@ -64,15 +62,11 @@ public class PantallaJuego extends Pantalla {
 		segundaPieza 				= new Pieza();
 		terceraPieza 				= new Pieza();
 
-		spritePiezaJugable			= new Sprite(textureAtlas.findRegion(piezaJugable.tipoPieza.texturaPieza));
-		spritePrimeraPieza 			= new Sprite(textureAtlas.findRegion(primeraPieza.tipoPieza.texturaPieza));
-		spriteSegundaPieza 			= new Sprite(textureAtlas.findRegion(segundaPieza.tipoPieza.texturaPieza));
-		spriteTerceraPieza			= new Sprite(textureAtlas.findRegion(terceraPieza.tipoPieza.texturaPieza));
-
-		// spritePiezaJugable.setPosition();	// Centro del tablero, arriba del tablero
-		spritePrimeraPieza.setPosition(spriteFondoPrimeraPieza.getX() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPrimeraPieza.getY() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
-		spriteSegundaPieza.setPosition(spriteFondoSegundaPieza.getX() + spriteFondoSegundaPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoSegundaPieza.getY() + spriteFondoSegundaPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
-		spriteTerceraPieza.setPosition(spriteFondoTerceraPieza.getX() + spriteFondoTerceraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoTerceraPieza.getY() + spriteFondoTerceraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
+		posicionInicioPiezaJugable	= new Vector2(); // Centro del tablero, arriba del tablero
+		posicionPiezaGuardada		= new Vector2(spriteFondoPiezaGuardada.getX() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPiezaGuardada.getY() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
+		posicionPrimeraPieza		= new Vector2(spriteFondoPrimeraPieza.getX() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPrimeraPieza.getY() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
+		posicionSegundaPieza		= new Vector2(spriteFondoSegundaPieza.getX() + spriteFondoSegundaPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoSegundaPieza.getY() + spriteFondoSegundaPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
+		posicionTerceraPieza		= new Vector2(spriteFondoTerceraPieza.getX() + spriteFondoTerceraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoTerceraPieza.getY() + spriteFondoTerceraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
 
 	}
 
@@ -86,17 +80,17 @@ public class PantallaJuego extends Pantalla {
 	@Override
 	public void gestionarInput(float delta) {
 
-		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+		if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
 
-			Pieza	piezaAuxiliar;
+			Pieza piezaAuxiliar;
 
 			if (piezaGuardada == null) {
 				this.piezaGuardada	= this.piezaJugable;
-				this.jugarSiguientePieza();
+				jugarSiguientePieza();
 			} else {
-				piezaAuxiliar		= this.piezaJugable;
-				this.piezaJugable	= this.piezaGuardada;
-				this.piezaGuardada	= piezaAuxiliar;
+				piezaAuxiliar		= this.piezaGuardada;
+				this.piezaGuardada	= this.piezaJugable;
+				this.piezaJugable	= piezaAuxiliar;
 			}
 
 		}
@@ -118,18 +112,18 @@ public class PantallaJuego extends Pantalla {
 
 		// DIBUJA EL FONDO DE LA PIEZA GUARDADA Y LA PIEZA EN SÍ CAMBIAR piezaPrueba POR LA PIZA QUE ESTE GUARDADA
 		spriteFondoPiezaGuardada.draw(spriteBatch);
-		if (spritePiezaGuardada != null) spriteBatch.draw(spritePiezaGuardada, spritePiezaGuardada.getX(), spritePiezaGuardada.getY(), ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
+		if (piezaGuardada != null) spriteBatch.draw(piezaGuardada.spritePieza, posicionPiezaGuardada.x, posicionPiezaGuardada.y, ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
 
 		// DIBUJA EL FONDO DE LAS PIEZAS SIGUIENTES Y LA PIEZA EN SÍ SUSTITUIR LAS PIEZAS POR PIEZAS GENERADAS ALEATORIAMENTE
 		spriteFondoPrimeraPieza.draw(spriteBatch);
 		spriteFondoSegundaPieza.draw(spriteBatch);
 		spriteFondoTerceraPieza.draw(spriteBatch);
-		spriteBatch.draw(spritePrimeraPieza, spritePrimeraPieza.getX(), spritePrimeraPieza.getY(), ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
-		spriteBatch.draw(spriteSegundaPieza, spriteSegundaPieza.getX(), spriteSegundaPieza.getY(), ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
-		spriteBatch.draw(spriteTerceraPieza, spriteTerceraPieza.getX(), spriteTerceraPieza.getY(), ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
+		spriteBatch.draw(primeraPieza.spritePieza, posicionPrimeraPieza.x, posicionPrimeraPieza.y, ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
+		spriteBatch.draw(segundaPieza.spritePieza, posicionSegundaPieza.x, posicionSegundaPieza.y, ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
+		spriteBatch.draw(terceraPieza.spritePieza, posicionTerceraPieza.x, posicionTerceraPieza.y, ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
 
 		// ToDo: Dibujar la pieza que esta moviendo el jugador y las que estaban en el tablero
-
+		System.out.println(piezaJugable.tipoPieza);
 
 		spriteBatch.end();
 	}
@@ -161,7 +155,7 @@ public class PantallaJuego extends Pantalla {
 
 	private void jugarSiguientePieza() {
 		this.piezaJugable = this.primeraPieza;
-		this.piezaJugable = this.segundaPieza;
+		this.primeraPieza = this.segundaPieza;
 		this.segundaPieza = this.terceraPieza;
 		this.terceraPieza = new Pieza();
 	}
