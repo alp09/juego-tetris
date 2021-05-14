@@ -1,14 +1,24 @@
 package proyectojuego.jugabilidad;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import proyectojuego.Juego;
+
 public class Pieza {
 
-	public final ListaPiezas tipoPieza;
+	public static TextureAtlas	textureAtlas = ((Juego) Gdx.app.getApplicationListener()).getAssetManager().get("ui/texturas.atlas", TextureAtlas.class);
+
+	public final ListaPiezas	tipoPieza;
+	public final Sprite			spritePieza;
 
 
 	 //////////Constructores///////////
 	 public Pieza(ListaPiezas tipoPieza){
-		 this.tipoPieza = tipoPieza;
+		 this.tipoPieza		= tipoPieza;
+		 this.spritePieza	= new Sprite(textureAtlas.findRegion(tipoPieza.spritePieza));
 	 }
+
 	 public Pieza(){
 		this(ListaPiezas.values()[(int) (Math.random() * (ListaPiezas.values().length))]);
 	 }
