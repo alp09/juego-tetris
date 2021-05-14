@@ -35,14 +35,8 @@ public class PantallaMenu extends Pantalla {
         // CARGA LAS TEXTURAS Y LAS POSICIONA
         textureAtlas = assetManager.get("ui/texturas.atlas", TextureAtlas.class);
         spriteFondoJuego = new Sprite(textureAtlas.findRegion("FondoJuego"));
-		System.out.println(Gdx.graphics.getWidth());
-		System.out.println(Gdx.graphics.getHeight());
-		System.out.println(spriteFondoJuego.getWidth());
-		System.out.println(spriteFondoJuego.getHeight());
-
 		spriteFondoJuego.setPosition(Juego.ANCHO_JUEGO * .5f - spriteFondoJuego.getWidth() * .5f, Juego.ALTO_JUEGO * .5f - spriteFondoJuego.getHeight() * .5f);
-		System.out.println(spriteFondoJuego.getX());
-		System.out.println(spriteFondoJuego.getY());
+
 
 		// CARGA LA SKIN, QUE CONTIENE LA FUENTE DE TEXTO Y BOTONES
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
@@ -91,21 +85,24 @@ public class PantallaMenu extends Pantalla {
 		tablaMenu.add(botonOpciones).padTop(spriteFondoJuego.getHeight() * .05f);
 
 
-		// CARGA LAS PUNTUACIONES DEL ARCHIVO puntiaciones.bin
+		// CARGA LAS PUNTUACIONES DEL ARCHIVO puntuaciones.bin
 		try (DataInputStream lector = new DataInputStream(new FileInputStream("assets/files/puntuaciones.bin"))) {
 			for (int i = 0; i < PUNTUACIONES_MAXIMAS_MOSTRADAS; i++) listaMejoresPuntuaciones.add(lector.readInt());
 		} catch (EOFException e) {
-			System.out.println("No hay más puntuaciones registradas.");
+			System.out.println("No hay mas puntuaciones registradas.");
+			e.printStackTrace();
 		} catch (FileNotFoundException e) {
-			System.out.println("No se encontro el archivo");
+			System.out.println("No se encontro el archivo.");
+			e.printStackTrace();
 		} catch (IOException e) {
+			System.out.println("Error en la lectura del archivo.");
 			e.printStackTrace();
 		}
 
 
 		// MUESTRA LAS PUNTUACIONES
 		tablaMenu.row();
-		tablaMenu.add(new Label("Mejores Puntuaciones", skin)).padTop(Value.percentHeight(3)).getActor().setAlignment(Align.center);
+		tablaMenu.add(new Label("Mejores Puntuaciones", skin)).padTop(spriteFondoJuego.getHeight() * .1f).getActor().setAlignment(Align.center);
 
 		if (listaMejoresPuntuaciones.size() == 0) {
 			tablaMenu.row();
