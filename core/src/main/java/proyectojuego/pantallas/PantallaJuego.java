@@ -1,10 +1,12 @@
 package proyectojuego.pantallas;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import proyectojuego.Juego;
-import proyectojuego.Pieza;
+import proyectojuego.jugabilidad.Pieza;
 
 
 public class PantallaJuego extends Pantalla {
@@ -36,7 +38,7 @@ public class PantallaJuego extends Pantalla {
 	private Vector2			posicionPiezaGuardada;
 
 
-	// CONSTRUCTOR
+// CONSTRUCTOR
 	public PantallaJuego() {
 		super();
 
@@ -62,14 +64,12 @@ public class PantallaJuego extends Pantalla {
 		segundaPieza 				= new Pieza();
 		terceraPieza 				= new Pieza();
 
-		spritePiezaJugable			= new Sprite(textureAtlas.findRegion(piezaJugable.getTipoPieza().texturaPieza));
-		spritePiezaGuardada			= null;
-		spritePrimeraPieza 			= new Sprite(textureAtlas.findRegion(primeraPieza.getTipoPieza().texturaPieza));
-		spriteSegundaPieza 			= new Sprite(textureAtlas.findRegion(segundaPieza.getTipoPieza().texturaPieza));
-		spriteTerceraPieza			= new Sprite(textureAtlas.findRegion(terceraPieza.getTipoPieza().texturaPieza));
+		spritePiezaJugable			= new Sprite(textureAtlas.findRegion(piezaJugable.tipoPieza.texturaPieza));
+		spritePrimeraPieza 			= new Sprite(textureAtlas.findRegion(primeraPieza.tipoPieza.texturaPieza));
+		spriteSegundaPieza 			= new Sprite(textureAtlas.findRegion(segundaPieza.tipoPieza.texturaPieza));
+		spriteTerceraPieza			= new Sprite(textureAtlas.findRegion(terceraPieza.tipoPieza.texturaPieza));
 
 		// spritePiezaJugable.setPosition();	// Centro del tablero, arriba del tablero
-		posicionPiezaGuardada		= new Vector2(spriteFondoPiezaGuardada.getX() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPiezaGuardada.getY() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
 		spritePrimeraPieza.setPosition(spriteFondoPrimeraPieza.getX() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPrimeraPieza.getY() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
 		spriteSegundaPieza.setPosition(spriteFondoSegundaPieza.getX() + spriteFondoSegundaPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoSegundaPieza.getY() + spriteFondoSegundaPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
 		spriteTerceraPieza.setPosition(spriteFondoTerceraPieza.getX() + spriteFondoTerceraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoTerceraPieza.getY() + spriteFondoTerceraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
@@ -85,7 +85,22 @@ public class PantallaJuego extends Pantalla {
 
 	@Override
 	public void gestionarInput(float delta) {
-		// ToDo: comprobar pulsaciones de teclas
+
+		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+
+			Pieza	piezaAuxiliar;
+
+			if (piezaGuardada == null) {
+				this.piezaGuardada	= this.piezaJugable;
+				this.jugarSiguientePieza();
+			} else {
+				piezaAuxiliar		= this.piezaJugable;
+				this.piezaJugable	= this.piezaGuardada;
+				this.piezaGuardada	= piezaAuxiliar;
+			}
+
+		}
+
 	}
 
 	@Override
@@ -103,7 +118,7 @@ public class PantallaJuego extends Pantalla {
 
 		// DIBUJA EL FONDO DE LA PIEZA GUARDADA Y LA PIEZA EN SÍ CAMBIAR piezaPrueba POR LA PIZA QUE ESTE GUARDADA
 		spriteFondoPiezaGuardada.draw(spriteBatch);
-		if (piezaGuardada != null) spritePiezaGuardada.draw(spriteBatch);
+		if (spritePiezaGuardada != null) spriteBatch.draw(spritePiezaGuardada, spritePiezaGuardada.getX(), spritePiezaGuardada.getY(), ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
 
 		// DIBUJA EL FONDO DE LAS PIEZAS SIGUIENTES Y LA PIEZA EN SÍ SUSTITUIR LAS PIEZAS POR PIEZAS GENERADAS ALEATORIAMENTE
 		spriteFondoPrimeraPieza.draw(spriteBatch);
@@ -114,6 +129,7 @@ public class PantallaJuego extends Pantalla {
 		spriteBatch.draw(spriteTerceraPieza, spriteTerceraPieza.getX(), spriteTerceraPieza.getY(), ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
 
 		// ToDo: Dibujar la pieza que esta moviendo el jugador y las que estaban en el tablero
+
 
 		spriteBatch.end();
 	}
@@ -142,4 +158,12 @@ public class PantallaJuego extends Pantalla {
 	public void dispose() {
 
 	}
+
+	private void jugarSiguientePieza() {
+		this.piezaJugable = this.primeraPieza;
+		this.piezaJugable = this.segundaPieza;
+		this.segundaPieza = this.terceraPieza;
+		this.terceraPieza = new Pieza();
+	}
+
 }
