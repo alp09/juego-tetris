@@ -5,22 +5,34 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.TimeUtils;
 import proyectojuego.Juego;
 import proyectojuego.jugabilidad.Pieza;
+import proyectojuego.jugabilidad.Tablero;
 
 
 public class PantallaJuego extends Pantalla {
 
-	public static final int 	ANCHO_TABLERO	= 10;
-	public static final int 	ALTO_TABLERO	= 20;
+
+	/** Variables usadas en los controles del juego */
+	public static final float	DELAY_ENTRE_MOVIMIENTOS = .2f;					// El valor indicado aqui será el delay inicial
+	public static final float	MAXIMO_CASILLAS_POR_SEGUNDO = 1 / 20f;			// 1 / N; siendo N el numero de casillas que podrá moverse la pieza como máximo en un segundo
+
+	public int		direccionUltimoMovimientoHorizontal;							// Guarda cual fue el ultimo movimiento horizontal (Izquierda o derecha) para resetear el tiempoDesdeMovimientoHorizontal y asi aplicar el DELAY_ENTRE_MOVIMIENTOS
+	public float	tiempoDesdeMovimientoHorizontal	= 0;							// Guarda el tiempo una tecla de movimiento horizontal ha estado pulsada. Su valor inicial es 0 para aplicarle el delay inicial.
+	public float	tiempoDesdeMovimientoVertical	= DELAY_ENTRE_MOVIMIENTOS;		// Guarda el tiempo una tecla de movimiento vertical ha estado pulsada. Su valor incial es DELAY_ENTRE_MOVIMIENTOS para saltarse el delay inicial en los movimientos verticales
+
+
+	/** Variables usadas en las actualizaciones del juego */
+	public static final float	DELAY_MAXIMO_BAJADA = .2f;
+	public static final float	DELAY_ENTRE_BAJADA	= 1;
+
+	public static float			multiplicadorVelocidad	= 1;
+	public static float			tiempoDesdeUltimaBajada = 0;
+
+
+	/** Variables usadas en la UI del juego */
 	public static final int 	ESCALA_PIEZA_UI = 96;
-
-	public static final float	DELAY_ENTRE_MOVIMIENTOS = .2f;				// El valor indicado aqui será el delay inicial
-	public static final float	MAXIMO_CASILLAS_POR_SEGUNDO = 1 / 20f;		// 1 / N; siendo N el numero de casillas que podrá moverse la pieza como máximo en un segundo
-
-	public int					direccionUltimoMovimientoHorizontal;		// Guarda cual fue el ultimo movimiento horizontal (Izquierda o derecha) para resetear el tiempoDesdeMovimientoHorizontal y asi aplicar el DELAY_ENTRE_MOVIMIENTOS
-	public float				tiempoDesdeMovimientoHorizontal	= 0;
-	public float				tiempoDesdeMovimientoVertical	= DELAY_ENTRE_MOVIMIENTOS;	// elimina el delay inicial en los movimientos verticales
 
 	private TextureAtlas		textureAtlas;
 	private final Sprite		spriteFondoJuego;
@@ -70,7 +82,7 @@ public class PantallaJuego extends Pantalla {
 		segundaPieza 				= new Pieza();
 		terceraPieza 				= new Pieza();
 
-		posicionInicioPiezaJugable	= new Vector2(ANCHO_TABLERO * .5f,ALTO_TABLERO); // Centro del tablero, arriba del tablero
+		posicionInicioPiezaJugable	= new Vector2(Tablero.ANCHO_TABLERO * .5f, Tablero.ALTO_TABLERO); // Centro del tablero, arriba del tablero
 		posicionPiezaJugable		= new Vector2(posicionInicioPiezaJugable.x, posicionInicioPiezaJugable.y); // Coloca la primera pieza en la posicion de inicio
 		posicionPiezaGuardada		= new Vector2(spriteFondoPiezaGuardada.getX() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPiezaGuardada.getY() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
 		posicionPrimeraPieza		= new Vector2(spriteFondoPrimeraPieza.getX() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPrimeraPieza.getY() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
@@ -175,7 +187,12 @@ public class PantallaJuego extends Pantalla {
 	@Override
 	public void recalcularPantalla(float delta) {
 		// ToDo: calcular el movimento de las piezas, actualizar puntuación, etc
-
+		if (tiempoDesdeUltimaBajada > Math.max(DELAY_ENTRE_BAJADA * multiplicadorVelocidad, DELAY_MAXIMO_BAJADA)) {
+			posicionPiezaJugable.add(0, -1);
+			tiempoDesdeUltimaBajada = 0;
+		} else {
+			tiempoDesdeUltimaBajada += delta;
+		}
 
 	}
 

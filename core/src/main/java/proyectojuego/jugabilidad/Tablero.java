@@ -5,8 +5,8 @@ import com.badlogic.gdx.utils.Array;
 
 public class Tablero {
 
-	private final static int ALTO_TABLERO = 20;	//Ver dimensiones Screen
-	private final static int ANCHO_TABLERO = 10;
+	public final static int ALTO_TABLERO = 20;	//Ver dimensiones Screen
+	public final static int ANCHO_TABLERO = 10;
 
 	private Pieza 		piezaNueva;					//pieza
 	private Vector2 	posicionPiezaNuevaTablero;	//coordenadas pieza en tablero
