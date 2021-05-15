@@ -12,15 +12,17 @@ import proyectojuego.jugabilidad.Pieza;
 public class PantallaJuego extends Pantalla {
 
 	public static final int 	ANCHO_TABLERO	= 10;
-	public static final int 	ALTO_TABLERO	= 24;
-
-	public static final float	DELAY_PRIMERA_PULSACION		= .15f;
-	public static final float	MAXIMO_CASILLAS_POR_SEGUNDO = 1 / 20f;		// 1 - N; siendo N el numero de casillas que podrá moverse lka pieza como máximo en un segundo
-	public float				tiempoDesdePulsacion		= 0;
-
+	public static final int 	ALTO_TABLERO	= 20;
 	public static final int 	ESCALA_PIEZA_UI = 96;
-	private TextureAtlas		textureAtlas;
 
+	public static final float	DELAY_ENTRE_MOVIMIENTOS = .2f;				// El valor indicado aqui será el delay inicial
+	public static final float	MAXIMO_CASILLAS_POR_SEGUNDO = 1 / 20f;		// 1 / N; siendo N el numero de casillas que podrá moverse la pieza como máximo en un segundo
+
+	public int					direccionUltimoMovimientoHorizontal;		// Guarda cual fue el ultimo movimiento horizontal (Izquierda o derecha) para resetear el tiempoDesdeMovimientoHorizontal y asi aplicar el DELAY_ENTRE_MOVIMIENTOS
+	public float				tiempoDesdeMovimientoHorizontal	= 0;
+	public float				tiempoDesdeMovimientoVertical	= DELAY_ENTRE_MOVIMIENTOS;	// elimina el delay inicial en los movimientos verticales
+
+	private TextureAtlas		textureAtlas;
 	private final Sprite		spriteFondoJuego;
 	private final Sprite		spriteFondoPiezaGuardada;
 	private final Sprite		spriteFondoPrimeraPieza;
@@ -68,7 +70,7 @@ public class PantallaJuego extends Pantalla {
 		segundaPieza 				= new Pieza();
 		terceraPieza 				= new Pieza();
 
-		posicionInicioPiezaJugable	= new Vector2(ANCHO_TABLERO * .5f,ALTO_TABLERO * .5f); // Centro del tablero, arriba del tablero
+		posicionInicioPiezaJugable	= new Vector2(ANCHO_TABLERO * .5f,ALTO_TABLERO); // Centro del tablero, arriba del tablero
 		posicionPiezaJugable		= new Vector2(posicionInicioPiezaJugable.x, posicionInicioPiezaJugable.y); // Coloca la primera pieza en la posicion de inicio
 		posicionPiezaGuardada		= new Vector2(spriteFondoPiezaGuardada.getX() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPiezaGuardada.getY() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
 		posicionPrimeraPieza		= new Vector2(spriteFondoPrimeraPieza.getX() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPrimeraPieza.getY() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
@@ -87,8 +89,9 @@ public class PantallaJuego extends Pantalla {
 	@Override
 	public void gestionarInput(float delta) {
 
-		if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
-
+		// GUARDA LA PIEZA JUGABLE O LA CAMBIA POR LA PIEZA GUARDADA
+		if (Gdx.input.isKeyJustPressed(Input.Keys.W))
+		{
 			Pieza piezaAuxiliar;
 
 			if (piezaGuardada == null) {
@@ -99,46 +102,72 @@ public class PantallaJuego extends Pantalla {
 				this.piezaGuardada	= this.piezaJugable;
 				this.piezaJugable	= piezaAuxiliar;
 			}
-
 		}
 
-
-		if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-
-			// ToDo: resetear el tiempoDesdePulsacion cuando cambie de dirección y evitar que mantega el momentum
+		// MUEVE LA PIEZA A LA IZQUIERDA O DERECHA (MUTUAMENTE EXCLUSIVO)
+		if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.RIGHT))
+		{
 			int movimientoHorizontal = (Gdx.input.isKeyPressed(Input.Keys.LEFT))? -1: 1;
-
-			if (tiempoDesdePulsacion == 0) {
-				posicionPiezaJugable.add(movimientoHorizontal, 0);
-			} else if (tiempoDesdePulsacion > DELAY_PRIMERA_PULSACION) {
-				posicionPiezaJugable.add(movimientoHorizontal, 0);
-				tiempoDesdePulsacion -= MAXIMO_CASILLAS_POR_SEGUNDO;
+			if (direccionUltimoMovimientoHorizontal != movimientoHorizontal) {
+				direccionUltimoMovimientoHorizontal = movimientoHorizontal;
+				tiempoDesdeMovimientoHorizontal = 0;
 			}
-			tiempoDesdePulsacion += delta;
+
+			if (tiempoDesdeMovimientoHorizontal == 0) {
+				posicionPiezaJugable.add(movimientoHorizontal, 0);
+			} else if (tiempoDesdeMovimientoHorizontal >= DELAY_ENTRE_MOVIMIENTOS) {
+				posicionPiezaJugable.add(movimientoHorizontal, 0);
+				tiempoDesdeMovimientoHorizontal -= MAXIMO_CASILLAS_POR_SEGUNDO;
+			}
+			tiempoDesdeMovimientoHorizontal += delta;
 
 		} else {
-			tiempoDesdePulsacion = 0;
+			tiempoDesdeMovimientoHorizontal = 0;
 		}
 
 
-		if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-			posicionPiezaJugable.add(0, -1);
+		// MUEVE LA PIEZA HACIA ABAJO
+		if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
+		{
+
+			if (tiempoDesdeMovimientoVertical >= DELAY_ENTRE_MOVIMIENTOS) {
+				posicionPiezaJugable.add(0, -1);
+				tiempoDesdeMovimientoVertical -= MAXIMO_CASILLAS_POR_SEGUNDO;
+			}
+			tiempoDesdeMovimientoVertical += delta;
+
+		} else {
+			tiempoDesdeMovimientoVertical = DELAY_ENTRE_MOVIMIENTOS;
 		}
 
+
+		// ENCAJA LA PIEZA JUSTO DEBAJO INSTANTÁNEAMENTE
 		if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
 			// ToDo: se coloca abajo del todo
 		}
 
-		if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+
+		// ROTA LA PIEZA EN EL SENTIDO DE LAS AGUJAS DEL REJOJ
+		if (Gdx.input.isKeyJustPressed(Input.Keys.E))
+		{
 			piezaJugable.rotarReloj();
 		}
 
-		if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
+
+		// ROTA LA PIEZA EN EL SENTIDO OPUESTO A LAS AGUJAS DEL RELOJ
+		if (Gdx.input.isKeyJustPressed(Input.Keys.Q))
+		{
 			piezaJugable.rotarContraReloj();
 		}
 
+
+		// Para hacer test - quitar despues
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
 			jugarSiguientePieza();
+		}
+		if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+			posicionPiezaJugable.x = posicionInicioPiezaJugable.x;
+			posicionPiezaJugable.y = posicionInicioPiezaJugable.y;
 		}
 
 	}
@@ -146,6 +175,7 @@ public class PantallaJuego extends Pantalla {
 	@Override
 	public void recalcularPantalla(float delta) {
 		// ToDo: calcular el movimento de las piezas, actualizar puntuación, etc
+
 
 	}
 
@@ -173,11 +203,8 @@ public class PantallaJuego extends Pantalla {
 		for (Vector2 bloquePieza: piezaJugable.formaPieza) {
 			spriteBatch.draw(piezaJugable.spriteBloquePieza, spriteFondoJuego.getX() + (posicionPiezaJugable.x + bloquePieza.x) * 32, spriteFondoJuego.getY() + (posicionPiezaJugable.y + bloquePieza.y) * 32);
 		}
-//		for(Vector2 bloquePieza:piezaJugable.formaPieza){
-//			System.out.println("(" + (posicionPiezaJugable.x + bloquePieza.x) + "," + (posicionPiezaJugable.y + bloquePieza.y) + ")");
-//		}
 
-		// ToDo: Dibujar laS piezaS que estaban en el tablero
+		// ToDo: Dibujar laS piezas que estaban en el tablero
 
 
 
