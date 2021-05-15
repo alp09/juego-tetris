@@ -6,31 +6,50 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import proyectojuego.Juego;
 
+import java.sql.Array;
+import java.util.Arrays;
+
 public class Pieza {
 
-	public static TextureAtlas	textureAtlas = ((Juego) Gdx.app.getApplicationListener()).getAssetManager().get("ui/texturas.atlas", TextureAtlas.class);
+	private static TextureAtlas	textureAtlas = ((Juego) Gdx.app.getApplicationListener()).getAssetManager().get("ui/texturas.atlas", TextureAtlas.class);
 
-	public ListaPiezas		tipoPieza;
-	public Vector2[]		formaPieza;
+	private ListaPiezas		tipoPieza;
+	private Vector2[]		formaPieza;
 	public final Sprite		spritePieza;
 	public final Sprite		spriteBloquePieza;
 
 
 	 //////////Constructores///////////
-	 public Pieza(ListaPiezas tipoPieza){
-	 	this.tipoPieza			= tipoPieza;
-		 this.formaPieza		= tipoPieza.getFormaPieza();
-		 this.spritePieza		= new Sprite(textureAtlas.findRegion(tipoPieza.getSpritePieza()));
-		 this.spriteBloquePieza	= new Sprite(textureAtlas.findRegion(tipoPieza.getSpriteBloquePieza()));
-	 }
+	public Pieza(ListaPiezas tipoPieza, Vector2[] formaPieza) {
+		this.tipoPieza			= tipoPieza;
+		this.formaPieza			= formaPieza;
+		this.spritePieza		= new Sprite(textureAtlas.findRegion(tipoPieza.getSpritePieza()));
+		this.spriteBloquePieza	= new Sprite(textureAtlas.findRegion(tipoPieza.getSpriteBloquePieza()));
+	}
 
-	 public Pieza(){
+	public Pieza(ListaPiezas tipoPieza){
+		this(tipoPieza, tipoPieza.getFormaPieza());
+	}
+
+	public Pieza(){
 		this(ListaPiezas.values()[(int) (Math.random() * (ListaPiezas.values().length))]);
-	 }
+	}
 
+	 // GETTERS Y SETTERS
+	public ListaPiezas getTipoPieza() {
+		return tipoPieza;
+	}
+
+	public Vector2[] getFormaPieza() {
+		Vector2[] copiaFormaPieza = new Vector2[formaPieza.length];
+		for (int i = 0; i < formaPieza.length; i++) {
+			copiaFormaPieza[i] = formaPieza[i].cpy();
+		}
+		return copiaFormaPieza;
+	}
 
 	//Rotamos la pieza en el sentido de las agujas del reloj
-	 public void rotarReloj(){
+	 public void rotarSentidoReloj() {
 	 	if(tipoPieza != ListaPiezas.CUADRADO){
 			for (Vector2 vector2 : formaPieza) {
 				vector2.rotate90(-1);
@@ -39,16 +58,11 @@ public class Pieza {
 	 }
 
 	//Rotamos la pieza en sentido contrario a las agujas del reloj
-	public void rotarContraReloj(){
+	public void rotarSentidoContraReloj() {
 		if(tipoPieza != ListaPiezas.CUADRADO){
 			for (Vector2 vector2 : formaPieza) {
 				vector2.rotate90(1);
 			}
 		}
 	}
-
-	//Obtener pieza
-//	public Array<Vector2> getPiezaElegida() {
-//		return new Array<Vector2>(piezaElegida);
-//	}
 }

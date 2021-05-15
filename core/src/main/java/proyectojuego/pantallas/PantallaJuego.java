@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.TimeUtils;
 import proyectojuego.Juego;
 import proyectojuego.jugabilidad.Pieza;
 import proyectojuego.jugabilidad.Tablero;
@@ -18,6 +17,7 @@ public class PantallaJuego extends Pantalla {
 	public static final float	DELAY_ENTRE_MOVIMIENTOS = .2f;					// El valor indicado aqui será el delay inicial
 	public static final float	MAXIMO_CASILLAS_POR_SEGUNDO = 1 / 20f;			// 1 / N; siendo N el numero de casillas que podrá moverse la pieza como máximo en un segundo
 
+	public Tablero	tableroJuego;
 	public int		direccionUltimoMovimientoHorizontal;							// Guarda cual fue el ultimo movimiento horizontal (Izquierda o derecha) para resetear el tiempoDesdeMovimientoHorizontal y asi aplicar el DELAY_ENTRE_MOVIMIENTOS
 	public float	tiempoDesdeMovimientoHorizontal	= 0;							// Guarda el tiempo una tecla de movimiento horizontal ha estado pulsada. Su valor inicial es 0 para aplicarle el delay inicial.
 	public float	tiempoDesdeMovimientoVertical	= DELAY_ENTRE_MOVIMIENTOS;		// Guarda el tiempo una tecla de movimiento vertical ha estado pulsada. Su valor incial es DELAY_ENTRE_MOVIMIENTOS para saltarse el delay inicial en los movimientos verticales
@@ -60,6 +60,7 @@ public class PantallaJuego extends Pantalla {
 	public PantallaJuego() {
 		super();
 
+		tableroJuego = new Tablero();
 		textureAtlas = assetManager.get("ui/texturas.atlas");
 
 		spriteFondoJuego 			= new Sprite(textureAtlas.findRegion("FondoJuego"));
@@ -119,27 +120,38 @@ public class PantallaJuego extends Pantalla {
 		// MUEVE LA PIEZA A LA IZQUIERDA O DERECHA (MUTUAMENTE EXCLUSIVO)
 		if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.RIGHT))
 		{
-			int movimientoHorizontal = (Gdx.input.isKeyPressed(Input.Keys.LEFT))? -1: 1;
-			if (direccionUltimoMovimientoHorizontal != movimientoHorizontal) {
-				direccionUltimoMovimientoHorizontal = movimientoHorizontal;
-				tiempoDesdeMovimientoHorizontal = 0;
+			int movimientoHorizontal		= 0;
+			boolean puedeMoverseHorizontal	= false;
+
+			if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+				movimientoHorizontal	= -1;
+				puedeMoverseHorizontal	= tableroJuego.puedeMoverIzquierda(posicionPiezaJugable, piezaJugable);
+			} else {
+				movimientoHorizontal	= 1;
+				puedeMoverseHorizontal	= tableroJuego.puedeMoverDerecha(posicionPiezaJugable, piezaJugable);
 			}
 
-			if (tiempoDesdeMovimientoHorizontal == 0) {
-				posicionPiezaJugable.add(movimientoHorizontal, 0);
-			} else if (tiempoDesdeMovimientoHorizontal >= DELAY_ENTRE_MOVIMIENTOS) {
-				posicionPiezaJugable.add(movimientoHorizontal, 0);
-				tiempoDesdeMovimientoHorizontal -= MAXIMO_CASILLAS_POR_SEGUNDO;
+			if (puedeMoverseHorizontal) {
+				if (direccionUltimoMovimientoHorizontal != movimientoHorizontal) {
+					direccionUltimoMovimientoHorizontal = movimientoHorizontal;
+					tiempoDesdeMovimientoHorizontal = 0;
+				}
+
+				if (tiempoDesdeMovimientoHorizontal == 0) {
+					posicionPiezaJugable.add(movimientoHorizontal, 0);
+				} else if (tiempoDesdeMovimientoHorizontal >= DELAY_ENTRE_MOVIMIENTOS) {
+					posicionPiezaJugable.add(movimientoHorizontal, 0);
+					tiempoDesdeMovimientoHorizontal -= MAXIMO_CASILLAS_POR_SEGUNDO;
+				}
+				tiempoDesdeMovimientoHorizontal += delta;
 			}
-			tiempoDesdeMovimientoHorizontal += delta;
 
 		} else {
 			tiempoDesdeMovimientoHorizontal = 0;
 		}
 
-
 		// MUEVE LA PIEZA HACIA ABAJO
-		if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
+		if (Gdx.input.isKeyPressed(Input.Keys.DOWN) && tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable))
 		{
 
 			if (tiempoDesdeMovimientoVertical >= DELAY_ENTRE_MOVIMIENTOS) {
@@ -152,26 +164,22 @@ public class PantallaJuego extends Pantalla {
 			tiempoDesdeMovimientoVertical = DELAY_ENTRE_MOVIMIENTOS;
 		}
 
-
 		// ENCAJA LA PIEZA JUSTO DEBAJO INSTANTÁNEAMENTE
 		if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
 			// ToDo: se coloca abajo del todo
 		}
 
-
 		// ROTA LA PIEZA EN EL SENTIDO DE LAS AGUJAS DEL REJOJ
-		if (Gdx.input.isKeyJustPressed(Input.Keys.E))
+		if (Gdx.input.isKeyJustPressed(Input.Keys.E) && tableroJuego.puedeRotarSentidoReloj(posicionPiezaJugable, piezaJugable))
 		{
-			piezaJugable.rotarReloj();
+			piezaJugable.rotarSentidoReloj();
 		}
-
 
 		// ROTA LA PIEZA EN EL SENTIDO OPUESTO A LAS AGUJAS DEL RELOJ
-		if (Gdx.input.isKeyJustPressed(Input.Keys.Q))
+		if (Gdx.input.isKeyJustPressed(Input.Keys.Q) && tableroJuego.puedeRotarSentidoContrarioReloj(posicionPiezaJugable, piezaJugable))
 		{
-			piezaJugable.rotarContraReloj();
+			piezaJugable.rotarSentidoContraReloj();
 		}
-
 
 		// Para hacer test - quitar despues
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
@@ -187,12 +195,12 @@ public class PantallaJuego extends Pantalla {
 	@Override
 	public void recalcularPantalla(float delta) {
 		// ToDo: calcular el movimento de las piezas, actualizar puntuación, etc
-		if (tiempoDesdeUltimaBajada > Math.max(DELAY_ENTRE_BAJADA * multiplicadorVelocidad, DELAY_MAXIMO_BAJADA)) {
-			posicionPiezaJugable.add(0, -1);
-			tiempoDesdeUltimaBajada = 0;
-		} else {
-			tiempoDesdeUltimaBajada += delta;
-		}
+//		if (tiempoDesdeUltimaBajada > Math.max(DELAY_ENTRE_BAJADA * multiplicadorVelocidad, DELAY_MAXIMO_BAJADA)) {
+//			posicionPiezaJugable.add(0, -1);
+//			tiempoDesdeUltimaBajada = 0;
+//		} else {
+//			tiempoDesdeUltimaBajada += delta;
+//		}
 
 	}
 
@@ -217,7 +225,7 @@ public class PantallaJuego extends Pantalla {
 		spriteBatch.draw(terceraPieza.spritePieza, posicionTerceraPieza.x, posicionTerceraPieza.y, ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
 
 		// DIBUJA LA PIEZA JUGABLE
-		for (Vector2 bloquePieza: piezaJugable.formaPieza) {
+		for (Vector2 bloquePieza: piezaJugable.getFormaPieza()) {
 			spriteBatch.draw(piezaJugable.spriteBloquePieza, spriteFondoJuego.getX() + (posicionPiezaJugable.x + bloquePieza.x) * 32, spriteFondoJuego.getY() + (posicionPiezaJugable.y + bloquePieza.y) * 32);
 		}
 
