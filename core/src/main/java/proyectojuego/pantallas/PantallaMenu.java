@@ -37,20 +37,16 @@ public class PantallaMenu extends Pantalla {
         spriteFondoJuego = new Sprite(textureAtlas.findRegion("FondoJuego"));
 		spriteFondoJuego.setPosition(Juego.ANCHO_JUEGO * .5f - spriteFondoJuego.getWidth() * .5f, Juego.ALTO_JUEGO * .5f - spriteFondoJuego.getHeight() * .5f);
 
-
 		// CARGA LA SKIN, QUE CONTIENE LA FUENTE DE TEXTO Y BOTONES
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
-
 
 		// CREA EL STAGE, DONDE SE COLOCARÁ LA TABLA
 		stage = new Stage(this.fitViewport);
 		Gdx.input.setInputProcessor(stage);
 
-
 		// CREA LA TABLA DONDE SE COLOCARÁN LOS BOTONES Y LA AÑADE AL STAGE
 		tablaMenu = new Table();
 		stage.addActor(tablaMenu);
-
 
 		// CREA Y DEFINE LOS BOTONES
 		botonJugar = new TextButton("Jugar", skin, "default");
@@ -72,7 +68,6 @@ public class PantallaMenu extends Pantalla {
 			}
 		});
 
-
 		// ESTABLECE LOS LIMITES DE LA TABLA, COLOCA SUS ELEMENTOS ALINEADOS ARRIBA Y ESTABLECE EL TAMAÑO POR DEFECTO DE LAS CELDAS
 		tablaMenu.center().top();
 		tablaMenu.setBounds(spriteFondoJuego.getX(), spriteFondoJuego.getY(), spriteFondoJuego.getWidth(), spriteFondoJuego.getHeight());
@@ -83,7 +78,6 @@ public class PantallaMenu extends Pantalla {
 		tablaMenu.add(botonJugar).padTop(spriteFondoJuego.getHeight() * .1f);
 		tablaMenu.row();
 		tablaMenu.add(botonOpciones).padTop(spriteFondoJuego.getHeight() * .05f);
-
 
 		// CARGA LAS PUNTUACIONES DEL ARCHIVO puntuaciones.bin
 		try (DataInputStream lector = new DataInputStream(new FileInputStream("assets/files/puntuaciones.bin"))) {
@@ -99,7 +93,6 @@ public class PantallaMenu extends Pantalla {
 //			e.printStackTrace();
 		}
 
-
 		// MUESTRA LAS PUNTUACIONES
 		tablaMenu.row();
 		tablaMenu.add(new Label("Mejores Puntuaciones", skin)).padTop(spriteFondoJuego.getHeight() * .1f).getActor().setAlignment(Align.center);
@@ -114,8 +107,6 @@ public class PantallaMenu extends Pantalla {
 			}
 		}
 
-		tablaMenu.setDebug(false);
-//		tablaMenu.setDebug(true);
     }
 
 

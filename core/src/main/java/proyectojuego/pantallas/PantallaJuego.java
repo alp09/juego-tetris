@@ -11,31 +11,35 @@ import proyectojuego.jugabilidad.Pieza;
 
 public class PantallaJuego extends Pantalla {
 
-	public static final int ANCHO_TABLERO	= 10;
-	public static final int ALTO_TABLERO	= 24;
-	public static final int ESCALA_PIEZA_UI = 96;
+	public static final int 	ANCHO_TABLERO	= 10;
+	public static final int 	ALTO_TABLERO	= 24;
 
-	private TextureAtlas	textureAtlas;
+	public static final float	DELAY_PRIMERA_PULSACION		= .15f;
+	public static final float	MAXIMO_CASILLAS_POR_SEGUNDO = 1 / 20f;		// 1 - N; siendo N el numero de casillas que podrá moverse lka pieza como máximo en un segundo
+	public float				tiempoDesdePulsacion		= 0;
 
-	private final Sprite	spriteFondoJuego;
-	private final Sprite	spriteFondoPiezaGuardada;
-	private final Sprite	spriteFondoPrimeraPieza;
-	private final Sprite	spriteFondoSegundaPieza;
-	private final Sprite	spriteFondoTerceraPieza;
-	private final Sprite	spriteGridZonaJuego;
+	public static final int 	ESCALA_PIEZA_UI = 96;
+	private TextureAtlas		textureAtlas;
 
-	private Pieza			piezaJugable;
-	private Pieza			piezaGuardada;
-	private Pieza 			primeraPieza;
-	private Pieza 			segundaPieza;
-	private Pieza 			terceraPieza;
+	private final Sprite		spriteFondoJuego;
+	private final Sprite		spriteFondoPiezaGuardada;
+	private final Sprite		spriteFondoPrimeraPieza;
+	private final Sprite		spriteFondoSegundaPieza;
+	private final Sprite		spriteFondoTerceraPieza;
+	private final Sprite		spriteGridZonaJuego;
 
-	private Vector2			posicionPiezaJugable;			// Posicion actual de la pieza
-	private final Vector2	posicionInicioPiezaJugable;		// Posicion desde donde la pieza jugable aparece al comienzo
-	private final Vector2	posicionPiezaGuardada;			// Posicion en la UI de la pieza guardada
-	private final Vector2	posicionPrimeraPieza;			// Posicion en la UI de la primera pieza de la lista
-	private final Vector2	posicionSegundaPieza;			// Posicion en la UI de la segunda pieza de la lista
-	private final Vector2	posicionTerceraPieza;			// Posicion en la UI de la tercera pieza de la lista
+	private Pieza				piezaJugable;
+	private Pieza				piezaGuardada;
+	private Pieza 				primeraPieza;
+	private Pieza 				segundaPieza;
+	private Pieza 				terceraPieza;
+
+	private Vector2				posicionPiezaJugable;			// Posicion actual de la pieza
+	private final Vector2		posicionInicioPiezaJugable;		// Posicion desde donde la pieza jugable aparece al comienzo
+	private final Vector2		posicionPiezaGuardada;			// Posicion en la UI de la pieza guardada
+	private final Vector2		posicionPrimeraPieza;			// Posicion en la UI de la primera pieza de la lista
+	private final Vector2		posicionSegundaPieza;			// Posicion en la UI de la segunda pieza de la lista
+	private final Vector2		posicionTerceraPieza;			// Posicion en la UI de la tercera pieza de la lista
 
 
 // CONSTRUCTOR
@@ -98,16 +102,27 @@ public class PantallaJuego extends Pantalla {
 
 		}
 
-		if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-			posicionPiezaJugable.add(new Vector2(-1,0));
+
+		if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+
+			// ToDo: resetear el tiempoDesdePulsacion cuando cambie de dirección y evitar que mantega el momentum
+			int movimientoHorizontal = (Gdx.input.isKeyPressed(Input.Keys.LEFT))? -1: 1;
+
+			if (tiempoDesdePulsacion == 0) {
+				posicionPiezaJugable.add(movimientoHorizontal, 0);
+			} else if (tiempoDesdePulsacion > DELAY_PRIMERA_PULSACION) {
+				posicionPiezaJugable.add(movimientoHorizontal, 0);
+				tiempoDesdePulsacion -= MAXIMO_CASILLAS_POR_SEGUNDO;
+			}
+			tiempoDesdePulsacion += delta;
+
+		} else {
+			tiempoDesdePulsacion = 0;
 		}
 
-		if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-			posicionPiezaJugable.add(new Vector2(1,0));
-		}
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-			posicionPiezaJugable.add(new Vector2(0,-1));
+			posicionPiezaJugable.add(0, -1);
 		}
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
@@ -131,6 +146,7 @@ public class PantallaJuego extends Pantalla {
 	@Override
 	public void recalcularPantalla(float delta) {
 		// ToDo: calcular el movimento de las piezas, actualizar puntuación, etc
+
 	}
 
 	@Override
@@ -153,15 +169,17 @@ public class PantallaJuego extends Pantalla {
 		spriteBatch.draw(segundaPieza.spritePieza, posicionSegundaPieza.x, posicionSegundaPieza.y, ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
 		spriteBatch.draw(terceraPieza.spritePieza, posicionTerceraPieza.x, posicionTerceraPieza.y, ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
 
-		// ToDo: Dibujar la pieza que esta moviendo el jugador y las que estaban en el tablero
-		for (Vector2 vector: piezaJugable.formaPieza) {
-			spriteBatch.draw(piezaJugable.spriteBloquePieza, spriteFondoJuego.getX() + (posicionPiezaJugable.x + vector.x) * 32, spriteFondoJuego.getY() + (posicionPiezaJugable.y + vector.y) * 32);
+		// DIBUJA LA PIEZA JUGABLE
+		for (Vector2 bloquePieza: piezaJugable.formaPieza) {
+			spriteBatch.draw(piezaJugable.spriteBloquePieza, spriteFondoJuego.getX() + (posicionPiezaJugable.x + bloquePieza.x) * 32, spriteFondoJuego.getY() + (posicionPiezaJugable.y + bloquePieza.y) * 32);
 		}
+//		for(Vector2 bloquePieza:piezaJugable.formaPieza){
+//			System.out.println("(" + (posicionPiezaJugable.x + bloquePieza.x) + "," + (posicionPiezaJugable.y + bloquePieza.y) + ")");
+//		}
+
+		// ToDo: Dibujar laS piezaS que estaban en el tablero
 
 
-		for(Vector2 vectores:piezaJugable.formaPieza){
-			System.out.println(vectores);
-		}
 
 		spriteBatch.end();
 	}

@@ -33,7 +33,7 @@ public class Pieza {
 	 public void rotarReloj(){
 	 	if(tipoPieza != ListaPiezas.CUADRADO){
 			for (Vector2 vector2 : formaPieza) {
-				vector2.rotateDeg(-90);
+				vector2.rotate90(-1);
 			}
 		}
 	 }
@@ -42,7 +42,7 @@ public class Pieza {
 	public void rotarContraReloj(){
 		if(tipoPieza != ListaPiezas.CUADRADO){
 			for (Vector2 vector2 : formaPieza) {
-				vector2.rotateDeg(90);
+				vector2.rotate90(1);
 			}
 		}
 	}
