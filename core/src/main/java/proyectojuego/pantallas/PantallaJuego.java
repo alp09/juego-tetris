@@ -24,7 +24,7 @@ public class PantallaJuego extends Pantalla {
 
 
 	/** Variables usadas en las actualizaciones del juego */
-	public static final float	DELAY_MAXIMO_BAJADA = .2f;
+	public static final float	DELAY_MAXIMO_BAJADA = .02f;
 	public static final float	DELAY_ENTRE_BAJADA	= 1;
 
 	public static float			multiplicadorVelocidad	= 1;
@@ -32,9 +32,10 @@ public class PantallaJuego extends Pantalla {
 
 
 	/** Variables usadas en la UI del juego */
-	public static final int 	ESCALA_PIEZA_UI = 96;
+	public static final int 	ALTURA_COMIENZO_PIEZA	= 20;
+	public static final int 	ESCALA_PIEZA_UI			= 96;
 
-	private TextureAtlas		textureAtlas;
+	public TextureAtlas			textureAtlas;
 	private final Sprite		spriteFondoJuego;
 	private final Sprite		spriteFondoPiezaGuardada;
 	private final Sprite		spriteFondoPrimeraPieza;
@@ -60,7 +61,7 @@ public class PantallaJuego extends Pantalla {
 	public PantallaJuego() {
 		super();
 
-		tableroJuego = new Tablero();
+		tableroJuego = Tablero.getInstance();
 		textureAtlas = assetManager.get("ui/texturas.atlas");
 
 		spriteFondoJuego 			= new Sprite(textureAtlas.findRegion("FondoJuego"));
@@ -83,8 +84,8 @@ public class PantallaJuego extends Pantalla {
 		segundaPieza 				= new Pieza();
 		terceraPieza 				= new Pieza();
 
-		posicionInicioPiezaJugable	= new Vector2(Tablero.ANCHO_TABLERO * .5f, Tablero.ALTO_TABLERO); // Centro del tablero, arriba del tablero
-		posicionPiezaJugable		= new Vector2(posicionInicioPiezaJugable.x, posicionInicioPiezaJugable.y); // Coloca la primera pieza en la posicion de inicio
+		posicionInicioPiezaJugable	= new Vector2(Tablero.ANCHO_TABLERO * .5f, ALTURA_COMIENZO_PIEZA);
+		posicionPiezaJugable		= new Vector2(posicionInicioPiezaJugable.x, posicionInicioPiezaJugable.y);
 		posicionPiezaGuardada		= new Vector2(spriteFondoPiezaGuardada.getX() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPiezaGuardada.getY() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
 		posicionPrimeraPieza		= new Vector2(spriteFondoPrimeraPieza.getX() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPrimeraPieza.getY() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
 		posicionSegundaPieza		= new Vector2(spriteFondoSegundaPieza.getX() + spriteFondoSegundaPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoSegundaPieza.getY() + spriteFondoSegundaPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
@@ -165,7 +166,8 @@ public class PantallaJuego extends Pantalla {
 		}
 
 		// ENCAJA LA PIEZA JUSTO DEBAJO INSTANTÁNEAMENTE
-		if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+		if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE))
+		{
 			// ToDo: se coloca abajo del todo
 		}
 
@@ -195,12 +197,18 @@ public class PantallaJuego extends Pantalla {
 	@Override
 	public void recalcularPantalla(float delta) {
 		// ToDo: calcular el movimento de las piezas, actualizar puntuación, etc
-//		if (tiempoDesdeUltimaBajada > Math.max(DELAY_ENTRE_BAJADA * multiplicadorVelocidad, DELAY_MAXIMO_BAJADA)) {
-//			posicionPiezaJugable.add(0, -1);
-//			tiempoDesdeUltimaBajada = 0;
-//		} else {
-//			tiempoDesdeUltimaBajada += delta;
-//		}
+		if (tiempoDesdeUltimaBajada > Math.max(DELAY_ENTRE_BAJADA * multiplicadorVelocidad, DELAY_MAXIMO_BAJADA)) {
+
+			if (tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable)) {
+				posicionPiezaJugable.add(0, -1);
+				tiempoDesdeUltimaBajada = 0;
+			} else {
+				// ToDo: la pieza se quede se bloquee y se juegue la siguiente tras un tiempo
+			}
+
+		} else {
+			tiempoDesdeUltimaBajada += delta;
+		}
 
 	}
 
@@ -224,14 +232,13 @@ public class PantallaJuego extends Pantalla {
 		spriteBatch.draw(segundaPieza.spritePieza, posicionSegundaPieza.x, posicionSegundaPieza.y, ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
 		spriteBatch.draw(terceraPieza.spritePieza, posicionTerceraPieza.x, posicionTerceraPieza.y, ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
 
+		// DIBUJA EL TABLERO
+		tableroJuego.dibujarContenidoTablero(spriteBatch, new Vector2(spriteFondoJuego.getX(), spriteFondoJuego.getY()));
+
 		// DIBUJA LA PIEZA JUGABLE
 		for (Vector2 bloquePieza: piezaJugable.getFormaPieza()) {
 			spriteBatch.draw(piezaJugable.spriteBloquePieza, spriteFondoJuego.getX() + (posicionPiezaJugable.x + bloquePieza.x) * 32, spriteFondoJuego.getY() + (posicionPiezaJugable.y + bloquePieza.y) * 32);
 		}
-
-		// ToDo: Dibujar laS piezas que estaban en el tablero
-
-
 
 		spriteBatch.end();
 	}

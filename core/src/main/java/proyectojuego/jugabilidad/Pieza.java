@@ -6,9 +6,6 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import proyectojuego.Juego;
 
-import java.sql.Array;
-import java.util.Arrays;
-
 public class Pieza {
 
 	private static TextureAtlas	textureAtlas = ((Juego) Gdx.app.getApplicationListener()).getAssetManager().get("ui/texturas.atlas", TextureAtlas.class);
@@ -19,7 +16,7 @@ public class Pieza {
 	public final Sprite		spriteBloquePieza;
 
 
-	 //////////Constructores///////////
+	 // Constructores
 	public Pieza(ListaPiezas tipoPieza, Vector2[] formaPieza) {
 		this.tipoPieza			= tipoPieza;
 		this.formaPieza			= formaPieza;
@@ -27,19 +24,19 @@ public class Pieza {
 		this.spriteBloquePieza	= new Sprite(textureAtlas.findRegion(tipoPieza.getSpriteBloquePieza()));
 	}
 
-	public Pieza(ListaPiezas tipoPieza){
+	public Pieza(ListaPiezas tipoPieza) {
 		this(tipoPieza, tipoPieza.getFormaPieza());
 	}
 
-	public Pieza(){
+	public Pieza() {
 		this(ListaPiezas.values()[(int) (Math.random() * (ListaPiezas.values().length))]);
 	}
 
-	 // GETTERS Y SETTERS
+
+	 // GETTERS
 	public ListaPiezas getTipoPieza() {
 		return tipoPieza;
 	}
-
 	public Vector2[] getFormaPieza() {
 		Vector2[] copiaFormaPieza = new Vector2[formaPieza.length];
 		for (int i = 0; i < formaPieza.length; i++) {
@@ -47,6 +44,7 @@ public class Pieza {
 		}
 		return copiaFormaPieza;
 	}
+
 
 	//Rotamos la pieza en el sentido de las agujas del reloj
 	 public void rotarSentidoReloj() {
@@ -56,6 +54,7 @@ public class Pieza {
 			}
 		}
 	 }
+
 
 	//Rotamos la pieza en sentido contrario a las agujas del reloj
 	public void rotarSentidoContraReloj() {
