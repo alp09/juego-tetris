@@ -14,26 +14,28 @@ public class PantallaJuego extends Pantalla {
 
 
 	/** Variables usadas en los controles del juego */
-	public static final float	DELAY_ENTRE_MOVIMIENTOS = .2f;					// El valor indicado aqui será el delay inicial
-	public static final float	MAXIMO_CASILLAS_POR_SEGUNDO = 1 / 20f;			// 1 / N; siendo N el numero de casillas que podrá moverse la pieza como máximo en un segundo
+	private static final float	DELAY_ENTRE_MOVIMIENTOS = .2f;					// El valor indicado aqui será el delay inicial
+	private static final float	MAXIMO_CASILLAS_POR_SEGUNDO = 1 / 20f;			// 1 / N; siendo N el numero de casillas que podrá moverse la pieza como máximo en un segundo
 
-	public Tablero	tableroJuego;
-	public int		direccionUltimoMovimientoHorizontal;							// Guarda cual fue el ultimo movimiento horizontal (Izquierda o derecha) para resetear el tiempoDesdeMovimientoHorizontal y asi aplicar el DELAY_ENTRE_MOVIMIENTOS
-	public float	tiempoDesdeMovimientoHorizontal	= 0;							// Guarda el tiempo una tecla de movimiento horizontal ha estado pulsada. Su valor inicial es 0 para aplicarle el delay inicial.
-	public float	tiempoDesdeMovimientoVertical	= DELAY_ENTRE_MOVIMIENTOS;		// Guarda el tiempo una tecla de movimiento vertical ha estado pulsada. Su valor incial es DELAY_ENTRE_MOVIMIENTOS para saltarse el delay inicial en los movimientos verticales
+	private Tablero	tableroJuego;
+	private int		direccionUltimoMovimientoHorizontal;							// Guarda cual fue el ultimo movimiento horizontal (Izquierda o derecha) para resetear el tiempoDesdeMovimientoHorizontal y asi aplicar el DELAY_ENTRE_MOVIMIENTOS
+	private float	tiempoDesdeMovimientoHorizontal	= 0;							// Guarda el tiempo una tecla de movimiento horizontal ha estado pulsada. Su valor inicial es 0 para aplicarle el delay inicial.
+	private float	tiempoDesdeMovimientoVertical	= DELAY_ENTRE_MOVIMIENTOS;		// Guarda el tiempo una tecla de movimiento vertical ha estado pulsada. Su valor incial es DELAY_ENTRE_MOVIMIENTOS para saltarse el delay inicial en los movimientos verticales
 
 
 	/** Variables usadas en las actualizaciones del juego */
-	public static final float	DELAY_MAXIMO_BAJADA = .02f;
-	public static final float	DELAY_ENTRE_BAJADA	= 1;
+	private static final float	DELAY_MAXIMO_BAJADA = .02f;
+	private static final float	DELAY_ENTRE_BAJADA	= 1;
+	private static final float	TIEMPO_COLOCACION	= .5f;
 
-	public static float			multiplicadorVelocidad	= 1;
-	public static float			tiempoDesdeUltimaBajada = 0;
-
+	private static float		multiplicadorVelocidad	= 1;
+	private static float		tiempoDesdeUltimaBajada = 0;
+	private float				tiempoParaColocar		= 0;
 
 	/** Variables usadas en la UI del juego */
-	public static final int 	ALTURA_COMIENZO_PIEZA	= 20;
-	public static final int 	ESCALA_PIEZA_UI			= 96;
+	private static final int 	ESCALA_PIEZA_UI			= 96;
+	private static final int 	ALTURA_COMIENZO_PIEZA	= 20;
+	public	static final int	PIXELES_BLOQUE_UI		= 32;
 
 	public TextureAtlas			textureAtlas;
 	private final Sprite		spriteFondoJuego;
@@ -104,23 +106,25 @@ public class PantallaJuego extends Pantalla {
 	public void gestionarInput(float delta) {
 
 		// GUARDA LA PIEZA JUGABLE O LA CAMBIA POR LA PIEZA GUARDADA
-		if (Gdx.input.isKeyJustPressed(Input.Keys.W))
-		{
+		if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
+
 			Pieza piezaAuxiliar;
 
 			if (piezaGuardada == null) {
-				this.piezaGuardada	= this.piezaJugable;
+				piezaGuardada	= piezaJugable;
 				jugarSiguientePieza();
 			} else {
-				piezaAuxiliar		= this.piezaGuardada;
-				this.piezaGuardada	= this.piezaJugable;
-				this.piezaJugable	= piezaAuxiliar;
+				piezaAuxiliar	= piezaGuardada;
+				piezaGuardada	= piezaJugable;
+				piezaJugable	= piezaAuxiliar;
 			}
+
+			posicionPiezaJugable = posicionInicioPiezaJugable.cpy();
 		}
 
 		// MUEVE LA PIEZA A LA IZQUIERDA O DERECHA (MUTUAMENTE EXCLUSIVO)
-		if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-		{
+		if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+
 			int movimientoHorizontal		= 0;
 			boolean puedeMoverseHorizontal	= false;
 
@@ -133,6 +137,7 @@ public class PantallaJuego extends Pantalla {
 			}
 
 			if (puedeMoverseHorizontal) {
+
 				if (direccionUltimoMovimientoHorizontal != movimientoHorizontal) {
 					direccionUltimoMovimientoHorizontal = movimientoHorizontal;
 					tiempoDesdeMovimientoHorizontal = 0;
@@ -144,6 +149,7 @@ public class PantallaJuego extends Pantalla {
 					posicionPiezaJugable.add(movimientoHorizontal, 0);
 					tiempoDesdeMovimientoHorizontal -= MAXIMO_CASILLAS_POR_SEGUNDO;
 				}
+
 				tiempoDesdeMovimientoHorizontal += delta;
 			}
 
@@ -152,8 +158,7 @@ public class PantallaJuego extends Pantalla {
 		}
 
 		// MUEVE LA PIEZA HACIA ABAJO
-		if (Gdx.input.isKeyPressed(Input.Keys.DOWN) && tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable))
-		{
+		if (Gdx.input.isKeyPressed(Input.Keys.DOWN) && tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable))	{
 
 			if (tiempoDesdeMovimientoVertical >= DELAY_ENTRE_MOVIMIENTOS) {
 				posicionPiezaJugable.add(0, -1);
@@ -166,49 +171,59 @@ public class PantallaJuego extends Pantalla {
 		}
 
 		// ENCAJA LA PIEZA JUSTO DEBAJO INSTANTÁNEAMENTE
-		if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE))
-		{
+		if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
 			// ToDo: se coloca abajo del todo
 		}
 
 		// ROTA LA PIEZA EN EL SENTIDO DE LAS AGUJAS DEL REJOJ
-		if (Gdx.input.isKeyJustPressed(Input.Keys.E) && tableroJuego.puedeRotarSentidoReloj(posicionPiezaJugable, piezaJugable))
-		{
+		if (Gdx.input.isKeyJustPressed(Input.Keys.E) && tableroJuego.puedeRotarSentidoReloj(posicionPiezaJugable, piezaJugable)) {
 			piezaJugable.rotarSentidoReloj();
 		}
 
 		// ROTA LA PIEZA EN EL SENTIDO OPUESTO A LAS AGUJAS DEL RELOJ
-		if (Gdx.input.isKeyJustPressed(Input.Keys.Q) && tableroJuego.puedeRotarSentidoContrarioReloj(posicionPiezaJugable, piezaJugable))
-		{
+		if (Gdx.input.isKeyJustPressed(Input.Keys.Q) && tableroJuego.puedeRotarSentidoContrarioReloj(posicionPiezaJugable, piezaJugable)) {
 			piezaJugable.rotarSentidoContraReloj();
 		}
 
-		// Para hacer test - quitar despues
-		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-			jugarSiguientePieza();
-		}
-		if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-			posicionPiezaJugable.x = posicionInicioPiezaJugable.x;
-			posicionPiezaJugable.y = posicionInicioPiezaJugable.y;
-		}
+//		// Para hacer test - quitar despues
+//		if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+//			jugarSiguientePieza();
+//		}
+//		if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+//			posicionPiezaJugable.x = posicionInicioPiezaJugable.x;
+//			posicionPiezaJugable.y = posicionInicioPiezaJugable.y;
+//		}
 
 	}
 
 	@Override
 	public void recalcularPantalla(float delta) {
-		// ToDo: calcular el movimento de las piezas, actualizar puntuación, etc
+
+		// BAJA LA PIEZA AUTOMÁTICAMENTE Y LA FIJA PASADO UN TIEMPO
 		if (tiempoDesdeUltimaBajada > Math.max(DELAY_ENTRE_BAJADA * multiplicadorVelocidad, DELAY_MAXIMO_BAJADA)) {
 
 			if (tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable)) {
+
 				posicionPiezaJugable.add(0, -1);
 				tiempoDesdeUltimaBajada = 0;
-			} else {
-				// ToDo: la pieza se quede se bloquee y se juegue la siguiente tras un tiempo
-			}
+				tiempoParaColocar		= 0;
 
+			} else {
+				tiempoParaColocar += delta;
+
+				if (tiempoParaColocar >= TIEMPO_COLOCACION) {
+
+					tableroJuego.colocarPieza(posicionPiezaJugable, piezaJugable);
+					posicionPiezaJugable = posicionInicioPiezaJugable.cpy();
+					jugarSiguientePieza();
+					tiempoParaColocar = 0;
+				}
+			}
 		} else {
 			tiempoDesdeUltimaBajada += delta;
 		}
+
+		// ToDo: calcular la puntuación
 
 	}
 
@@ -237,8 +252,10 @@ public class PantallaJuego extends Pantalla {
 
 		// DIBUJA LA PIEZA JUGABLE
 		for (Vector2 bloquePieza: piezaJugable.getFormaPieza()) {
-			spriteBatch.draw(piezaJugable.spriteBloquePieza, spriteFondoJuego.getX() + (posicionPiezaJugable.x + bloquePieza.x) * 32, spriteFondoJuego.getY() + (posicionPiezaJugable.y + bloquePieza.y) * 32);
+			spriteBatch.draw(piezaJugable.spriteBloquePieza, spriteFondoJuego.getX() + (posicionPiezaJugable.x + bloquePieza.x) * PIXELES_BLOQUE_UI, spriteFondoJuego.getY() + (posicionPiezaJugable.y + bloquePieza.y) * PIXELES_BLOQUE_UI);
 		}
+
+		System.out.println("(" + posicionPiezaJugable.x + ", " + posicionPiezaJugable.y + ")");
 
 		spriteBatch.end();
 	}
@@ -269,10 +286,10 @@ public class PantallaJuego extends Pantalla {
 	}
 
 	private void jugarSiguientePieza() {
-		this.piezaJugable = this.primeraPieza;
-		this.primeraPieza = this.segundaPieza;
-		this.segundaPieza = this.terceraPieza;
-		this.terceraPieza = new Pieza();
+		piezaJugable = primeraPieza;
+		primeraPieza = segundaPieza;
+		segundaPieza = terceraPieza;
+		terceraPieza = new Pieza();
 	}
 
 }

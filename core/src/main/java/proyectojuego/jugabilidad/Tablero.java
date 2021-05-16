@@ -5,13 +5,18 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import proyectojuego.Juego;
+import proyectojuego.pantallas.PantallaJuego;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Tablero {
 
-	public	static final int 	ALTO_TABLERO	= 24;
+	public	static final int 	ALTO_TABLERO	= 23;	// Se añaden 3 filas más para que la pieza generada no aparezca fuera del tablero.
 	public	static final int 	ANCHO_TABLERO	= 10;
-	private	static Tablero		TABLERO_JUEGO;
 
+	private	static Tablero 		tableroJuego;
 	private static TextureAtlas textureAtlas = ((Juego) Gdx.app.getApplicationListener()).getAssetManager().get("ui/texturas.atlas", TextureAtlas.class);
 
 	private	int[][] 	contenidoTablero;
@@ -21,39 +26,27 @@ public class Tablero {
 	// CONSTRUCTOR PRIVADO
 	private Tablero() {
 		contenidoTablero = new int[ANCHO_TABLERO][ALTO_TABLERO];
-		for (int i = 0; i < ALTO_TABLERO / 2; i++) {
-			for (int j = 0; j < ANCHO_TABLERO; j++) {
-				contenidoTablero[j][i] = (int) (Math.random() * 7);
-			}
-		}
+		for (int[] columna: contenidoTablero) Arrays.fill(columna, -1);
 	}
 
 
 	// GET INSTANCE - PATRON SINGLETON
 	public static Tablero getInstance() {
-		if (TABLERO_JUEGO == null) TABLERO_JUEGO = new Tablero();
-		return TABLERO_JUEGO;
+		if (tableroJuego == null) tableroJuego = new Tablero();
+		return tableroJuego;
 	}
 
 
-	// METODO DIBUJAR
-	public void dibujarContenidoTablero(SpriteBatch spriteBatch, Vector2 posicionComienzoDibujo) {
-		for (int i = 0; i < ALTO_TABLERO; i++) {
-			for (int j = 0; j < ANCHO_TABLERO; j++) {
-				switch (contenidoTablero[j][i]) {
+	// METODOS COORDENADAS
+	private Vector2[] traducirCoordenadasPiezaATablero(Vector2 posicionPieza, Pieza pieza) {
 
-					case 0: continue;
-					case 1: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[1].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * 32, posicionComienzoDibujo.y + i * 32);	break;	// PIEZA CIAN
-					case 2: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[2].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * 32, posicionComienzoDibujo.y + i * 32);	break;	// PIEZA AMARILLA
-					case 3: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[3].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * 32, posicionComienzoDibujo.y + i * 32);	break;	// PIEZA MORADA
-					case 4: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[4].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * 32, posicionComienzoDibujo.y + i * 32);	break;	// PIEZA NARANJA
-					case 5: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[5].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * 32, posicionComienzoDibujo.y + i * 32);	break;	// PIEZA AZUL
-					case 6: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[6].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * 32, posicionComienzoDibujo.y + i * 32);	break;	// PIEZA VERDE
-					case 7: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[7].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * 32, posicionComienzoDibujo.y + i * 32);	break;	// PIEZA ROJA
+		Vector2[] posicionBloquesEnTablero = new Vector2[pieza.getFormaPieza().length];
 
-				}
-			}
+		for (int i = 0; i < posicionBloquesEnTablero.length; i++) {
+			posicionBloquesEnTablero[i] = new Vector2(pieza.getFormaPieza()[i].x + posicionPieza.x, pieza.getFormaPieza()[i].y + posicionPieza.y);
 		}
+
+		return posicionBloquesEnTablero;
 	}
 
 
@@ -82,37 +75,60 @@ public class Tablero {
 		return !this.detectarColisiones(posicionPieza.add(0, 0), piezaAuxiliar);
 	}
 
-	private boolean detectarColisiones(Vector2 posicionPieza, Pieza piezaAuxiliar) {
+	private boolean detectarColisiones(Vector2 posicionPieza, Pieza pieza) {
 
-		Vector2[] posicionBloquesEnTablero = new Vector2[piezaAuxiliar.getFormaPieza().length];
-		for (int i = 0; i < posicionBloquesEnTablero.length; i++) {
-			posicionBloquesEnTablero[i] = new Vector2(piezaAuxiliar.getFormaPieza()[i].x + posicionPieza.x, piezaAuxiliar.getFormaPieza()[i].y + posicionPieza.y);
-		}
-
+		Vector2[] posicionBloquesEnTablero = traducirCoordenadasPiezaATablero(posicionPieza, pieza);
 		boolean hayColision = false;
 
 		for (Vector2 posicionBloque: posicionBloquesEnTablero) {
 
-			// SI CHOCA CON LAD PAREDES
-			if (posicionBloque.x < 0 || posicionBloque.x >= ANCHO_TABLERO) {
+			try {
+				if (contenidoTablero[(int) posicionBloque.x][(int) posicionBloque.y] != -1) {
+					hayColision = true;
+					break;
+				}
+			} catch (ArrayIndexOutOfBoundsException exception) {
+				// SI SE PRODUCE ESTA EXCEPCION SIGNIFICA QUE EL BLOQUE SE SALDRIA DEL TABLERO
 				hayColision = true;
-				break;
 			}
 
-			// SI TOCA FONDO
-			if (posicionBloque.y < 0) {
-				hayColision = true;
-				break;
-			}
-
-			// SI LA CASILLA YA ESTA OCUPADA
-			if (contenidoTablero[(int) posicionBloque.x][(int) posicionBloque.y] != 0) {
-				hayColision = true;
-				break;
-			}
 		}
 
 		return hayColision;
 	}
+
+
+	// METODO DIBUJAR - RECORRE LA MATRIZ Y DIBUJA POR PANTALLA EL CONTENIDO DE ESTA A PARTIR DE posicionComienzoDibujo
+	public void dibujarContenidoTablero(SpriteBatch spriteBatch, Vector2 posicionComienzoDibujo) {
+
+		for (int i = 0; i < ALTO_TABLERO; i++) {
+			for (int j = 0; j < ANCHO_TABLERO; j++) {
+				switch (contenidoTablero[j][i]) {
+					case -1: continue;
+					case  0: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[0].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionComienzoDibujo.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA CIAN
+					case  1: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[1].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionComienzoDibujo.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA AMARILLA
+					case  2: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[2].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionComienzoDibujo.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA MORADA
+					case  3: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[3].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionComienzoDibujo.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA NARANJA
+					case  4: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[4].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionComienzoDibujo.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA AZUL
+					case  5: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[5].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionComienzoDibujo.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA VERDE
+					case  6: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[6].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionComienzoDibujo.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA ROJA
+				}
+			}
+		}
+	}
+
+
+	// METODO COLOCAR - ESTABLECE EL VALOR CORRESPONDIENTE DE ListaPiezas EN LAS COORDENADAS DE LA PIEZA JUGABLE
+	public void colocarPieza(Vector2 posicionPieza, Pieza pieza) {
+
+		Vector2[] posicionBloquesEnTablero = traducirCoordenadasPiezaATablero(posicionPieza, pieza);
+		List listaBloques = Arrays.asList(ListaPiezas.values());
+
+		for (Vector2 posicionBloque: posicionBloquesEnTablero) {
+			contenidoTablero[(int) posicionBloque.x][(int) posicionBloque.y] = listaBloques.indexOf(pieza.getTipoPieza());
+		}
+
+	}
+
 
 }
