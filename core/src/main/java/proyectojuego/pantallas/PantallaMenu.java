@@ -18,7 +18,7 @@ public class PantallaMenu extends Pantalla {
 	private static final int 	PUNTUACIONES_MAXIMAS_MOSTRADAS = 5;
 	private ArrayList<Integer>	listaMejoresPuntuaciones = new ArrayList<>();
 
-	private TextureAtlas		textureAtlas;
+	private final TextureAtlas	textureAtlas;
 	private final Sprite		spriteFondoJuego;
 
 	private final Skin 			skin;

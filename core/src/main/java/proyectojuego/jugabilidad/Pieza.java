@@ -8,20 +8,20 @@ import proyectojuego.Juego;
 
 public class Pieza {
 
-	private static TextureAtlas	textureAtlas = ((Juego) Gdx.app.getApplicationListener()).getAssetManager().get("ui/texturas.atlas", TextureAtlas.class);
+	private static final TextureAtlas	TEXTURE_ATLAS = ((Juego) Gdx.app.getApplicationListener()).getAssetManager().get("ui/texturas.atlas", TextureAtlas.class);
 
 	private ListaPiezas		tipoPieza;
 	private Vector2[]		formaPieza;
-	public final Sprite		spritePieza;
-	public final Sprite		spriteBloquePieza;
+	public	final Sprite	spritePieza;
+	public	final Sprite	spriteBloquePieza;
 
 
 	 // Constructores
 	public Pieza(ListaPiezas tipoPieza, Vector2[] formaPieza) {
 		this.tipoPieza			= tipoPieza;
 		this.formaPieza			= formaPieza;
-		this.spritePieza		= new Sprite(textureAtlas.findRegion(tipoPieza.getSpritePieza()));
-		this.spriteBloquePieza	= new Sprite(textureAtlas.findRegion(tipoPieza.getSpriteBloquePieza()));
+		this.spritePieza		= new Sprite(TEXTURE_ATLAS.findRegion(tipoPieza.getSpritePieza()));
+		this.spriteBloquePieza	= new Sprite(TEXTURE_ATLAS.findRegion(tipoPieza.getSpriteBloquePieza()));
 	}
 
 	public Pieza(ListaPiezas tipoPieza) {

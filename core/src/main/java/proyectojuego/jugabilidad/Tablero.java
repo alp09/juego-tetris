@@ -7,26 +7,24 @@ import com.badlogic.gdx.math.Vector2;
 import proyectojuego.Juego;
 import proyectojuego.pantallas.PantallaJuego;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class Tablero {
 
-	public	static final int 	ALTO_TABLERO	= 23;	// Se añaden 3 filas más para que la pieza generada no aparezca fuera del tablero.
-	public	static final int 	ANCHO_TABLERO	= 10;
+	private static final TextureAtlas	textureAtlas	= ((Juego) Gdx.app.getApplicationListener()).getAssetManager().get("ui/texturas.atlas", TextureAtlas.class);
 
-	private	static Tablero 		tableroJuego;
-	private static TextureAtlas textureAtlas = ((Juego) Gdx.app.getApplicationListener()).getAssetManager().get("ui/texturas.atlas", TextureAtlas.class);
+	public	static final int 			ALTO_TABLERO	= 23;					// Se añaden 3 filas más para que la pieza generada no aparezca fuera del tablero.
+	public	static final int 			ANCHO_TABLERO	= 10;					// Se usan en la clase PantallaJuego para determinar la posicionInicioPiezaJugable
 
-	private	int[][] 	contenidoTablero;
-	private Pieza 		piezaAuxiliar;
+	private	static Tablero tableroJuego;										// Contiene la instancia del Tablero para el patron singleton
 
+	private	int[][] 	contenidoTablero;										// El tablero en sí - cada indice contiene un int que define el contenido de esa casilla del tablero
 
 	// CONSTRUCTOR PRIVADO
 	private Tablero() {
 		contenidoTablero = new int[ANCHO_TABLERO][ALTO_TABLERO];
-		for (int[] columna: contenidoTablero) Arrays.fill(columna, -1);
+		for (int[] columna: contenidoTablero) Arrays.fill(columna, -1);		// Llena la matriz con el valor -1 para indicar los espacios vacios
 	}
 
 
@@ -37,7 +35,9 @@ public class Tablero {
 	}
 
 
-	// METODOS COORDENADAS
+	// METODO COORDENADAS
+	// La posicion de cada bloque que compone la pieza se consigue sumando la variable Vector2 posicionPiezaJugable con cada indice de Vector2[] pieza.formaPieza
+	// Con las coordenadas resultantes se puede comprobar el contenido o asignar un valor a un indice de contenidoTablero
 	private Vector2[] traducirCoordenadasPiezaATablero(Vector2 posicionPieza, Pieza pieza) {
 
 		Vector2[] posicionBloquesEnTablero = new Vector2[pieza.getFormaPieza().length];
@@ -51,30 +51,8 @@ public class Tablero {
 
 
 	// METODOS COLISION
-	public boolean puedeMoverIzquierda(Vector2 posicionPieza, Pieza pieza) {
-		return !this.detectarColisiones(posicionPieza.cpy().add(-1, 0).cpy(), pieza);
-	}
-
-	public boolean puedeMoverDerecha(Vector2 posicionPieza, Pieza pieza) {
-		return !this.detectarColisiones(posicionPieza.cpy().add(1, 0), pieza);
-	}
-
-	public boolean puedeBajar(Vector2 posicionPieza, Pieza pieza) {
-		return !this.detectarColisiones(posicionPieza.cpy().add(0, -1).cpy(), pieza);
-	}
-
-	public boolean puedeRotarSentidoReloj(Vector2 posicionPieza, Pieza pieza) {
-		piezaAuxiliar = new Pieza(pieza.getTipoPieza(), pieza.getFormaPieza());
-		piezaAuxiliar.rotarSentidoReloj();
-		return !this.detectarColisiones(posicionPieza.add(0, 0), piezaAuxiliar);
-	}
-
-	public boolean puedeRotarSentidoContrarioReloj(Vector2 posicionPieza, Pieza pieza) {
-		piezaAuxiliar = new Pieza(pieza.getTipoPieza(), pieza.getFormaPieza());
-		piezaAuxiliar.rotarSentidoContraReloj();
-		return !this.detectarColisiones(posicionPieza.add(0, 0), piezaAuxiliar);
-	}
-
+	// Los metodos públicos pasan al método privado las coordenadas de la pieza si el movimiento que quiere realizar fuese posible
+	// El método privado detectarColisiones devuelve false si las coordenadas proporcionadas no salen del tablero y estan libres, en otras palabras, no choca con las paredes ni otras piezas
 	private boolean detectarColisiones(Vector2 posicionPieza, Pieza pieza) {
 
 		Vector2[] posicionBloquesEnTablero = traducirCoordenadasPiezaATablero(posicionPieza, pieza);
@@ -95,6 +73,30 @@ public class Tablero {
 		}
 
 		return hayColision;
+	}
+
+	public boolean puedeMoverIzquierda(Vector2 posicionPieza, Pieza pieza) {
+		return !this.detectarColisiones(posicionPieza.cpy().add(-1, 0).cpy(), pieza);
+	}
+
+	public boolean puedeMoverDerecha(Vector2 posicionPieza, Pieza pieza) {
+		return !this.detectarColisiones(posicionPieza.cpy().add(1, 0), pieza);
+	}
+
+	public boolean puedeBajar(Vector2 posicionPieza, Pieza pieza) {
+		return !this.detectarColisiones(posicionPieza.cpy().add(0, -1).cpy(), pieza);
+	}
+
+	public boolean puedeRotarSentidoReloj(Vector2 posicionPieza, Pieza pieza) {
+		Pieza piezaAuxiliar = new Pieza(pieza.getTipoPieza(), pieza.getFormaPieza());
+		piezaAuxiliar.rotarSentidoReloj();
+		return !this.detectarColisiones(posicionPieza.add(0, 0), piezaAuxiliar);
+	}
+
+	public boolean puedeRotarSentidoContrarioReloj(Vector2 posicionPieza, Pieza pieza) {
+		Pieza piezaAuxiliar = new Pieza(pieza.getTipoPieza(), pieza.getFormaPieza());
+		piezaAuxiliar.rotarSentidoContraReloj();
+		return !this.detectarColisiones(posicionPieza.add(0, 0), piezaAuxiliar);
 	}
 
 
@@ -118,11 +120,11 @@ public class Tablero {
 	}
 
 
-	// METODO COLOCAR - ESTABLECE EL VALOR CORRESPONDIENTE DE ListaPiezas EN LAS COORDENADAS DE LA PIEZA JUGABLE
+	// METODO COLOCAR - ESTABLECE EL INDICE DE contenidoTablero DONDE CAYO LA PIEZA CON EL int CORRESPONDIENTE
 	public void colocarPieza(Vector2 posicionPieza, Pieza pieza) {
 
-		Vector2[] posicionBloquesEnTablero = traducirCoordenadasPiezaATablero(posicionPieza, pieza);
-		List listaBloques = Arrays.asList(ListaPiezas.values());
+		Vector2[] 			posicionBloquesEnTablero	= traducirCoordenadasPiezaATablero(posicionPieza, pieza);
+		List<ListaPiezas>	listaBloques				= Arrays.asList(ListaPiezas.values());						// se pasa a List para usar el metodo indexOf()
 
 		for (Vector2 posicionBloque: posicionBloquesEnTablero) {
 			contenidoTablero[(int) posicionBloque.x][(int) posicionBloque.y] = listaBloques.indexOf(pieza.getTipoPieza());
