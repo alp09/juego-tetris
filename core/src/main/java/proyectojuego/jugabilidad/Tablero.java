@@ -20,10 +20,12 @@ public class Tablero {
 	private	static Tablero tableroJuego;										// Contiene la instancia del Tablero para el patron singleton
 
 	private	int[][] 	contenidoTablero;										// El tablero en sí - cada indice contiene un int que define el contenido de esa casilla del tablero
+	private int 		puntucionTotal;
 
 	// CONSTRUCTOR PRIVADO
 	private Tablero() {
 		contenidoTablero = new int[ANCHO_TABLERO][ALTO_TABLERO];
+		puntucionTotal   = 0;
 		for (int[] columna: contenidoTablero) Arrays.fill(columna, -1);		// Llena la matriz con el valor -1 para indicar los espacios vacios
 	}
 
@@ -132,5 +134,24 @@ public class Tablero {
 
 	}
 
+	public void eliminaFila(){
+		int bloquesOcupados;
+		for(int i=ALTO_TABLERO-3;i>=0;i--){
+			bloquesOcupados=0;
+			for (int j=0;j<ANCHO_TABLERO;j++){
+				if(contenidoTablero[j][i] != -1){
+					bloquesOcupados++;
+				}
+			}
+			if(bloquesOcupados == ANCHO_TABLERO){
+				puntucionTotal+=10;
+				for(int e=0;e<ALTO_TABLERO-3;e++){
+					for(int h=0;h<ANCHO_TABLERO;h++){
+						contenidoTablero[h][e]= contenidoTablero[h][e+1];
+					}
+				}
+			}
+		}
+	}
 
 }

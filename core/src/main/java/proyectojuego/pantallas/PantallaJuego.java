@@ -198,6 +198,7 @@ public class PantallaJuego extends Pantalla {
 	@Override
 	public void recalcularPantalla(float delta) {
 
+
 		// BAJA LA PIEZA AUTOMÁTICAMENTE Y LA FIJA PASADO UN TIEMPO
 		if (tiempoDesdeUltimaBajada > Math.max(DELAY_ENTRE_BAJADA * multiplicadorVelocidad, DELAY_MAXIMO_BAJADA)) {
 			if (tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable)) {
@@ -221,7 +222,7 @@ public class PantallaJuego extends Pantalla {
 		} else {
 			tiempoDesdeUltimaBajada += delta;
 		}
-
+		tableroJuego.eliminaFila();
 		// ToDo: calcular la puntuación
 
 	}
@@ -229,6 +230,7 @@ public class PantallaJuego extends Pantalla {
 	@Override
 	public void dibujarPantalla(float delta) {
 		spriteBatch.begin();
+
 
 		// DIBUJA EL TABLERO DE JUEGO Y EL FONDO DEL TABLERO
 		spriteFondoJuego.draw(spriteBatch);
