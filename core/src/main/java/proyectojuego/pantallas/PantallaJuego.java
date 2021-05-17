@@ -26,16 +26,19 @@ public class PantallaJuego extends Pantalla {
 	/** Variables usadas en las actualizaciones del juego */
 	private final float			DELAY_MAXIMO_BAJADA = .02f;		// Establece el tiempo mínimo entre bajada y bajada - Usado para capar la dificultad del juego
 	private final float			DELAY_ENTRE_BAJADA	= 1;		// Establece el delay en el que una pieza baja automaticamente
-	private final float			TIEMPO_COLOCACION	= .5f;		// Contiene el tiempo necesario que debe transcurrir para que una pieza se coloque en el tablero
+	private final float			TIEMPO_COLOCACION	= .25f;		// Contiene el tiempo necesario que debe transcurrir para que una pieza se coloque en el tablero
 
 	private float				multiplicadorVelocidad	= 1;	// Multiplicador del DELAY_ENTRE_BAJADA - Con el tiempo aumenta para que la velocidad a la que bajan las piezas aumente
 	private float				tiempoDesdeUltimaBajada = 0;	// Guarda el tiempo desde la ultima vez que la pieza bajo
 	private float				tiempoParaColocar		= 0;	// Guarda el tiempo que la pieza ha pasado sin poder bajar mas casillas
 
+	/** Variables usadas para las puntuciones */
+	private boolean				seTerminoPartida = false;
+	private int 				puntucionTotal;					//
+
 	/** Variables usadas en la UI del juego */
 	public	static final int	PIXELES_BLOQUE_UI		= 32;	// Tamaño en px de un bloque - Se usa establecer un espacio entre las coordenadas cuando se va a dibujar un bloque
 	private final int 			ESCALA_PIEZA_UI			= 96;	// Tamaño en px de las piezas mostradas en los laterales
-	private final int 			ALTURA_COMIENZO_PIEZA	= 20;	// Fila en la que la piezaJugable comienza
 
 	public TextureAtlas			textureAtlas;					// Contiene información de donde se localizan las texturas en la imagen texturas.png
 	private final Sprite		spriteFondoJuego;				// Sprite para el fondo del tablero
@@ -86,7 +89,7 @@ public class PantallaJuego extends Pantalla {
 		segundaPieza 				= new Pieza();
 		terceraPieza 				= new Pieza();
 
-		posicionInicioPiezaJugable	= new Vector2(Tablero.ANCHO_TABLERO * .5f, ALTURA_COMIENZO_PIEZA);
+		posicionInicioPiezaJugable	= new Vector2(tableroJuego.ANCHO_TABLERO * .5f, tableroJuego.ALTURA_COMIENZO_PIEZA);
 		posicionPiezaJugable		= new Vector2(posicionInicioPiezaJugable.x, posicionInicioPiezaJugable.y);
 		posicionPiezaGuardada		= new Vector2(spriteFondoPiezaGuardada.getX() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPiezaGuardada.getY() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
 		posicionPrimeraPieza		= new Vector2(spriteFondoPrimeraPieza.getX() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPrimeraPieza.getY() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
@@ -212,7 +215,9 @@ public class PantallaJuego extends Pantalla {
 
 				// SI SUPERA EL TIEMPO DE COLOCACION SIN PODER BAJAR MAS SE EJECUTAN LAS SIGUIENTES ACCIONES
 				if (tiempoParaColocar >= TIEMPO_COLOCACION) {
-					tableroJuego.colocarPieza(posicionPiezaJugable, piezaJugable);
+					seTerminoPartida = tableroJuego.colocarPieza(posicionPiezaJugable, piezaJugable);
+					tableroJuego.eliminarFilasCompletas();
+
 					posicionPiezaJugable		= posicionInicioPiezaJugable.cpy();
 					tiempoParaColocar			= 0;
 					seIntercambioPiezaJugable	= false;
@@ -222,8 +227,9 @@ public class PantallaJuego extends Pantalla {
 		} else {
 			tiempoDesdeUltimaBajada += delta;
 		}
-		tableroJuego.eliminaFila();
+
 		// ToDo: calcular la puntuación
+		// ToDo: comprobar si la partida termino
 
 	}
 
@@ -255,8 +261,6 @@ public class PantallaJuego extends Pantalla {
 		for (Vector2 bloquePieza: piezaJugable.getFormaPieza()) {
 			spriteBatch.draw(piezaJugable.spriteBloquePieza, spriteFondoJuego.getX() + (posicionPiezaJugable.x + bloquePieza.x) * PIXELES_BLOQUE_UI, spriteFondoJuego.getY() + (posicionPiezaJugable.y + bloquePieza.y) * PIXELES_BLOQUE_UI);
 		}
-
-		System.out.println("(" + posicionPiezaJugable.x + ", " + posicionPiezaJugable.y + ")");
 
 		spriteBatch.end();
 	}

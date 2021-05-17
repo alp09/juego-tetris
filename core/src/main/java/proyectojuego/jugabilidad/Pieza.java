@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import proyectojuego.Juego;
 
+import java.util.Arrays;
+
 public class Pieza {
 
 	private static final TextureAtlas	TEXTURE_ATLAS = ((Juego) Gdx.app.getApplicationListener()).getAssetManager().get("ui/texturas.atlas", TextureAtlas.class);
@@ -44,6 +46,7 @@ public class Pieza {
 		}
 		return copiaFormaPieza;
 	}
+
 
 
 	//Rotamos la pieza en el sentido de las agujas del reloj

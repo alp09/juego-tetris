@@ -23,7 +23,11 @@ public enum ListaPiezas {
 	}
 
 	public Vector2[] getFormaPieza() {
-		return formaPieza;
+		Vector2[] copiaFormaPieza = new Vector2[formaPieza.length];
+		for (int i = 0; i < formaPieza.length; i++) {
+			copiaFormaPieza[i] = formaPieza[i].cpy();
+		}
+		return copiaFormaPieza;
 	}
 	public String getSpritePieza() {
 		return spritePieza;
