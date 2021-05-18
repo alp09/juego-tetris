@@ -27,7 +27,7 @@ public class Tablero {
 	// CONSTRUCTOR PRIVADO
 	private Tablero() {
 		contenidoTablero = new int[ANCHO_TABLERO][ALTO_TABLERO];
-		for (int[] columna: contenidoTablero) Arrays.fill(columna, -1);		// Llena la matriz con el valor -1 para indicar los espacios vacios
+		limpiarTablero();
 	}
 
 
@@ -137,7 +137,6 @@ public class Tablero {
 			if (posicionBloque.y >= ALTURA_COMIENZO_PIEZA) gameOver = true;
 			if (posicionBloque.y > filaOcupadaMasAlta) filaOcupadaMasAlta = (int) posicionBloque.y;
 		}
-		System.out.println(filaOcupadaMasAlta);
 
 		return gameOver;
 	}
@@ -181,6 +180,10 @@ public class Tablero {
 		}
 
 		return filasEliminadas;
+	}
+
+	public void limpiarTablero() {
+		for (int[] columna: contenidoTablero) Arrays.fill(columna, -1);		// Llena la matriz con el valor -1 para indicar los espacios vacios
 	}
 
 }

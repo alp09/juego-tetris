@@ -24,42 +24,45 @@ public class PantallaJuego extends Pantalla {
 	private boolean 			seIntercambioPiezaJugable		= false;						// Guarda si se guardo una pieza para asi prevenir que la que se esta jugando pueda ser guardada de nuevo
 
 	/** Variables usadas en las actualizaciones del juego */
-	private final float			DELAY_MAXIMO_BAJADA = .02f;		// Establece el tiempo mínimo entre bajada y bajada - Usado para capar la dificultad del juego
-	private final float			DELAY_ENTRE_BAJADA	= 1;		// Establece el delay en el que una pieza baja automaticamente
-	private final float			TIEMPO_COLOCACION	= .25f;		// Contiene el tiempo necesario que debe transcurrir para que una pieza se coloque en el tablero
+	private final float			DELAY_MAXIMO_BAJADA = .05f;			// Establece el tiempo mínimo entre bajada y bajada - Usado para capar la dificultad del juego
+	private final float			DELAY_ENTRE_BAJADA	= 1;			// Establece el delay en el que una pieza baja automaticamente
+	private final float			TIEMPO_COLOCACION	= .4f;			// Contiene el tiempo necesario que debe transcurrir para que una pieza se coloque en el tablero
 
-	private float				multiplicadorVelocidad	= 1;	// Multiplicador del DELAY_ENTRE_BAJADA - Con el tiempo aumenta para que la velocidad a la que bajan las piezas aumente
-	private float				tiempoDesdeUltimaBajada = 0;	// Guarda el tiempo desde la ultima vez que la pieza bajo
-	private float				tiempoParaColocar		= 0;	// Guarda el tiempo que la pieza ha pasado sin poder bajar mas casillas
+	private float				multiplicadorVelocidad	= 1;		// Multiplicador del DELAY_ENTRE_BAJADA - Con el tiempo aumenta para que la velocidad a la que bajan las piezas aumente
+	private float				tiempoDesdeUltimaBajada = 0;		// Guarda el tiempo desde la ultima vez que la pieza bajo
+	private float				tiempoParaFijarATablero = 0;		// Guarda el tiempo que la pieza ha pasado sin poder bajar mas casillas
+	private float 				tiempoNecesitadoParaColocar;		// Tiempo necesitado por el jugador para colocar la pieza
 
 	/** Variables usadas para las puntuciones */
-	private boolean				seTerminoPartida = false;
-	private int 				puntucionTotal;					//
+	private final int			PUNTOS_COLOCAR_PIEZA	= 100;		//
+	private final int			PUNTOS_COMPLETAR_LINEA	= 1000;		//
+	private boolean				seTerminoPartida = false;			//
+	private int 				puntucionTotal;						//
 
 	/** Variables usadas en la UI del juego */
-	public	static final int	PIXELES_BLOQUE_UI		= 32;	// Tamaño en px de un bloque - Se usa establecer un espacio entre las coordenadas cuando se va a dibujar un bloque
-	private final int 			ESCALA_PIEZA_UI			= 96;	// Tamaño en px de las piezas mostradas en los laterales
+	public	static final int	PIXELES_BLOQUE_UI		= 32;		// Tamaño en px de un bloque - Se usa establecer un espacio entre las coordenadas cuando se va a dibujar un bloque
+	private final int 			ESCALA_PIEZA_UI			= 96;		// Tamaño en px de las piezas mostradas en los laterales
 
-	public TextureAtlas			textureAtlas;					// Contiene información de donde se localizan las texturas en la imagen texturas.png
-	private final Sprite		spriteFondoJuego;				// Sprite para el fondo del tablero
-	private final Sprite		spriteFondoPiezaGuardada;		// Sprite que se coloca de fondo para la pieza guardada
-	private final Sprite		spriteFondoPrimeraPieza;		// Sprite que se coloca de fondo para la primera pieza en la lista de siguientes
-	private final Sprite		spriteFondoSegundaPieza;		// Sprite que se coloca de fondo para la segunda pieza en la lista de siguientes
-	private final Sprite		spriteFondoTerceraPieza;		// Sprite que se coloca de fondo para la tercera pieza en la lista de siguientes
-	private final Sprite		spriteGridZonaJuego;			// Contiene la malla que se coloca sobre el spriteFondoJuego
+	public TextureAtlas			textureAtlas;						// Contiene información de donde se localizan las texturas en la imagen texturas.png
+	private final Sprite		spriteFondoJuego;					// Sprite para el fondo del tablero
+	private final Sprite		spriteFondoPiezaGuardada;			// Sprite que se coloca de fondo para la pieza guardada
+	private final Sprite		spriteFondoPrimeraPieza;			// Sprite que se coloca de fondo para la primera pieza en la lista de siguientes
+	private final Sprite		spriteFondoSegundaPieza;			// Sprite que se coloca de fondo para la segunda pieza en la lista de siguientes
+	private final Sprite		spriteFondoTerceraPieza;			// Sprite que se coloca de fondo para la tercera pieza en la lista de siguientes
+	private final Sprite		spriteGridZonaJuego;				// Contiene la malla que se coloca sobre el spriteFondoJuego
 
-	private Pieza				piezaJugable;					// Guarda la pieza que se está jugando
-	private Pieza				piezaGuardada;					// Guarda la pieza que el jugador guardó
-	private Pieza 				primeraPieza;					// Guarda la primera pieza en la lista de siguientes
-	private Pieza 				segundaPieza;					// Guarda la segunda pieza en la lista de siguientes
-	private Pieza 				terceraPieza;					// Guarda la tercera pieza en la lista de siguientes
+	private Pieza				piezaJugable;						// Guarda la pieza que se está jugando
+	private Pieza				piezaGuardada;						// Guarda la pieza que el jugador guardó
+	private Pieza 				primeraPieza;						// Guarda la primera pieza en la lista de siguientes
+	private Pieza 				segundaPieza;						// Guarda la segunda pieza en la lista de siguientes
+	private Pieza 				terceraPieza;						// Guarda la tercera pieza en la lista de siguientes
 
-	private Vector2				posicionPiezaJugable;			// Posicion actual de la pieza
-	private final Vector2		posicionInicioPiezaJugable;		// Posicion desde donde la pieza jugable aparece al comienzo
-	private final Vector2		posicionPiezaGuardada;			// Posicion en la UI de la pieza guardada
-	private final Vector2		posicionPrimeraPieza;			// Posicion en la UI de la primera pieza de la lista
-	private final Vector2		posicionSegundaPieza;			// Posicion en la UI de la segunda pieza de la lista
-	private final Vector2		posicionTerceraPieza;			// Posicion en la UI de la tercera pieza de la lista
+	private Vector2				posicionPiezaJugable;				// Posicion actual de la pieza
+	private final Vector2		posicionInicioPiezaJugable;			// Posicion desde donde la pieza jugable aparece al comienzo
+	private final Vector2		posicionPiezaGuardada;				// Posicion en la UI de la pieza guardada
+	private final Vector2		posicionPrimeraPieza;				// Posicion en la UI de la primera pieza de la lista
+	private final Vector2		posicionSegundaPieza;				// Posicion en la UI de la segunda pieza de la lista
+	private final Vector2		posicionTerceraPieza;				// Posicion en la UI de la tercera pieza de la lista
 
 
 // CONSTRUCTOR
@@ -171,19 +174,25 @@ public class PantallaJuego extends Pantalla {
 		}
 
 		// MUEVE LA PIEZA HACIA ABAJO - FUNCIONA IGUAL QUE EL DE MOVIMIENTO HORIZONTAL SIN EL DELAY INICIAL
-		if (Gdx.input.isKeyPressed(Input.Keys.DOWN) && tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable))	{
-			if (tiempoDesdeMovimientoVertical >= DELAY_ENTRE_MOVIMIENTOS) {
-				posicionPiezaJugable.add(0, -1);
-				tiempoDesdeMovimientoVertical -= MAXIMO_CASILLAS_POR_SEGUNDO;
+		if (Gdx.input.isKeyPressed(Input.Keys.DOWN))	{
+			if (tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable)) {
+				if (tiempoDesdeMovimientoVertical >= DELAY_ENTRE_MOVIMIENTOS) {
+					posicionPiezaJugable.add(0, -1);
+					tiempoDesdeMovimientoVertical -= MAXIMO_CASILLAS_POR_SEGUNDO;
+				}
+				tiempoDesdeMovimientoVertical += delta;
 			}
-			tiempoDesdeMovimientoVertical += delta;
 		} else {
-			tiempoDesdeMovimientoVertical = DELAY_ENTRE_MOVIMIENTOS;
+			tiempoDesdeMovimientoVertical	= DELAY_ENTRE_MOVIMIENTOS;
 		}
 
 		// ENCAJA LA PIEZA JUSTO DEBAJO INSTANTÁNEAMENTE
 		if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-			// ToDo: se coloca abajo del todo
+			while (tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable)) {
+				posicionPiezaJugable.y -= 1;
+			}
+
+			fijarPiezaAlTablero(TIEMPO_COLOCACION);
 		}
 
 		// ROTA LA PIEZA EN EL SENTIDO DE LAS AGUJAS DEL REJOJ
@@ -196,40 +205,31 @@ public class PantallaJuego extends Pantalla {
 			piezaJugable.rotarSentidoContraReloj();
 		}
 
+		//
+		if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+			// ToDo: pausar/reanudar el juego
+		}
+
 	}
 
 	@Override
 	public void recalcularPantalla(float delta) {
-
 
 		// BAJA LA PIEZA AUTOMÁTICAMENTE Y LA FIJA PASADO UN TIEMPO
 		if (tiempoDesdeUltimaBajada > Math.max(DELAY_ENTRE_BAJADA * multiplicadorVelocidad, DELAY_MAXIMO_BAJADA)) {
 			if (tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable)) {
 				posicionPiezaJugable.add(0, -1);
 				tiempoDesdeUltimaBajada = 0;
-				tiempoParaColocar		= 0;
-
-			// SI NO ES POSIBLE BAJARLA COMIENZA UN CONTADOR PARA FIJARLA EN SU POSICION ACTUAL
-			} else {
-				tiempoParaColocar += delta;
-
-				// SI SUPERA EL TIEMPO DE COLOCACION SIN PODER BAJAR MAS SE EJECUTAN LAS SIGUIENTES ACCIONES
-				if (tiempoParaColocar >= TIEMPO_COLOCACION) {
-					seTerminoPartida = tableroJuego.colocarPieza(posicionPiezaJugable, piezaJugable);
-					tableroJuego.eliminarFilasCompletas();
-
-					posicionPiezaJugable		= posicionInicioPiezaJugable.cpy();
-					tiempoParaColocar			= 0;
-					seIntercambioPiezaJugable	= false;
-					jugarSiguientePieza();
-				}
+				tiempoParaFijarATablero = 0;
 			}
 		} else {
 			tiempoDesdeUltimaBajada += delta;
 		}
 
-		// ToDo: calcular la puntuación
-		// ToDo: comprobar si la partida termino
+		tiempoNecesitadoParaColocar += delta;
+		if (!tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable)) fijarPiezaAlTablero(delta);
+
+		if (seTerminoPartida); // ToDo: comprobar si la partida termino
 
 	}
 
@@ -295,6 +295,32 @@ public class PantallaJuego extends Pantalla {
 		primeraPieza = segundaPieza;
 		segundaPieza = terceraPieza;
 		terceraPieza = new Pieza();
+	}
+
+	private void fijarPiezaAlTablero(float delta) {
+		tiempoParaFijarATablero += delta;
+
+		// SI SUPERA EL TIEMPO DE COLOCACION SIN PODER BAJAR MAS SE EJECUTAN LAS SIGUIENTES ACCIONES
+		if (tiempoParaFijarATablero >= TIEMPO_COLOCACION) {
+			seTerminoPartida = tableroJuego.colocarPieza(posicionPiezaJugable, piezaJugable);
+			int lineasEliminadas = 0;
+			if ((lineasEliminadas = tableroJuego.eliminarFilasCompletas()) > 0) puntucionTotal += sumarPuntosCompletarLinea(lineasEliminadas);
+			puntucionTotal += sumarPuntosColocarPieza(tiempoNecesitadoParaColocar);
+
+			posicionPiezaJugable		= posicionInicioPiezaJugable.cpy();
+			tiempoNecesitadoParaColocar = 0;
+			tiempoParaFijarATablero		= 0;
+			seIntercambioPiezaJugable	= false;
+			jugarSiguientePieza();
+		}
+	}
+
+	private int sumarPuntosColocarPieza(float tiempoDeColocacion) {
+		return (int) (PUNTOS_COLOCAR_PIEZA * 1 + (2 / tiempoDeColocacion));
+	}
+
+	private int sumarPuntosCompletarLinea(int lineasCompletadas) {
+		return PUNTOS_COMPLETAR_LINEA * lineasCompletadas * lineasCompletadas;
 	}
 
 }
