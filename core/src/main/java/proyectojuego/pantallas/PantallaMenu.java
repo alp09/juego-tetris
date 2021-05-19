@@ -29,8 +29,8 @@ public class PantallaMenu extends Pantalla {
 	private final TextButton	botonJugar;
 	private final TextButton	botonOpciones;
 
-	private Music musica;
-	private boolean musicaEncendida;
+	private Music				musica;
+	private boolean				musicaEncendida;
 
 
 // CONSTRUCTOR
@@ -38,7 +38,7 @@ public class PantallaMenu extends Pantalla {
         super();
 
 		//CARGAMOS LA MUSICA Y LA INICIAMOS
-		musica = Gdx.audio.newMusic(Gdx.files.internal("musicaMenu.ogg"));
+		musica = assetManager.get("sounds/musicaMenu.ogg");
 		musica.setVolume(0.25f);
 		musica.setLooping(true);
 		musica.play();
@@ -50,7 +50,7 @@ public class PantallaMenu extends Pantalla {
 		spriteFondoJuego.setPosition(Juego.ANCHO_JUEGO * .5f - spriteFondoJuego.getWidth() * .5f, Juego.ALTO_JUEGO * .5f - spriteFondoJuego.getHeight() * .5f);
 
 		// CARGA LA SKIN, QUE CONTIENE LA FUENTE DE TEXTO Y BOTONES
-		skin = new Skin(Gdx.files.internal("uiskin.json"));
+		skin = assetManager.get("uiskin.json", Skin.class);
 
 		// CREA EL STAGE, DONDE SE COLOCARÁ LA TABLA
 		stage = new Stage(this.fitViewport);
@@ -96,13 +96,10 @@ public class PantallaMenu extends Pantalla {
 			for (int i = 0; i < PUNTUACIONES_MAXIMAS_MOSTRADAS; i++) listaMejoresPuntuaciones.add(lector.readInt());
 		} catch (EOFException e) {
 			System.out.println("No hay mas puntuaciones registradas.");
-//			e.printStackTrace();
 		} catch (FileNotFoundException e) {
 			System.out.println("No se encontro el archivo.");
-//			e.printStackTrace();
 		} catch (IOException e) {
 			System.out.println("Error en la lectura del archivo.");
-//			e.printStackTrace();
 		}
 
 		// MUESTRA LAS PUNTUACIONES
@@ -176,7 +173,7 @@ public class PantallaMenu extends Pantalla {
 
     @Override
     public void dispose() {
-		skin.dispose();
+//		skin.dispose();		COMENTADO PORQUE EL ASSETMANAGER LO ELIMINA EN VEZ DE CARGARLO DE NUEVO
 		stage.dispose();
 		musica.dispose();
     }

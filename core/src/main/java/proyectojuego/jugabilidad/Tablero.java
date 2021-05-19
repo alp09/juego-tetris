@@ -25,11 +25,8 @@ public class Tablero {
 	private	int[][] 	contenidoTablero;						// El tablero en sí - cada indice contiene un int que define el contenido de esa casilla del tablero
 	private int			filaOcupadaMasAlta = 0;
 
-	private Sound sonidoFila;
-
 	// CONSTRUCTOR PRIVADO
 	private Tablero() {
-		sonidoFila = Gdx.audio.newSound(Gdx.files.internal("ExplosionLinea.ogg"));
 		contenidoTablero = new int[ANCHO_TABLERO][ALTO_TABLERO];
 		limpiarTablero();
 	}
@@ -181,8 +178,6 @@ public class Tablero {
 				filasEliminadas++;
 			}
 			filaOcupadaMasAlta -= filasEliminadas;
-			sonidoFila.play();
-
 		}
 
 		return filasEliminadas;

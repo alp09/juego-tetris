@@ -2,10 +2,12 @@ package proyectojuego.pantallas;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 public class PantallaSplash extends Pantalla {
 
@@ -22,8 +24,8 @@ public class PantallaSplash extends Pantalla {
 	private float 	progresoAnimacionFadeOut 	= 1;					// LA ANIMACION FADE OUT COMIENZA CON EL VALOR ALPHA A 1.
 	private float 	tiempoEntreAnimaciones		= 0;					// DEFINE EL TIEMPO QUE HA TRANSCURRIDO DESDE QUE LA ANIMACION FADE IN TERMINÓ.
 
-	private final Sprite spritePantallaSplash;
-	private Sound sonidoSplash;
+	private final	Sprite	spritePantallaSplash;
+	private			Sound	sonidoSplash;
 
 
 // CONSTRUCTOR
@@ -32,17 +34,28 @@ public class PantallaSplash extends Pantalla {
 
 		// CARGA LA IMAGEN MOSTRADA AL INICIO DEL JUEGO
 		assetManager.load("ui/imagenIntro.png", Texture.class);
+		assetManager.load("sounds/sonidoSplash.ogg", Sound.class);
 		assetManager.finishLoading();
 
 		// SE ASIGNA LA TEXTURA AL SPRITE Y SE ESTABLECE SU ALPHA A 0 PARA LA ANIMACION
 		spritePantallaSplash = new Sprite(assetManager.get("ui/imagenIntro.png", Texture.class));
 		spritePantallaSplash.setAlpha(0);
 
-		// AQUI VAN TODOS LOS ASSETS A CARGAR
-		assetManager.load("ui/texturas.atlas", TextureAtlas.class);
-		sonidoSplash = Gdx.audio.newSound(Gdx.files.internal("sonidoSplash.ogg"));
+		// ASIGNA Y REPRODUCE LA MUSICA
+		sonidoSplash = assetManager.get("sounds/sonidoSplash.ogg", Sound.class);
 		sonidoSplash.play();
 		sonidoSplash.setLooping(1,true);
+
+		// AQUI VAN TODOS LOS ASSETS A CARGAR
+		assetManager.load("ui/texturas.atlas", TextureAtlas.class);
+		assetManager.load("uiskin.json", Skin.class);
+		assetManager.load("sounds/sonidoPieza.ogg", Sound.class);
+		assetManager.load("sounds/sonidoFilaCompleta.ogg", Sound.class);
+		assetManager.load("sounds/sonidoGameOver.ogg", Sound.class);
+		assetManager.load("sounds/musicaMenu.ogg", Music.class);
+		assetManager.load("sounds/musicaJuego.ogg", Music.class);
+		assetManager.load("sounds/musicaOpciones.ogg", Music.class);
+
 	}
 
 
@@ -108,7 +121,7 @@ public class PantallaSplash extends Pantalla {
 
 	@Override
 	public void dispose() {
-		sonidoSplash.dispose();
 		spritePantallaSplash.getTexture().dispose();
+		sonidoSplash.dispose();
 	}
 }

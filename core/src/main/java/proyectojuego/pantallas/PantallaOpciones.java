@@ -11,7 +11,7 @@ public class PantallaOpciones extends Pantalla {
 		super();
 
 		//CARGAMOS LA MUSICA Y LA INICIAMOS
-		musica = Gdx.audio.newMusic(Gdx.files.internal("musicaOpciones.ogg"));
+		musica = Gdx.audio.newMusic(Gdx.files.internal("sounds/musicaOpciones.ogg"));
 		musica.setVolume(0.25f);
 		musica.setLooping(true);
 		musica.play();

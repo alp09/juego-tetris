@@ -15,7 +15,7 @@ import proyectojuego.Juego;
 import proyectojuego.jugabilidad.Pieza;
 import proyectojuego.jugabilidad.Tablero;
 
-
+import java.io.*;
 
 public class PantallaJuego extends Pantalla {
 
@@ -74,9 +74,11 @@ public class PantallaJuego extends Pantalla {
 	private final Vector2		posicionSegundaPieza;				// Posicion en la UI de la segunda pieza de la lista
 	private final Vector2		posicionTerceraPieza;				// Posicion en la UI de la tercera pieza de la lista
 
-	private Music musica;
-	private Sound sonidoPieza;
-	private Sound sonidoGameOver;
+	/** Variables usadas para los sonidos del juego*/
+	private Music	musica;
+	private Sound	sonidoPieza;
+	private Sound	sonidoFila;
+	private Sound	sonidoGameOver;
 	private boolean musicaEncendida;
 
 
@@ -84,18 +86,12 @@ public class PantallaJuego extends Pantalla {
 	public PantallaJuego() {
 		super();
 
-		//CARGAMOS LA MUSICA Y LOS SONIDOS Y LOS INICIAMOS
-		musica = Gdx.audio.newMusic(Gdx.files.internal("musicaJuego.ogg"));
-		sonidoPieza = Gdx.audio.newSound(Gdx.files.internal("sonidoPieza.ogg"));
-		musica.play();
-		musica.setVolume(.06f);
-		sonidoPieza.setVolume(0,1);
-		sonidoGameOver = Gdx.audio.newSound(Gdx.files.internal("GameOver.ogg"));
 		// CARGA LAS TEXUTRAS DEL ASSETMANAGER
 		textureAtlas = assetManager.get("ui/texturas.atlas");
 
 		// CREA UNA INSTANCIA DEL TABLERO DE JUEGO
 		tableroJuego = Tablero.getInstance();
+		tableroJuego.limpiarTablero();
 
 		// CREA LA TABLA Y LOS LABEL QUE CONTENDRÁN LA PUNTUACION, DESPUES ALINEA LA TABLA ABAJO A LA DERECHA
 		skin							= new Skin(Gdx.files.internal("uiskin.json"));
@@ -135,12 +131,23 @@ public class PantallaJuego extends Pantalla {
 		terceraPieza 	= new Pieza();
 
 		// GUARDA UNAS COORDENADAS QUE SE USARÁN A MENUDO DURANTE LA PARTIDA
-		posicionInicioPiezaJugable			= new Vector2(tableroJuego.ANCHO_TABLERO * .5f, tableroJuego.ALTURA_COMIENZO_PIEZA);
-		posicionPiezaJugable				= new Vector2(posicionInicioPiezaJugable.x, posicionInicioPiezaJugable.y);
-		posicionPiezaGuardada				= new Vector2(spriteFondoPiezaGuardada.getX() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPiezaGuardada.getY() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
-		posicionPrimeraPieza				= new Vector2(spriteFondoPrimeraPieza.getX() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPrimeraPieza.getY() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
-		posicionSegundaPieza				= new Vector2(spriteFondoSegundaPieza.getX() + spriteFondoSegundaPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoSegundaPieza.getY() + spriteFondoSegundaPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
-		posicionTerceraPieza				= new Vector2(spriteFondoTerceraPieza.getX() + spriteFondoTerceraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoTerceraPieza.getY() + spriteFondoTerceraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
+		posicionInicioPiezaJugable	= new Vector2(tableroJuego.ANCHO_TABLERO * .5f, tableroJuego.ALTURA_COMIENZO_PIEZA);
+		posicionPiezaJugable		= new Vector2(posicionInicioPiezaJugable.x, posicionInicioPiezaJugable.y);
+		posicionPiezaGuardada		= new Vector2(spriteFondoPiezaGuardada.getX() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPiezaGuardada.getY() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
+		posicionPrimeraPieza		= new Vector2(spriteFondoPrimeraPieza.getX() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPrimeraPieza.getY() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
+		posicionSegundaPieza		= new Vector2(spriteFondoSegundaPieza.getX() + spriteFondoSegundaPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoSegundaPieza.getY() + spriteFondoSegundaPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
+		posicionTerceraPieza		= new Vector2(spriteFondoTerceraPieza.getX() + spriteFondoTerceraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoTerceraPieza.getY() + spriteFondoTerceraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
+
+		//CARGA MUSICA Y LOS SONIDOS
+		musica			= assetManager.get("sounds/musicaJuego.ogg");
+		sonidoPieza		= assetManager.get("sounds/sonidoPieza.ogg");
+		sonidoFila		= assetManager.get("sounds/sonidoFilaCompleta.ogg");
+		sonidoGameOver	= assetManager.get("sounds/sonidoGameOver.ogg");
+
+		// INICIA LA REPRODUCCION DE SONIDOS
+		musica.play();
+		musica.setVolume(.06f);
+		sonidoPieza.setVolume(0,1);
 
 	}
 
@@ -290,9 +297,21 @@ public class PantallaJuego extends Pantalla {
 		indicadorPuntuacionTotal.setText(Integer.toString(puntucionTotal));
 
 		// CUANDO LA PARTIDA ACABA
-
 		if (seTerminoPartida){
 			sonidoGameOver.play();
+
+			// ToDo: leer puntuaciones existentes
+
+			try (DataOutputStream escritor = new DataOutputStream(new FileOutputStream("assets/files/puntuaciones.bin"))) {
+
+				// ToDo: comparar puntuaciones existentes con la actual y guardarla si procede
+
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
 			juego.setScreen(new PantallaMenu());
 		}
 
@@ -349,13 +368,14 @@ public class PantallaJuego extends Pantalla {
 
 	@Override
 	public void hide() {
-		musica.dispose();
-		sonidoPieza.dispose();
+		this.dispose();
 	}
 
 	@Override
 	public void dispose() {
-
+		musica.dispose();
+//		sonidoPieza.dispose();		COMNETADO PORQUE AL CARGAR LA PARTIDA DE NUEVO NO CARGA LOS SONIDOS
+//		sonidoFila.dispose();
 	}
 
 	private void fijarPiezaAlTablero(float delta) {
@@ -363,14 +383,19 @@ public class PantallaJuego extends Pantalla {
 
 		// SI SUPERA EL TIEMPO DE COLOCACION SIN PODER BAJAR MAS SE EJECUTAN LAS SIGUIENTES ACCIONES
 		if (tiempoParaFijarATablero >= TIEMPO_COLOCACION) {
+
 			//SONIDO DE CHOQUE ENTRE PIEZAS
 			sonidoPieza.play();
+
 			// SI LA PIEZA SE COLOCA EN UNA POSICION y > 19 LA PARTIDA TERMINA
 			seTerminoPartida = tableroJuego.colocarPieza(posicionPiezaJugable, piezaJugable);
 
 			// CALCULA LA PUNTUACION OBTENIDA
 			int lineasEliminadas;
-			if ((lineasEliminadas = tableroJuego.eliminarFilasCompletas()) > 0) puntucionTotal += sumarPuntosCompletarLinea(lineasEliminadas);
+			if ((lineasEliminadas = tableroJuego.eliminarFilasCompletas()) > 0) {
+				puntucionTotal += sumarPuntosCompletarLinea(lineasEliminadas);
+				sonidoFila.play();
+			}
 			puntucionTotal += sumarPuntosColocarPieza(tiempoNecesitadoParaColocar);
 
 			// ACTUALIZA EL MULTIPLICADOR DE VELOCIDAD A LA QUE LA PIEZA BAJA
