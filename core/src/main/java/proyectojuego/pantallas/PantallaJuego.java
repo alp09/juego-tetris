@@ -43,7 +43,7 @@ public class PantallaJuego extends Pantalla {
 	private final int			PUNTOS_COLOCAR_PIEZA	= 100;		// Puntuacion base por colocar una pieza
 	private final int			PUNTOS_COMPLETAR_LINEA	= 1000;		// Puntuacion base por completar una linea
 	private int 				puntucionTotal;						// Almacena la puntuacion obtenida durante la partida
-	private boolean				seTerminoPartida = false;			// Determina se la partida termino
+	private boolean				seTerminoPartida = false;			// Determina si la partida termino
 
 	/** Variables usadas en la UI del juego */
 	public	static final int	PIXELES_BLOQUE_UI		= 32;		// Tamaño en px de un bloque - Se usa establecer un espacio entre las coordenadas cuando se va a dibujar un bloque
@@ -76,6 +76,7 @@ public class PantallaJuego extends Pantalla {
 
 	private Music musica;
 	private Sound sonidoPieza;
+	private Sound sonidoGameOver;
 	private boolean musicaEncendida;
 
 
@@ -87,11 +88,7 @@ public class PantallaJuego extends Pantalla {
 		musica = Gdx.audio.newMusic(Gdx.files.internal("musicaJuego.ogg"));
 		sonidoPieza = Gdx.audio.newSound(Gdx.files.internal("sonidoPieza.ogg"));
 		sonidoPieza.setVolume(0,1);
-		musica.setVolume(.1f);
-		musica.setLooping(true);
-		musica.play();
-		musicaEncendida= true;
-
+		sonidoGameOver = Gdx.audio.newSound(Gdx.files.internal("GameOver.ogg"));
 		// CARGA LAS TEXUTRAS DEL ASSETMANAGER
 		textureAtlas = assetManager.get("ui/texturas.atlas");
 
@@ -291,7 +288,11 @@ public class PantallaJuego extends Pantalla {
 		indicadorPuntuacionTotal.setText(Integer.toString(puntucionTotal));
 
 		// CUANDO LA PARTIDA
-		if (seTerminoPartida); // ToDo: comprobar si la partida termino
+
+		if (seTerminoPartida){
+			sonidoGameOver.play();
+			juego.setScreen(new PantallaMenu());
+		}
 
 	}
 
@@ -352,6 +353,8 @@ public class PantallaJuego extends Pantalla {
 	@Override
 	public void dispose() {
 		musica.dispose();
+		sonidoPieza.dispose();
+		sonidoGameOver.dispose();
 	}
 
 	private void fijarPiezaAlTablero(float delta) {

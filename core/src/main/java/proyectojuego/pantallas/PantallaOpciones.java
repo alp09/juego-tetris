@@ -15,6 +15,8 @@ public class PantallaOpciones extends Pantalla {
 		musica.setVolume(0.25f);
 		musica.setLooping(true);
 		musica.play();
+
+
 	}
 
 
