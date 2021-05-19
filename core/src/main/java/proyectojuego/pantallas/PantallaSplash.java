@@ -56,6 +56,7 @@ public class PantallaSplash extends Pantalla {
 	public void gestionarInput(float delta) {
 
 		if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY) && assetManager.update()) {
+			sonidoSplash.stop();
 			juego.setScreen(new PantallaMenu());
 		}
 
@@ -107,6 +108,7 @@ public class PantallaSplash extends Pantalla {
 
 	@Override
 	public void dispose() {
+		sonidoSplash.dispose();
 		spritePantallaSplash.getTexture().dispose();
 	}
 }

@@ -87,6 +87,8 @@ public class PantallaJuego extends Pantalla {
 		//CARGAMOS LA MUSICA Y LOS SONIDOS Y LOS INICIAMOS
 		musica = Gdx.audio.newMusic(Gdx.files.internal("musicaJuego.ogg"));
 		sonidoPieza = Gdx.audio.newSound(Gdx.files.internal("sonidoPieza.ogg"));
+		musica.play();
+		musica.setVolume(.06f);
 		sonidoPieza.setVolume(0,1);
 		sonidoGameOver = Gdx.audio.newSound(Gdx.files.internal("GameOver.ogg"));
 		// CARGA LAS TEXUTRAS DEL ASSETMANAGER
@@ -287,7 +289,7 @@ public class PantallaJuego extends Pantalla {
 		// ACTUALIZA EL LABEL CON LA PUNTUACION ACTUAL
 		indicadorPuntuacionTotal.setText(Integer.toString(puntucionTotal));
 
-		// CUANDO LA PARTIDA
+		// CUANDO LA PARTIDA ACABA
 
 		if (seTerminoPartida){
 			sonidoGameOver.play();
@@ -347,14 +349,13 @@ public class PantallaJuego extends Pantalla {
 
 	@Override
 	public void hide() {
-
+		musica.dispose();
+		sonidoPieza.dispose();
 	}
 
 	@Override
 	public void dispose() {
-		musica.dispose();
-		sonidoPieza.dispose();
-		sonidoGameOver.dispose();
+
 	}
 
 	private void fijarPiezaAlTablero(float delta) {
