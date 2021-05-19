@@ -5,9 +5,10 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Align;
 import proyectojuego.Juego;
 import proyectojuego.jugabilidad.Pieza;
 import proyectojuego.jugabilidad.Tablero;
@@ -15,7 +16,6 @@ import proyectojuego.jugabilidad.Tablero;
 
 
 public class PantallaJuego extends Pantalla {
-
 
 	/** Variables usadas en los controles del juego */
 	private static final float	DELAY_ENTRE_MOVIMIENTOS		= .2f;								// El valor indicado aqui será el delay inicial
@@ -48,14 +48,16 @@ public class PantallaJuego extends Pantalla {
 	private final int 			ESCALA_PIEZA_UI			= 96;		// Tamaño en px de las piezas mostradas en los laterales
 
 	public TextureAtlas			textureAtlas;						// Contiene información de donde se localizan las texturas en la imagen texturas.png
+	private Skin				skin;								// Skin que contiene los estilos del texto puntuacionTotal
+	private Table				tablaIndicadorPuntuacion;			// Contenedor que encapsula el Label indicadorPuntuacionTotal
+	private Label				textoPuntuacionTotal;				// Label que contiene la palabra puntuacion
+	private Label				indicadorPuntuacionTotal;			// Label que contiene la variable puntuacionTotal
 	private final Sprite		spriteFondoJuego;					// Sprite para el fondo del tablero
 	private final Sprite		spriteFondoPiezaGuardada;			// Sprite que se coloca de fondo para la pieza guardada
 	private final Sprite		spriteFondoPrimeraPieza;			// Sprite que se coloca de fondo para la primera pieza en la lista de siguientes
 	private final Sprite		spriteFondoSegundaPieza;			// Sprite que se coloca de fondo para la segunda pieza en la lista de siguientes
 	private final Sprite		spriteFondoTerceraPieza;			// Sprite que se coloca de fondo para la tercera pieza en la lista de siguientes
 	private final Sprite		spriteGridZonaJuego;				// Contiene la malla que se coloca sobre el spriteFondoJuego
-	private Container<Label>	contenedorIndicadorPuntuacion;		// Contenedor que encapsula el Label indicadorPuntuacionTotal
-	private Label				indicadorPuntuacionTotal;			// Label que contiene la variable puntuacionTotal
 
 	private Pieza				piezaJugable;						// Guarda la pieza que se está jugando
 	private Pieza				piezaGuardada;						// Guarda la pieza que el jugador guardó
@@ -81,11 +83,18 @@ public class PantallaJuego extends Pantalla {
 		// CREA UNA INSTANCIA DEL TABLERO DE JUEGO
 		tableroJuego = Tablero.getInstance();
 
-		// CREA EL CONTENEDOR Y EL LABEL QUE CONTENDRÁ LA PUNTUACION, DESPUES AGREGA EL LABEL AL CONTENEDOR Y LO ALINEA ABAJO A LA DERECHA
-		contenedorIndicadorPuntuacion	= new Container<>();
-		indicadorPuntuacionTotal		= new Label(Integer.toString(puntucionTotal), new Skin(Gdx.files.internal("uiskin.json")));
-		contenedorIndicadorPuntuacion.setActor(indicadorPuntuacionTotal);
-		contenedorIndicadorPuntuacion.bottom().right();
+		// CREA LA TABLA Y LOS LABEL QUE CONTENDRÁN LA PUNTUACION, DESPUES ALINEA LA TABLA ABAJO A LA DERECHA
+		skin							= new Skin(Gdx.files.internal("uiskin.json"));
+		tablaIndicadorPuntuacion		= new Table();
+		textoPuntuacionTotal			= new Label("Puntuacion", skin);
+		indicadorPuntuacionTotal		= new Label(Integer.toString(puntucionTotal), skin, "default");
+		tablaIndicadorPuntuacion.bottom().right();
+
+		// AÑADE LOS LABEL A LA TABLA
+		tablaIndicadorPuntuacion.defaults().align(Align.right);
+		tablaIndicadorPuntuacion.add(textoPuntuacionTotal);
+		tablaIndicadorPuntuacion.row();
+		tablaIndicadorPuntuacion.add(indicadorPuntuacionTotal);
 
 		// CARGA LOS SPRITES CORRESPONDIENTES DEL TEXTUREATLAS
 		spriteFondoJuego 			= new Sprite(textureAtlas.findRegion("FondoJuego"));
@@ -102,7 +111,7 @@ public class PantallaJuego extends Pantalla {
 		spriteFondoPrimeraPieza.setPosition(spriteFondoJuego.getX() + spriteFondoJuego.getWidth() + 20, spriteFondoJuego.getY() + spriteFondoJuego.getHeight() - spriteFondoPrimeraPieza.getHeight());
 		spriteFondoSegundaPieza.setPosition(spriteFondoJuego.getX() + spriteFondoJuego.getWidth() + 20, spriteFondoJuego.getY() + spriteFondoJuego.getHeight() - spriteFondoSegundaPieza.getHeight() * 2);
 		spriteFondoTerceraPieza.setPosition(spriteFondoJuego.getX() + spriteFondoJuego.getWidth() + 20, spriteFondoJuego.getY() + spriteFondoJuego.getHeight() - spriteFondoTerceraPieza.getHeight() * 3);
-		contenedorIndicadorPuntuacion.setPosition(spriteFondoJuego.getX() - 20 - contenedorIndicadorPuntuacion.getWidth(), spriteFondoJuego.getY());
+		tablaIndicadorPuntuacion.setPosition(spriteFondoJuego.getX() - 20 - tablaIndicadorPuntuacion.getWidth(), spriteFondoJuego.getY());
 
 		// ESTABLECE EL VALOR INICIAL DE CADA PIEZA
 		piezaJugable	= new Pieza();
@@ -264,7 +273,6 @@ public class PantallaJuego extends Pantalla {
 	public void dibujarPantalla(float delta) {
 		spriteBatch.begin();
 
-
 		// DIBUJA EL TABLERO DE JUEGO Y EL FONDO DEL TABLERO
 		spriteFondoJuego.draw(spriteBatch);
 		spriteGridZonaJuego.draw(spriteBatch);
@@ -290,7 +298,7 @@ public class PantallaJuego extends Pantalla {
 		}
 
 		// DIBUJA EL LABEL CON LA PUNTUACION ACTUAL
-		contenedorIndicadorPuntuacion.draw(spriteBatch, 1);
+		tablaIndicadorPuntuacion.draw(spriteBatch, 1);
 
 		spriteBatch.end();
 	}
@@ -320,28 +328,28 @@ public class PantallaJuego extends Pantalla {
 
 	}
 
-	private void jugarSiguientePieza() {
-		piezaJugable = primeraPieza;
-		primeraPieza = segundaPieza;
-		segundaPieza = terceraPieza;
-		terceraPieza = new Pieza();
-	}
-
 	private void fijarPiezaAlTablero(float delta) {
 		tiempoParaFijarATablero += delta;
 
 		// SI SUPERA EL TIEMPO DE COLOCACION SIN PODER BAJAR MAS SE EJECUTAN LAS SIGUIENTES ACCIONES
 		if (tiempoParaFijarATablero >= TIEMPO_COLOCACION) {
+			// SI LA PIEZA SE COLOCA EN UNA POSICION y > 19 LA PARTIDA TERMINA
 			seTerminoPartida = tableroJuego.colocarPieza(posicionPiezaJugable, piezaJugable);
+
+			// CALCULA LA PUNTUACION OBTENIDA
 			int lineasEliminadas;
 			if ((lineasEliminadas = tableroJuego.eliminarFilasCompletas()) > 0) puntucionTotal += sumarPuntosCompletarLinea(lineasEliminadas);
 			puntucionTotal += sumarPuntosColocarPieza(tiempoNecesitadoParaColocar);
 
+			// ACTUALIZA EL MULTIPLICADOR DE VELOCIDAD A LA QUE LA PIEZA BAJA
+			multiplicadorVelocidad 		= 1 + puntucionTotal / 25000f;
+
+			// SACA LA SIGUIENTE PIEZA, LA POSICIONA ARRIBA DEL TABLERO Y ESTABLECE UNA SERIE DE VARIABLES A SU VALOR POR DEFECTO
+			jugarSiguientePieza();
 			posicionPiezaJugable		= posicionInicioPiezaJugable.cpy();
 			tiempoNecesitadoParaColocar = 0;
 			tiempoParaFijarATablero		= 0;
 			seIntercambioPiezaJugable	= false;
-			jugarSiguientePieza();
 		}
 	}
 
@@ -351,6 +359,13 @@ public class PantallaJuego extends Pantalla {
 
 	private int sumarPuntosCompletarLinea(int lineasCompletadas) {
 		return PUNTOS_COMPLETAR_LINEA * lineasCompletadas * lineasCompletadas;
+	}
+
+	private void jugarSiguientePieza() {
+		piezaJugable = primeraPieza;
+		primeraPieza = segundaPieza;
+		segundaPieza = terceraPieza;
+		terceraPieza = new Pieza();
 	}
 
 }
