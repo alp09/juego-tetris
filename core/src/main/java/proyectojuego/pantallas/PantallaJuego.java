@@ -2,6 +2,8 @@ package proyectojuego.pantallas;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
@@ -72,10 +74,23 @@ public class PantallaJuego extends Pantalla {
 	private final Vector2		posicionSegundaPieza;				// Posicion en la UI de la segunda pieza de la lista
 	private final Vector2		posicionTerceraPieza;				// Posicion en la UI de la tercera pieza de la lista
 
+	private Music musica;
+	private Sound sonidoPieza;
+	private boolean musicaEncendida;
+
 
 // CONSTRUCTOR
 	public PantallaJuego() {
 		super();
+
+		//CARGAMOS LA MUSICA Y LOS SONIDOS Y LOS INICIAMOS
+		musica = Gdx.audio.newMusic(Gdx.files.internal("musicaJuego.ogg"));
+		sonidoPieza = Gdx.audio.newSound(Gdx.files.internal("sonidoPieza.ogg"));
+		sonidoPieza.setVolume(0,1);
+		musica.setVolume(.1f);
+		musica.setLooping(true);
+		musica.play();
+		musicaEncendida= true;
 
 		// CARGA LAS TEXUTRAS DEL ASSETMANAGER
 		textureAtlas = assetManager.get("ui/texturas.atlas");
@@ -239,6 +254,17 @@ public class PantallaJuego extends Pantalla {
 			// ToDo: pausar/reanudar el juego
 		}
 
+		if (Gdx.input.isKeyJustPressed((Input.Keys.M))){
+			if(musicaEncendida){
+				musica.stop();
+				musicaEncendida=false;
+			} else {
+				musica.play();
+				musicaEncendida=true;
+			}
+
+		}
+
 	}
 
 	@Override
@@ -325,7 +351,7 @@ public class PantallaJuego extends Pantalla {
 
 	@Override
 	public void dispose() {
-
+		musica.dispose();
 	}
 
 	private void fijarPiezaAlTablero(float delta) {
@@ -333,6 +359,8 @@ public class PantallaJuego extends Pantalla {
 
 		// SI SUPERA EL TIEMPO DE COLOCACION SIN PODER BAJAR MAS SE EJECUTAN LAS SIGUIENTES ACCIONES
 		if (tiempoParaFijarATablero >= TIEMPO_COLOCACION) {
+			//SONIDO DE CHOQUE ENTRE PIEZAS
+			sonidoPieza.play();
 			// SI LA PIEZA SE COLOCA EN UNA POSICION y > 19 LA PARTIDA TERMINA
 			seTerminoPartida = tableroJuego.colocarPieza(posicionPiezaJugable, piezaJugable);
 

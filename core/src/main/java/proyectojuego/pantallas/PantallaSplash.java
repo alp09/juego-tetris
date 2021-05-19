@@ -2,6 +2,7 @@ package proyectojuego.pantallas;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -22,6 +23,7 @@ public class PantallaSplash extends Pantalla {
 	private float 	tiempoEntreAnimaciones		= 0;					// DEFINE EL TIEMPO QUE HA TRANSCURRIDO DESDE QUE LA ANIMACION FADE IN TERMINÓ.
 
 	private final Sprite spritePantallaSplash;
+	private Sound sonidoSplash;
 
 
 // CONSTRUCTOR
@@ -38,7 +40,9 @@ public class PantallaSplash extends Pantalla {
 
 		// AQUI VAN TODOS LOS ASSETS A CARGAR
 		assetManager.load("ui/texturas.atlas", TextureAtlas.class);
-
+		sonidoSplash = Gdx.audio.newSound(Gdx.files.internal("sonidoSplash.ogg"));
+		sonidoSplash.play();
+		sonidoSplash.setLooping(1,true);
 	}
 
 

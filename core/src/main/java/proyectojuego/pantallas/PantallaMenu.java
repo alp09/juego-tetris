@@ -1,6 +1,8 @@
 package proyectojuego.pantallas;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -27,10 +29,20 @@ public class PantallaMenu extends Pantalla {
 	private final TextButton	botonJugar;
 	private final TextButton	botonOpciones;
 
+	private Music musica;
+	private boolean musicaEncendida;
+
 
 // CONSTRUCTOR
     public PantallaMenu() {
         super();
+
+		//CARGAMOS LA MUSICA Y LA INICIAMOS
+		musica = Gdx.audio.newMusic(Gdx.files.internal("musicaMenu.ogg"));
+		musica.setVolume(0.25f);
+		musica.setLooping(true);
+		musica.play();
+		musicaEncendida= true;
 
         // CARGA LAS TEXTURAS Y LAS POSICIONA
         textureAtlas = assetManager.get("ui/texturas.atlas", TextureAtlas.class);
@@ -64,7 +76,7 @@ public class PantallaMenu extends Pantalla {
 			public void clicked(InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
 				// ToDo: cambiar pantalla opciones
-				// juego.setScreen(new PantallaOpciones());
+				juego.setScreen(new PantallaOpciones());
 			}
 		});
 
@@ -118,7 +130,15 @@ public class PantallaMenu extends Pantalla {
 
     @Override
     public void gestionarInput(float delta) {
-
+		if (Gdx.input.isKeyJustPressed((Input.Keys.M))){
+			if(musicaEncendida){
+				musica.stop();
+				musicaEncendida=false;
+			} else {
+				musica.play();
+				musicaEncendida=true;
+			}
+		}
     }
 
     @Override
@@ -158,5 +178,6 @@ public class PantallaMenu extends Pantalla {
     public void dispose() {
 		skin.dispose();
 		stage.dispose();
+		musica.dispose();
     }
 }
