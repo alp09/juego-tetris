@@ -151,7 +151,7 @@ public class Tablero {
 		int filasEliminadas					= 0;
 
 		// AÑADE EL NUMERO DE LAS FILAS COMPLETAS AL ARRAYLIST filasCompletas
-		for (int i = 0; i < filaOcupadaMasAlta; i++) {
+		for (int i = 0; i <= filaOcupadaMasAlta; i++) {
 			bloquesOcupados = 0;
 			for (int j = 0; j < ANCHO_TABLERO / 2; j++) {
 				if (contenidoTablero[j][i] == -1) break;
@@ -167,8 +167,9 @@ public class Tablero {
 			// POR CADA FILA AÑADIDA AL ARRALIST
 			for (Integer indiceFila: filasCompletas) {
 
+				int filaCompleta = indiceFila - filasEliminadas;
 				// ESTABLECE EL VALOR DE LA FILA SUPERIOR EN LA FILA ACTUAL
-				for (int i = indiceFila - filasEliminadas; i < filaOcupadaMasAlta + 1; i++) {
+				for (int i = filaCompleta; i < filaOcupadaMasAlta + 1; i++) {
 					for (int j = 0; j < ANCHO_TABLERO; j++) {
 						contenidoTablero[j][i] = contenidoTablero[j][i + 1];
 					}
@@ -176,8 +177,8 @@ public class Tablero {
 
 				// PUESTO QUE LAS FILAS BAJAN, SI HAY MAS DE UNA FILA COMPLETA SE DEBE ACTUALIZAR EL indiceFila
 				filasEliminadas++;
+				filaOcupadaMasAlta--;
 			}
-			filaOcupadaMasAlta -= filasEliminadas;
 		}
 
 		return filasEliminadas;
