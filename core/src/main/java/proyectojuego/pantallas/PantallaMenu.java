@@ -129,7 +129,7 @@ public class PantallaMenu extends Pantalla {
     public void gestionarInput(float delta) {
 		if (Gdx.input.isKeyJustPressed((Input.Keys.M))){
 			if(musicaEncendida){
-				musica.stop();
+				musica.pause();
 				musicaEncendida=false;
 			} else {
 				musica.play();

@@ -31,8 +31,7 @@ public class Pieza {
 	}
 
 	public Pieza() {
-//		this(ListaPiezas.values()[(int) (Math.random() * (ListaPiezas.values().length))]);
-		this(ListaPiezas.CUADRADO);
+		this(ListaPiezas.values()[(int) (Math.random() * (ListaPiezas.values().length))]);
 	}
 
 

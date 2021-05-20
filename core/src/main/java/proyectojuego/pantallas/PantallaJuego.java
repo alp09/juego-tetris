@@ -128,11 +128,7 @@ public class PantallaJuego extends Pantalla {
 		tablaIndicadorPuntuacion.setPosition(spriteFondoJuego.getX() - 20 - tablaIndicadorPuntuacion.getWidth(), spriteFondoJuego.getY());
 
 		// ESTABLECE EL VALOR INICIAL DE CADA PIEZA
-		piezaJugable				= new Pieza();
-		piezaGuardada				= null;
-		primeraPieza 				= new Pieza();
-		segundaPieza 				= new Pieza();
-		terceraPieza 				= new Pieza();
+		this.generarNuevasPiezas();
 
 		// GUARDA UNAS COORDENADAS QUE SE USARÁN A MENUDO DURANTE LA PARTIDA
 		posicionInicioPiezaJugable	= new Vector2(tableroJuego.ANCHO_TABLERO * .5f, tableroJuego.ALTURA_COMIENZO_PIEZA);
@@ -177,6 +173,21 @@ public class PantallaJuego extends Pantalla {
 			} else {
 				this.resume();
 			}
+		}
+
+		if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+
+			// Resetea el tablero
+			tableroJuego.limpiarTablero();
+			estadoAplicacion = EstadoAplicacion.EJECUTANDO;
+
+			// Resetea la puntuacion
+			puntucionTotal = 0;
+
+			// Genera nuevas piezas y restablece la pieza jugable
+			posicionPiezaJugable = posicionInicioPiezaJugable.cpy();
+			this.generarNuevasPiezas();
+
 		}
 
 		if (estadoAplicacion == EstadoAplicacion.EJECUTANDO) {
@@ -277,7 +288,7 @@ public class PantallaJuego extends Pantalla {
 
 			if (Gdx.input.isKeyJustPressed((Input.Keys.M))){
 				if(musicaEncendida){
-					musica.stop();
+					musica.pause();
 					musicaEncendida=false;
 				} else {
 					musica.play();
@@ -405,9 +416,7 @@ public class PantallaJuego extends Pantalla {
 
 	@Override
 	public void dispose() {
-		musica.dispose();
-//		sonidoPieza.dispose();		COMNETADO PORQUE AL CARGAR LA PARTIDA DE NUEVO NO CARGA LOS SONIDOS
-//		sonidoFila.dispose();
+
 	}
 
 	private void fijarPiezaAlTablero(float delta) {
@@ -448,6 +457,14 @@ public class PantallaJuego extends Pantalla {
 
 	private int sumarPuntosCompletarLinea(int lineasCompletadas) {
 		return PUNTOS_COMPLETAR_LINEA * lineasCompletadas * lineasCompletadas;
+	}
+
+	private void generarNuevasPiezas() {
+		piezaJugable	= new Pieza();
+		piezaGuardada	= null;
+		primeraPieza 	= new Pieza();
+		segundaPieza 	= new Pieza();
+		terceraPieza 	= new Pieza();
 	}
 
 	private void jugarSiguientePieza() {
