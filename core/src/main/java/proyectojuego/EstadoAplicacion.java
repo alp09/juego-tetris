@@ -3,6 +3,7 @@ package proyectojuego;
 public enum EstadoAplicacion {
 
 	EJECUTANDO,
-	PAUSADO
+	PAUSADO,
+	GAME_OVER
 
 }

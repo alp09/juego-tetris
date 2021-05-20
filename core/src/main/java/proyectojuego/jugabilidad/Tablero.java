@@ -1,7 +1,6 @@
 package proyectojuego.jugabilidad;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
@@ -144,13 +143,13 @@ public class Tablero {
 
 
 	// METODO ELIMIAR - Elimina las filas completas del tablero
-	public int eliminarFilasCompletas() {
+	public int detectarFilasCompletas() {
 
 		int bloquesOcupados;
 		ArrayList<Integer> filasCompletas	= new ArrayList<>();
-		int filasEliminadas					= 0;
+		int filasEliminadas 				= 0;
 
-		// AÑADE EL NUMERO DE LAS FILAS COMPLETAS AL ARRAYLIST filasCompletas
+		// AÑADE EL INDICE DE LAS FILAS COMPLETAS AL ARRAYLIST filasCompletas
 		for (int i = 0; i <= filaOcupadaMasAlta; i++) {
 			bloquesOcupados = 0;
 			for (int j = 0; j < ANCHO_TABLERO / 2; j++) {
@@ -161,24 +160,33 @@ public class Tablero {
 			if (bloquesOcupados == ANCHO_TABLERO) filasCompletas.add(i);
 		}
 
-		// SI HAY ALGUNA FILA COMPLETA, EL TAMAÑO DEL ARRAYLIST SERA SUPERIOR A 0 Y ENTRA AQUI
-		if (filasCompletas.size() > 0) {
+		// SI HAY ALGUNA FILA COMPLETA, EL TAMAÑO DEL ARRAYLIST SERA SUPERIOR A 0 ELIMINA LAS FILAS
+		if (filasCompletas.size() > 0) filasEliminadas = eliminarFilasCompletas(filasCompletas);
 
-			// POR CADA FILA AÑADIDA AL ARRALIST
-			for (Integer indiceFila: filasCompletas) {
+		// DEVUELVE LA CANTIDAD DE FILAS ELIMINADAS
+		return filasEliminadas;
 
-				int filaCompleta = indiceFila - filasEliminadas;
-				// ESTABLECE EL VALOR DE LA FILA SUPERIOR EN LA FILA ACTUAL
-				for (int i = filaCompleta; i < filaOcupadaMasAlta + 1; i++) {
-					for (int j = 0; j < ANCHO_TABLERO; j++) {
-						contenidoTablero[j][i] = contenidoTablero[j][i + 1];
-					}
+	}
+
+	private int eliminarFilasCompletas(ArrayList<Integer> filasCompletas) {
+
+		int filasEliminadas	= 0;
+
+		// POR CADA FILA AÑADIDA AL ARRALIST
+		for (Integer indiceFila: filasCompletas) {
+
+			// ESTABLECE EL VALOR DE LA FILA SUPERIOR EN LA FILA ACTUAL
+			for (int i = indiceFila - filasEliminadas; i <= filaOcupadaMasAlta; i++) {
+				for (int j = 0; j < ANCHO_TABLERO; j++) {
+					contenidoTablero[j][i] = contenidoTablero[j][i + 1];
 				}
-
-				// PUESTO QUE LAS FILAS BAJAN, SI HAY MAS DE UNA FILA COMPLETA SE DEBE ACTUALIZAR EL indiceFila
-				filasEliminadas++;
-				filaOcupadaMasAlta--;
 			}
+
+			// PUESTO QUE LAS FILAS BAJAN, SE DEBE ACTUALIZAR filasEliminadas POR SI HAY MAS DE UNA FILA COMPLETA
+			filasEliminadas++;
+
+			// TAMBIEN SE MANTIENE ACTUALIZADA LA VARIABLE filaOcupadaMasAlta RESTANDOLE LA FILA ELIMINADA
+			filaOcupadaMasAlta--;
 		}
 
 		return filasEliminadas;

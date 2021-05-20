@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 public class PantallaMenu extends Pantalla {
 
-	private static final int 	PUNTUACIONES_MAXIMAS_MOSTRADAS = 5;
+	public static final int 	PUNTUACIONES_MAXIMAS_MOSTRADAS = 5;
 	private ArrayList<Integer>	listaMejoresPuntuaciones = new ArrayList<>();
 
 	private final TextureAtlas	textureAtlas;
@@ -29,20 +29,20 @@ public class PantallaMenu extends Pantalla {
 	private final TextButton	botonJugar;
 	private final TextButton	botonOpciones;
 
-	private Music				musica;
-	private boolean				musicaEncendida;
+	private Music				musicaPantallaMenu;
+	private boolean				musicaEstaEncendida;
 
 
 // CONSTRUCTOR
     public PantallaMenu() {
         super();
 
-		//CARGAMOS LA MUSICA Y LA INICIAMOS
-		musica = assetManager.get("sounds/musicaMenu.ogg");
-		musica.setVolume(0.25f);
-		musica.setLooping(true);
-		musica.play();
-		musicaEncendida= true;
+		//CARGA LA MUSICA Y LA INICIA
+		musicaPantallaMenu = assetManager.get("sounds/musicaMenu.ogg");
+		musicaPantallaMenu.setVolume(0.25f);
+		musicaPantallaMenu.setLooping(true);
+		musicaPantallaMenu.play();
+		musicaEstaEncendida = true;
 
         // CARGA LAS TEXTURAS Y LAS POSICIONA
         textureAtlas = assetManager.get("ui/texturas.atlas", TextureAtlas.class);
@@ -128,12 +128,12 @@ public class PantallaMenu extends Pantalla {
     @Override
     public void gestionarInput(float delta) {
 		if (Gdx.input.isKeyJustPressed((Input.Keys.M))){
-			if(musicaEncendida){
-				musica.pause();
-				musicaEncendida=false;
+			if(musicaEstaEncendida){
+				musicaPantallaMenu.pause();
+				musicaEstaEncendida = false;
 			} else {
-				musica.play();
-				musicaEncendida=true;
+				musicaPantallaMenu.play();
+				musicaEstaEncendida = true;
 			}
 		}
     }
@@ -173,8 +173,6 @@ public class PantallaMenu extends Pantalla {
 
     @Override
     public void dispose() {
-//		skin.dispose();		COMENTADO PORQUE EL ASSETMANAGER LO ELIMINA EN VEZ DE CARGARLO DE NUEVO
 		stage.dispose();
-		musica.dispose();
     }
 }

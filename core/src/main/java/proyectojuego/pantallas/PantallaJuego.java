@@ -7,6 +7,8 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -17,6 +19,8 @@ import proyectojuego.jugabilidad.Pieza;
 import proyectojuego.jugabilidad.Tablero;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class PantallaJuego extends Pantalla {
 
@@ -50,13 +54,20 @@ public class PantallaJuego extends Pantalla {
 	public	static final int	PIXELES_BLOQUE_UI		= 32;		// Tamaño en px de un bloque - Se usa establecer un espacio entre las coordenadas cuando se va a dibujar un bloque
 	private final int 			ESCALA_PIEZA_UI			= 96;		// Tamaño en px de las piezas mostradas en los laterales
 
-	public	TextureAtlas		textureAtlas;						// Contiene información de donde se localizan las texturas en la imagen texturas.png
+	private final Skin			skin;								// Skin que contiene los estilos del texto puntuacionTotal
+	private final Table			tablaIndicadorPuntuacion;			// Contenedor que encapsula el Label indicadorPuntuacionTotal
+	private final Label			textoPuntuacionTotal;				// Label que contiene la palabra puntuacion
+	private final Label			indicadorPuntuacionTotal;			// Label que contiene la variable puntuacionTotal
+	private final Label			mensajePantallaPausa;				// Mensaje que aparece cuando el juego esta pausado
+	private Stage				stage;								// Stage para el cuadro de dialogo
+	private Dialog				ventanaGameOver;					// Cuadro de dialogo mostrado al finalizar la partida
 
-	private Skin				skin;								// Skin que contiene los estilos del texto puntuacionTotal
-	private Table				tablaIndicadorPuntuacion;			// Contenedor que encapsula el Label indicadorPuntuacionTotal
-	private Label				textoPuntuacionTotal;				// Label que contiene la palabra puntuacion
-	private Label				indicadorPuntuacionTotal;			// Label que contiene la variable puntuacionTotal
-	private Label				mensajePantallaPausa;				// Mensaje que aparece cuando el juego esta pausado
+	public	TextureAtlas		textureAtlas;						// Contiene información de donde se localizan las texturas en la imagen texturas.png
+	private Pieza				piezaJugable;						// Guarda la pieza que se está jugando
+	private Pieza				piezaGuardada;						// Guarda la pieza que el jugador guardó
+	private Pieza 				primeraPieza;						// Guarda la primera pieza en la lista de siguientes
+	private Pieza 				segundaPieza;						// Guarda la segunda pieza en la lista de siguientes
+	private Pieza 				terceraPieza;						// Guarda la tercera pieza en la lista de siguientes
 
 	private final Sprite		spriteFondoJuego;					// Sprite para el fondo del tablero
 	private final Sprite		spriteFondoPiezaGuardada;			// Sprite que se coloca de fondo para la pieza guardada
@@ -65,25 +76,21 @@ public class PantallaJuego extends Pantalla {
 	private final Sprite		spriteFondoTerceraPieza;			// Sprite que se coloca de fondo para la tercera pieza en la lista de siguientes
 	private final Sprite		spriteGridZonaJuego;				// Contiene la malla que se coloca sobre el spriteFondoJuego
 
-	private Pieza				piezaJugable;						// Guarda la pieza que se está jugando
-	private Pieza				piezaGuardada;						// Guarda la pieza que el jugador guardó
-	private Pieza 				primeraPieza;						// Guarda la primera pieza en la lista de siguientes
-	private Pieza 				segundaPieza;						// Guarda la segunda pieza en la lista de siguientes
-	private Pieza 				terceraPieza;						// Guarda la tercera pieza en la lista de siguientes
-
+	private final Vector2		posicionTablero;					// Esquina inferior derecha del tablero
 	private Vector2				posicionPiezaJugable;				// Posicion actual de la pieza
 	private final Vector2		posicionInicioPiezaJugable;			// Posicion desde donde la pieza jugable aparece al comienzo
-	private final Vector2		posicionPiezaGuardada;				// Posicion en la UI de la pieza guardada
-	private final Vector2		posicionPrimeraPieza;				// Posicion en la UI de la primera pieza de la lista
-	private final Vector2		posicionSegundaPieza;				// Posicion en la UI de la segunda pieza de la lista
-	private final Vector2		posicionTerceraPieza;				// Posicion en la UI de la tercera pieza de la lista
+	private final Vector2		posicionPiezaGuardada;				// Esquina inferior derecha en la UI de la pieza guardada
+	private final Vector2		posicionPrimeraPieza;				// Esquina inferior derecha en la UI de la primera pieza de la lista
+	private final Vector2		posicionSegundaPieza;				// Esquina inferior derecha en la UI de la segunda pieza de la lista
+	private final Vector2		posicionTerceraPieza;				// Esquina inferior derecha en la UI de la tercera pieza de la lista
 
 	/** Variables usadas para los sonidos del juego*/
-	private Music	musica;
-	private Sound	sonidoPieza;
-	private Sound	sonidoFila;
-	private Sound	sonidoGameOver;
-	private boolean musicaEncendida;
+	private boolean 			musicaEstaEncendida;				// Determina si la musica se reproduce
+	private boolean				efectosSondioEstanHabilitados;		// Determina si los efectos de sonido se reproducen
+	private final Music			musicaPantallajuego;				// Almacena la musica de PantallaJuego
+	private final Sound			sonidoPiezaColocada;				// Almacena el efecto de sonido piezaColocada
+	private final Sound 		sonidoFilaCompleta;					// Almacena el efecto de sonido filaCompletada
+	private final Sound			sonidoGameOver;						// Almacena el efecto de sonido GameOver
 
 
 // CONSTRUCTOR
@@ -131,6 +138,7 @@ public class PantallaJuego extends Pantalla {
 		this.generarNuevasPiezas();
 
 		// GUARDA UNAS COORDENADAS QUE SE USARÁN A MENUDO DURANTE LA PARTIDA
+		posicionTablero				= new Vector2(spriteFondoJuego.getX(), spriteFondoJuego.getY());
 		posicionInicioPiezaJugable	= new Vector2(tableroJuego.ANCHO_TABLERO * .5f, tableroJuego.ALTURA_COMIENZO_PIEZA);
 		posicionPiezaJugable		= new Vector2(posicionInicioPiezaJugable.x, posicionInicioPiezaJugable.y);
 		posicionPiezaGuardada		= new Vector2(spriteFondoPiezaGuardada.getX() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPiezaGuardada.getY() + spriteFondoPiezaGuardada.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
@@ -139,18 +147,18 @@ public class PantallaJuego extends Pantalla {
 		posicionTerceraPieza		= new Vector2(spriteFondoTerceraPieza.getX() + spriteFondoTerceraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoTerceraPieza.getY() + spriteFondoTerceraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
 
 		//CARGA MUSICA Y LOS SONIDOS
-		musica			= assetManager.get("sounds/musicaJuego.ogg");
-		sonidoPieza		= assetManager.get("sounds/sonidoPieza.ogg");
-		sonidoFila		= assetManager.get("sounds/sonidoFilaCompleta.ogg");
+		musicaPantallajuego = assetManager.get("sounds/musicaJuego.ogg");
+		sonidoPiezaColocada = assetManager.get("sounds/sonidoPieza.ogg");
+		sonidoFilaCompleta = assetManager.get("sounds/sonidoFilaCompleta.ogg");
 		sonidoGameOver	= assetManager.get("sounds/sonidoGameOver.ogg");
 
 		// INICIA LA REPRODUCCION DE SONIDOS
-		musica.play();
-		musica.setVolume(.06f);
-		sonidoPieza.setVolume(0,1);
+		musicaPantallajuego.play();
+		musicaPantallajuego.setVolume(.06f);
+		sonidoPiezaColocada.setVolume(0,1);
 
 		// CREA EL MENSAJE DE PAUSA
-		mensajePantallaPausa		= new Label("Pausa", skin);
+		mensajePantallaPausa = new Label("Pausa", skin);
 		mensajePantallaPausa.setAlignment(Align.center);
 		mensajePantallaPausa.setPosition(spriteFondoJuego.getX() + spriteFondoJuego.getWidth() * .5f - mensajePantallaPausa.getWidth() * .5f, spriteFondoJuego.getY() + spriteFondoJuego.getHeight() * .5f - mensajePantallaPausa.getHeight() * .5f);
 
@@ -166,148 +174,139 @@ public class PantallaJuego extends Pantalla {
 	@Override
 	public void gestionarInput(float delta) {
 
-		// LLAMA AL METODO QUE CORRESPONDE DEPENDIENDO DEL ESTADO DE LA APLICACION
-		if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+		// SI LA PARTIDA NO HA TERMINADO
+		if (estadoAplicacion != EstadoAplicacion.GAME_OVER) {
+
+			// LLAMA AL METODO QUE CORRESPONDE DEPENDIENDO DEL ESTADO DE LA APLICACION
+			if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+				if (estadoAplicacion == EstadoAplicacion.EJECUTANDO) {
+					this.pause();
+				} else {
+					this.resume();
+				}
+			}
+
+			// RESETEA LA PARTIDA
+			if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+				this.nuevaPartida();
+			}
+
+			// SI LA APLICACION ESTA PAUSADA, ESTOS CONTROLES NO RESPONDEN
 			if (estadoAplicacion == EstadoAplicacion.EJECUTANDO) {
-				this.pause();
-			} else {
-				this.resume();
-			}
-		}
 
-		if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+				// GUARDA LA PIEZA JUGABLE O LA CAMBIA POR LA PIEZA GUARDADA
+				if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
 
-			// Resetea el tablero
-			tableroJuego.limpiarTablero();
-			estadoAplicacion = EstadoAplicacion.EJECUTANDO;
+					// EVITA QUE EL JUGADOR CAMBIE CONSTANTEMENTE DE PIEZA, RESETEANDO posicionPiezaJugable
+					if (!seIntercambioPiezaJugable) {
+						// SI NO HAY NINGUNA PIEZA GUARDADA, GUARDA LA PIEZA JUGABLE Y SACA LA SIGUIENTE PIEZA DE LA LISTA
+						if (piezaGuardada == null) {
+							piezaGuardada	= piezaJugable;
+							jugarSiguientePieza();
 
-			// Resetea la puntuacion
-			puntucionTotal = 0;
+							// EN CASO DE QUE HAYA UNA PIEZA GUARDADA, LAS INTERCAMBIA
+						} else {
+							Pieza piezaAuxiliar = piezaGuardada;
+							piezaGuardada		= piezaJugable;
+							piezaJugable		= piezaAuxiliar;
+						}
+						posicionPiezaJugable	= posicionInicioPiezaJugable.cpy();
+					}
+					// INDICA QUE SE GUARDO LA PIEZA - SE RESETEA UNA VEZ SE COLOQUE EN EL TABLERO UNA PIEZA
+					seIntercambioPiezaJugable	= true;
+				}
 
-			// Genera nuevas piezas y restablece la pieza jugable
-			posicionPiezaJugable = posicionInicioPiezaJugable.cpy();
-			this.generarNuevasPiezas();
+				// MUEVE LA PIEZA A LA IZQUIERDA O DERECHA (MUTUAMENTE EXCLUSIVO)
+				if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
 
-		}
+					// AQUI SE DISTINGUE SI SE ESTA MOVIENDO A LA IZQUIERDA O DERECHA
+					int 	movimientoHorizontal;
+					boolean puedeMoverseHorizontal;
 
-		if (estadoAplicacion == EstadoAplicacion.EJECUTANDO) {
-
-			// GUARDA LA PIEZA JUGABLE O LA CAMBIA POR LA PIEZA GUARDADA
-			if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
-
-				// EVITA QUE EL JUGADOR CAMBIE CONSTANTEMENTE DE PIEZA, RESETEANDO posicionPiezaJugable
-				if (!seIntercambioPiezaJugable) {
-					// SI NO HAY NINGUNA PIEZA GUARDADA, GUARDA LA PIEZA JUGABLE Y SACA LA SIGUIENTE PIEZA DE LA LISTA
-					if (piezaGuardada == null) {
-						piezaGuardada	= piezaJugable;
-						jugarSiguientePieza();
-
-						// EN CASO DE QUE HAYA UNA PIEZA GUARDADA, LAS INTERCAMBIA
+					if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+						movimientoHorizontal	= -1;
+						puedeMoverseHorizontal	= tableroJuego.puedeMoverIzquierda(posicionPiezaJugable, piezaJugable);
 					} else {
-						Pieza piezaAuxiliar = piezaGuardada;
-						piezaGuardada		= piezaJugable;
-						piezaJugable		= piezaAuxiliar;
+						movimientoHorizontal	= 1;
+						puedeMoverseHorizontal	= tableroJuego.puedeMoverDerecha(posicionPiezaJugable, piezaJugable);
 					}
-					posicionPiezaJugable	= posicionInicioPiezaJugable.cpy();
-				}
-				// INDICA QUE SE GUARDO LA PIEZA - SE RESETEA UNA VEZ SE COLOQUE EN EL TABLERO UNA PIEZA
-				seIntercambioPiezaJugable	= true;
-			}
 
-			// MUEVE LA PIEZA A LA IZQUIERDA O DERECHA (MUTUAMENTE EXCLUSIVO)
-			if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+					// COMPRUEBA LAS COLISIONES
+					if (puedeMoverseHorizontal) {
+						// COMPRUEBA SI LA DIRECCION A LA QUE SE QUIERE MOVER LA PIEZA ES DISTINTA QUE LA VEZ ANTERIOR PARA RESETEAR EL tiempoDesdeMovimientoHorizontal
+						if (direccionUltimoMovimientoHorizontal != movimientoHorizontal) {
+							direccionUltimoMovimientoHorizontal = movimientoHorizontal;
+							tiempoDesdeMovimientoHorizontal = 0;
+						}
+						// SE MUEVE LA PIEZA INMEDIATAMENTE SI LA TECLA SE PULSO
+						if (tiempoDesdeMovimientoHorizontal == 0) {
+							posicionPiezaJugable.add(movimientoHorizontal, 0);
 
-				// AQUI SE DISTINGUE SI SE ESTA MOVIENDO A LA IZQUIERDA O DERECHA
-				int 	movimientoHorizontal;
-				boolean puedeMoverseHorizontal;
+							// SI SE MANTUVO PULSADA LA TECLA, NO VUELVE A MOVERLA HASTA PASADO UN TIEMPO
+						} else if (tiempoDesdeMovimientoHorizontal >= DELAY_ENTRE_MOVIMIENTOS) {
+							posicionPiezaJugable.add(movimientoHorizontal, 0);
 
-				if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-					movimientoHorizontal	= -1;
-					puedeMoverseHorizontal	= tableroJuego.puedeMoverIzquierda(posicionPiezaJugable, piezaJugable);
+							// SE LE RESTA AL tiempoDesdeMovimientoHorizontal UNA PEQUEÑA CANTIDAD DE TIEMPO PARA EVITAR QUE ENTRE EN EL if ANTERIOR EN CADA LLAMADA AL RENDER
+							tiempoDesdeMovimientoHorizontal -= MAXIMO_CASILLAS_POR_SEGUNDO;
+						}
+						tiempoDesdeMovimientoHorizontal += delta;
+					}
+					// SI LA PIEZA NO SE ESTA MOVIENDO, SE RESETEA LA VARIABLE PARA ASI APLICAR EL DELAY INICIAL LA PROXIMA VEZ
 				} else {
-					movimientoHorizontal	= 1;
-					puedeMoverseHorizontal	= tableroJuego.puedeMoverDerecha(posicionPiezaJugable, piezaJugable);
+					tiempoDesdeMovimientoHorizontal = 0;
 				}
 
-				// COMPRUEBA LAS COLISIONES
-				if (puedeMoverseHorizontal) {
-					// COMPRUEBA SI LA DIRECCION A LA QUE SE QUIERE MOVER LA PIEZA ES DISTINTA QUE LA VEZ ANTERIOR PARA RESETEAR EL tiempoDesdeMovimientoHorizontal
-					if (direccionUltimoMovimientoHorizontal != movimientoHorizontal) {
-						direccionUltimoMovimientoHorizontal = movimientoHorizontal;
-						tiempoDesdeMovimientoHorizontal = 0;
+				// MUEVE LA PIEZA HACIA ABAJO - FUNCIONA IGUAL QUE EL DE MOVIMIENTO HORIZONTAL SIN EL DELAY INICIAL
+				if (Gdx.input.isKeyPressed(Input.Keys.DOWN))	{
+					if (tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable)) {
+						if (tiempoDesdeMovimientoVertical >= DELAY_ENTRE_MOVIMIENTOS) {
+							posicionPiezaJugable.add(0, -1);
+							tiempoDesdeMovimientoVertical -= MAXIMO_CASILLAS_POR_SEGUNDO;
+						}
+						tiempoDesdeMovimientoVertical += delta;
 					}
-					// SE MUEVE LA PIEZA INMEDIATAMENTE SI LA TECLA SE PULSO
-					if (tiempoDesdeMovimientoHorizontal == 0) {
-						posicionPiezaJugable.add(movimientoHorizontal, 0);
-
-						// SI SE MANTUVO PULSADA LA TECLA, NO VUELVE A MOVERLA HASTA PASADO UN TIEMPO
-					} else if (tiempoDesdeMovimientoHorizontal >= DELAY_ENTRE_MOVIMIENTOS) {
-						posicionPiezaJugable.add(movimientoHorizontal, 0);
-
-						// SE LE RESTA AL tiempoDesdeMovimientoHorizontal UNA PEQUEÑA CANTIDAD DE TIEMPO PARA EVITAR QUE ENTRE EN EL if ANTERIOR EN CADA LLAMADA AL RENDER
-						tiempoDesdeMovimientoHorizontal -= MAXIMO_CASILLAS_POR_SEGUNDO;
-					}
-					tiempoDesdeMovimientoHorizontal += delta;
-				}
-				// SI LA PIEZA NO SE ESTA MOVIENDO, SE RESETEA LA VARIABLE PARA ASI APLICAR EL DELAY INICIAL LA PROXIMA VEZ
-			} else {
-				tiempoDesdeMovimientoHorizontal = 0;
-			}
-
-			// MUEVE LA PIEZA HACIA ABAJO - FUNCIONA IGUAL QUE EL DE MOVIMIENTO HORIZONTAL SIN EL DELAY INICIAL
-			if (Gdx.input.isKeyPressed(Input.Keys.DOWN))	{
-				if (tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable)) {
-					if (tiempoDesdeMovimientoVertical >= DELAY_ENTRE_MOVIMIENTOS) {
-						posicionPiezaJugable.add(0, -1);
-						tiempoDesdeMovimientoVertical -= MAXIMO_CASILLAS_POR_SEGUNDO;
-					}
-					tiempoDesdeMovimientoVertical += delta;
-				}
-			} else {
-				tiempoDesdeMovimientoVertical = DELAY_ENTRE_MOVIMIENTOS;
-			}
-
-			// ENCAJA LA PIEZA JUSTO DEBAJO INSTANTÁNEAMENTE
-			if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-				while (tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable)) {
-					posicionPiezaJugable.y -= 1;
-				}
-
-				fijarPiezaAlTablero(TIEMPO_COLOCACION);
-			}
-
-			// ROTA LA PIEZA EN EL SENTIDO DE LAS AGUJAS DEL REJOJ
-			if (Gdx.input.isKeyJustPressed(Input.Keys.E) && tableroJuego.puedeRotarSentidoReloj(posicionPiezaJugable, piezaJugable)) {
-				piezaJugable.rotarSentidoReloj();
-			}
-
-			// ROTA LA PIEZA EN EL SENTIDO OPUESTO A LAS AGUJAS DEL RELOJ
-			if (Gdx.input.isKeyJustPressed(Input.Keys.Q) && tableroJuego.puedeRotarSentidoContrarioReloj(posicionPiezaJugable, piezaJugable)) {
-				piezaJugable.rotarSentidoContraReloj();
-			}
-
-			if (Gdx.input.isKeyJustPressed((Input.Keys.M))){
-				if(musicaEncendida){
-					musica.pause();
-					musicaEncendida=false;
 				} else {
-					musica.play();
-					musicaEncendida=true;
+					tiempoDesdeMovimientoVertical = DELAY_ENTRE_MOVIMIENTOS;
+				}
+
+				// ENCAJA LA PIEZA JUSTO DEBAJO INSTANTÁNEAMENTE
+				if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+					while (tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable)) {
+						posicionPiezaJugable.y -= 1;
+					}
+
+					fijarPiezaAlTablero(TIEMPO_COLOCACION);
+				}
+
+				// ROTA LA PIEZA EN EL SENTIDO DE LAS AGUJAS DEL REJOJ
+				if (Gdx.input.isKeyJustPressed(Input.Keys.E) && tableroJuego.puedeRotarSentidoReloj(posicionPiezaJugable, piezaJugable)) {
+					piezaJugable.rotarSentidoReloj();
+				}
+
+				// ROTA LA PIEZA EN EL SENTIDO OPUESTO A LAS AGUJAS DEL RELOJ
+				if (Gdx.input.isKeyJustPressed(Input.Keys.Q) && tableroJuego.puedeRotarSentidoContrarioReloj(posicionPiezaJugable, piezaJugable)) {
+					piezaJugable.rotarSentidoContraReloj();
+				}
+
+				// HABILITA / DESHABILITA LA MUSICA EN MITAD DE LA PARTIDA
+				if (Gdx.input.isKeyJustPressed((Input.Keys.M))){
+					if(musicaEstaEncendida){
+						musicaPantallajuego.pause();
+						musicaEstaEncendida =false;
+					} else {
+						musicaPantallajuego.play();
+						musicaEstaEncendida =true;
+					}
 				}
 
 			}
-
-			if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-				jugarSiguientePieza();
-			}
-
 		}
-
 	}
 
 	@Override
 	public void recalcularPantalla(float delta) {
 
+		// SI LA APLICACION NO ESTA EN EJECUCION (ESTA PAUSADA O TERMINO) NO SE ACTUALIZA
 		if (estadoAplicacion == EstadoAplicacion.EJECUTANDO) {
 
 			// BAJA LA PIEZA AUTOMÁTICAMENTE Y LA FIJA PASADO UN TIEMPO
@@ -321,7 +320,7 @@ public class PantallaJuego extends Pantalla {
 				tiempoDesdeUltimaBajada += delta;
 			}
 
-			// MANTIENE ACTUALIZADO EL TIEMPO QUE LLEVA LA PIEZA JUGABLE EN JUEGO
+			// MANTIENE ACTUALIZADO EL TIEMPO QUE LLEVA LA PIEZA JUGABLE EN JUEGO (USADO PARA CALCULAR PUNTUACION POR COLOCAR PIEZA)
 			tiempoNecesitadoParaColocar += delta;
 
 			// SI LA PIEZA NO PUEDE BAJAR, COMIENZO EL CONTADOR PARA FIJARSE AL TABLERO
@@ -331,33 +330,52 @@ public class PantallaJuego extends Pantalla {
 			indicadorPuntuacionTotal.setText(Integer.toString(puntucionTotal));
 
 			// CUANDO LA PARTIDA ACABA
-			if (seTerminoPartida){
+			if (seTerminoPartida) {
+
+				// ESTABLECE EL estadoAplicacion a GAME_OVER
+				estadoAplicacion = EstadoAplicacion.GAME_OVER;
+
+				// REPRODUCE EL SONIDO DE GAMEOVER
 				sonidoGameOver.play();
 
-				// ToDo: leer puntuaciones existentes
+				// GUARDA LA PUNTUACION AL ARCHIVO puntuaciones.bin
+				this.guardarPuntuacion();
 
-				try (DataOutputStream escritor = new DataOutputStream(new FileOutputStream("assets/files/puntuaciones.bin"))) {
+				// CREA EL CUADRO DE DIALOGO MOSTRADO EN EL GAMEOVER
+				stage = new Stage();
+				Gdx.input.setInputProcessor(stage);
 
-					// ToDo: comparar puntuaciones existentes con la actual y guardarla si procede
+				ventanaGameOver = new Dialog("GAME OVER", skin) {
+					@Override
+					protected void result(Object object) {
+						switch (object.toString()) {
+							case "0": nuevaPartida();						break;
+							case "1": juego.setScreen(new PantallaMenu());	break;
+						}
+					}
+				};
+				ventanaGameOver.setPosition(posicionTablero.x + spriteFondoJuego.getWidth() * .5f - ventanaGameOver.getWidth() * .5f, posicionTablero.y + spriteFondoJuego.getHeight() * .5f - ventanaGameOver.getHeight() * .5f);
+				ventanaGameOver.text("Puntuacion obtenida: " + puntucionTotal);
+				ventanaGameOver.button("VOLVER A JUGAR", 0);
+				ventanaGameOver.button("SALIR", 1);
+				ventanaGameOver.show(stage);
 
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-
-				juego.setScreen(new PantallaMenu());
 			}
-
 		}
-
 	}
 
 	@Override
 	public void dibujarPantalla(float delta) {
 		spriteBatch.begin();
 
-		if (estadoAplicacion == EstadoAplicacion.EJECUTANDO) {
+		// SI LA APLICACION ESTA PAUSADA SE DIBUJA LO SIGUIENTE
+		if (estadoAplicacion == EstadoAplicacion.PAUSADO) {
+
+			spriteFondoJuego.draw(spriteBatch);
+			mensajePantallaPausa.draw(spriteBatch, 1);
+
+		// EN CASO CONTRARIO (ESTA EN EJECUCION O SE TERMINO) SE DIBUJA ESTO OTRO
+		} else {
 
 			// DIBUJA EL TABLERO DE JUEGO Y EL FONDO DEL TABLERO
 			spriteFondoJuego.draw(spriteBatch);
@@ -376,7 +394,7 @@ public class PantallaJuego extends Pantalla {
 			spriteBatch.draw(terceraPieza.spritePieza, posicionTerceraPieza.x, posicionTerceraPieza.y, ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
 
 			// DIBUJA EL TABLERO
-			tableroJuego.dibujarContenidoTablero(spriteBatch, new Vector2(spriteFondoJuego.getX(), spriteFondoJuego.getY()));
+			tableroJuego.dibujarContenidoTablero(spriteBatch, posicionTablero);
 
 			// DIBUJA LA PIEZA JUGABLE
 			for (Vector2 bloquePieza: piezaJugable.getFormaPieza()) {
@@ -386,9 +404,9 @@ public class PantallaJuego extends Pantalla {
 			// DIBUJA EL LABEL CON LA PUNTUACION ACTUAL
 			tablaIndicadorPuntuacion.draw(spriteBatch, 1);
 
-		} else {
-			spriteFondoJuego.draw(spriteBatch);
-			mensajePantallaPausa.draw(spriteBatch, 1);
+			// SI LA PARTIDA TERMINO, DIBUJA EL CUADRO DE DIALOGO ENCIMA DEL TABLERO
+			if (estadoAplicacion == EstadoAplicacion.GAME_OVER) stage.draw();
+
 		}
 
 		spriteBatch.end();
@@ -426,16 +444,16 @@ public class PantallaJuego extends Pantalla {
 		if (tiempoParaFijarATablero >= TIEMPO_COLOCACION) {
 
 			//SONIDO DE CHOQUE ENTRE PIEZAS
-			sonidoPieza.play();
+			sonidoPiezaColocada.play();
 
 			// SI LA PIEZA SE COLOCA EN UNA POSICION y > 19 LA PARTIDA TERMINA
 			seTerminoPartida = tableroJuego.colocarPieza(posicionPiezaJugable, piezaJugable);
 
 			// CALCULA LA PUNTUACION OBTENIDA
 			int lineasEliminadas;
-			if ((lineasEliminadas = tableroJuego.eliminarFilasCompletas()) > 0) {
+			if ((lineasEliminadas = tableroJuego.detectarFilasCompletas()) > 0) {
 				puntucionTotal += sumarPuntosCompletarLinea(lineasEliminadas);
-				sonidoFila.play();
+				sonidoFilaCompleta.play();
 			}
 			puntucionTotal += sumarPuntosColocarPieza(tiempoNecesitadoParaColocar);
 
@@ -472,6 +490,50 @@ public class PantallaJuego extends Pantalla {
 		primeraPieza = segundaPieza;
 		segundaPieza = terceraPieza;
 		terceraPieza = new Pieza();
+	}
+
+	private void guardarPuntuacion() {
+
+		ArrayList<Integer>	mejoresPuntuaciones = new ArrayList<>();
+
+		// LEE LAS MEJORES PUNTUACIONES
+		try (DataInputStream lector	= new DataInputStream(new FileInputStream("assets/files/puntuaciones.bin"))) {
+			for (int i = 0; i < PantallaMenu.PUNTUACIONES_MAXIMAS_MOSTRADAS; i++) mejoresPuntuaciones.add(lector.readInt());
+		} catch (EOFException e) {
+			System.out.println("Fin de archivo");
+		} catch (FileNotFoundException e) {
+			System.out.println("Archivo no encontrado");
+		} catch (IOException e) {
+			System.out.println("Error en la lectura del archivo");
+		}
+
+		// ORDENA LAS PUNTUACIONES DE MEJOR A PEOR
+		mejoresPuntuaciones.add(puntucionTotal);
+		mejoresPuntuaciones.sort(Collections.reverseOrder());
+
+		// ESCRIBE LAS 5 MEJORES PUNTUACIONES EN EL ARCHIVO puntuaciones.bin
+		try (DataOutputStream escritor = new DataOutputStream(new FileOutputStream("assets/files/puntuaciones.bin"))) {
+			for (int i = 0; i < PantallaMenu.PUNTUACIONES_MAXIMAS_MOSTRADAS && i < mejoresPuntuaciones.size(); i++) escritor.writeInt(mejoresPuntuaciones.get(i));
+		} catch (FileNotFoundException e) {
+			System.out.println("Archivo no encontrado - Creando uno nuevo...");
+		} catch (IOException e) {
+			System.out.println("Error en la escritura del archivo");
+		}
+
+	}
+
+	public void nuevaPartida() {
+		// Resetea el tablero
+		tableroJuego.limpiarTablero();
+		seTerminoPartida = false;
+		estadoAplicacion = EstadoAplicacion.EJECUTANDO;
+
+		// Resetea la puntuacion
+		puntucionTotal = 0;
+
+		// Genera nuevas piezas y restablece la pieza jugable
+		posicionPiezaJugable = posicionInicioPiezaJugable.cpy();
+		this.generarNuevasPiezas();
 	}
 
 }
