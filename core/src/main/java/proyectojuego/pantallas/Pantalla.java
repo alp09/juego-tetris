@@ -6,22 +6,25 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import proyectojuego.EstadoAplicacion;
 import proyectojuego.Juego;
 
 public abstract class Pantalla implements Screen {
 
-	protected Juego			juego;
-	protected FitViewport	fitViewport;
-	protected AssetManager	assetManager;
-	protected SpriteBatch	spriteBatch;
+	protected EstadoAplicacion	estadoAplicacion;
+	protected Juego				juego;
+	protected FitViewport		fitViewport;
+	protected AssetManager		assetManager;
+	protected SpriteBatch		spriteBatch;
 
 
 // CONSTRUCTOR
 	public Pantalla() {
-		this.juego 			= (Juego) Gdx.app.getApplicationListener();
-		this.fitViewport	= this.juego.getFitViewport();
-		this.assetManager	= this.juego.getAssetManager();
-		this.spriteBatch	= this.juego.getSpriteBatch();
+		this.juego 				= (Juego) Gdx.app.getApplicationListener();
+		this.estadoAplicacion	= this.juego.getEstadoAplicacion();
+		this.fitViewport		= this.juego.getFitViewport();
+		this.assetManager		= this.juego.getAssetManager();
+		this.spriteBatch		= this.juego.getSpriteBatch();
 	}
 
 

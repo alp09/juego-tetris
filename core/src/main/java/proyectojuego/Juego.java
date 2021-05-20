@@ -14,6 +14,7 @@ public class Juego extends Game {
 	public static final int 	ALTO_JUEGO		= 900;
 	public static final String 	NOMBRE_JUEGO	= "Tetris";
 
+	private EstadoAplicacion	estadoAplicacion;
 	private OrthographicCamera	orthographicCamera;
 	private FitViewport 		fitViewport;
 	private AssetManager		assetManager;
@@ -27,6 +28,9 @@ public class Juego extends Game {
 
 
 // GETTERS
+	public EstadoAplicacion getEstadoAplicacion() {
+		return estadoAplicacion;
+	}
 	public FitViewport getFitViewport() {
 		return fitViewport;
 	}
@@ -41,6 +45,7 @@ public class Juego extends Game {
 // METODOS
 	@Override
 	public void create() {
+		estadoAplicacion	= EstadoAplicacion.EJECUTANDO;
 		orthographicCamera	= new OrthographicCamera();
 		fitViewport		 	= new FitViewport(ANCHO_JUEGO, ALTO_JUEGO, orthographicCamera);
 		assetManager		= new AssetManager();
