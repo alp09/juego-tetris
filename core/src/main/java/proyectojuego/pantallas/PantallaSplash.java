@@ -2,12 +2,14 @@ package proyectojuego.pantallas;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import proyectojuego.ListaPreferencias;
 
 public class PantallaSplash extends Pantalla {
 
@@ -45,6 +47,18 @@ public class PantallaSplash extends Pantalla {
 		sonidoSplash = assetManager.get("sounds/sonidoSplash.ogg", Sound.class);
 		sonidoSplash.play();
 		sonidoSplash.setLooping(1,true);
+
+		// SE CARGAN LOS CONTROLES
+		preferenciasUsuario = Gdx.app.getPreferences("preferenciasUsuario.prefs");
+
+		// COMPRUEBA CADA PREFERENCIA
+		for (ListaPreferencias preferencia: ListaPreferencias.values()) {
+
+			// SI NO EXISTE UNA ENTRADA PARA ESA PREFERENCIA
+			if (!preferenciasUsuario.contains(preferencia.getNombrePreferencia())) {
+
+			}
+		}
 
 		// AQUI VAN TODOS LOS ASSETS A CARGAR
 		assetManager.load("ui/texturas.atlas", TextureAtlas.class);

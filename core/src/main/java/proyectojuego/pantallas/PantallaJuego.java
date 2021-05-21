@@ -24,7 +24,7 @@ import java.util.Collections;
 
 public class PantallaJuego extends Pantalla {
 
-	/** Variables usadas en los controles del juego */
+	// Variables usadas en los controles del juego
 	private static final float	DELAY_ENTRE_MOVIMIENTOS		= .2f;								// El valor indicado aqui será el delay inicial
 	private static final float	MAXIMO_CASILLAS_POR_SEGUNDO	= 1 / 20f;							// 1 / N; siendo N el numero de casillas que podrá moverse la pieza como máximo en un segundo
 
@@ -34,7 +34,7 @@ public class PantallaJuego extends Pantalla {
 	private float				tiempoDesdeMovimientoVertical	= DELAY_ENTRE_MOVIMIENTOS;		// Guarda el tiempo una tecla de movimiento vertical ha estado pulsada. Su valor incial es DELAY_ENTRE_MOVIMIENTOS para saltarse el delay inicial en los movimientos verticales
 	private boolean 			seIntercambioPiezaJugable		= false;						// Guarda si se guardo una pieza para asi prevenir que la que se esta jugando pueda ser guardada de nuevo
 
-	/** Variables usadas en las actualizaciones del juego */
+	// Variables usadas en las actualizaciones del juego
 	private final float			DELAY_MAXIMO_BAJADA = .05f;			// Establece el tiempo mínimo entre bajada y bajada: Usado para capar la dificultad del juego
 	private final float			DELAY_ENTRE_BAJADA	= 1;			// Establece el delay en el que una pieza baja automaticamente
 	private final float			TIEMPO_COLOCACION	= .4f;			// Contiene el tiempo necesario que debe transcurrir para que una pieza se coloque en el tablero
@@ -44,13 +44,13 @@ public class PantallaJuego extends Pantalla {
 	private float				tiempoParaFijarATablero = 0;		// Guarda el tiempo que la pieza ha pasado sin poder bajar mas casillas
 	private float 				tiempoNecesitadoParaColocar;		// Tiempo necesitado por el jugador para colocar la pieza
 
-	/** Variables usadas para las puntuciones */
+	// Variables usadas para las puntuciones
 	private final int			PUNTOS_COLOCAR_PIEZA	= 100;		// Puntuacion base por colocar una pieza
 	private final int			PUNTOS_COMPLETAR_LINEA	= 1000;		// Puntuacion base por completar una linea
 	private int 				puntucionTotal;						// Almacena la puntuacion obtenida durante la partida
 	private boolean				seTerminoPartida = false;			// Determina si la partida termino
 
-	/** Variables usadas en la UI del juego */
+	// Variables usadas en la UI del juego
 	public	static final int	PIXELES_BLOQUE_UI		= 32;		// Tamaño en px de un bloque - Se usa establecer un espacio entre las coordenadas cuando se va a dibujar un bloque
 	private final int 			ESCALA_PIEZA_UI			= 96;		// Tamaño en px de las piezas mostradas en los laterales
 
@@ -84,7 +84,7 @@ public class PantallaJuego extends Pantalla {
 	private final Vector2		posicionSegundaPieza;				// Esquina inferior derecha en la UI de la segunda pieza de la lista
 	private final Vector2		posicionTerceraPieza;				// Esquina inferior derecha en la UI de la tercera pieza de la lista
 
-	/** Variables usadas para los sonidos del juego*/
+	// Variables usadas para los sonidos del juego
 	private boolean 			musicaEstaEncendida;				// Determina si la musica se reproduce
 	private boolean				efectosSondioEstanHabilitados;		// Determina si los efectos de sonido se reproducen
 	private final Music			musicaPantallajuego;				// Almacena la musica de PantallaJuego
@@ -149,12 +149,14 @@ public class PantallaJuego extends Pantalla {
 		//CARGA MUSICA Y LOS SONIDOS
 		musicaPantallajuego = assetManager.get("sounds/musicaJuego.ogg");
 		sonidoPiezaColocada = assetManager.get("sounds/sonidoPieza.ogg");
-		sonidoFilaCompleta = assetManager.get("sounds/sonidoFilaCompleta.ogg");
-		sonidoGameOver	= assetManager.get("sounds/sonidoGameOver.ogg");
+		sonidoFilaCompleta	= assetManager.get("sounds/sonidoFilaCompleta.ogg");
+		sonidoGameOver		= assetManager.get("sounds/sonidoGameOver.ogg");
 
 		// INICIA LA REPRODUCCION DE SONIDOS
-		musicaPantallajuego.play();
 		musicaPantallajuego.setVolume(.06f);
+		musicaPantallajuego.setLooping(true);
+		musicaEstaEncendida = true;
+		musicaPantallajuego.play();
 		sonidoPiezaColocada.setVolume(0,1);
 
 		// CREA EL MENSAJE DE PAUSA
@@ -204,7 +206,7 @@ public class PantallaJuego extends Pantalla {
 							piezaGuardada	= piezaJugable;
 							jugarSiguientePieza();
 
-							// EN CASO DE QUE HAYA UNA PIEZA GUARDADA, LAS INTERCAMBIA
+						// EN CASO DE QUE HAYA UNA PIEZA GUARDADA, LAS INTERCAMBIA
 						} else {
 							Pieza piezaAuxiliar = piezaGuardada;
 							piezaGuardada		= piezaJugable;
@@ -242,7 +244,7 @@ public class PantallaJuego extends Pantalla {
 						if (tiempoDesdeMovimientoHorizontal == 0) {
 							posicionPiezaJugable.add(movimientoHorizontal, 0);
 
-							// SI SE MANTUVO PULSADA LA TECLA, NO VUELVE A MOVERLA HASTA PASADO UN TIEMPO
+						// SI SE MANTUVO PULSADA LA TECLA, NO VUELVE A MOVERLA HASTA PASADO UN TIEMPO
 						} else if (tiempoDesdeMovimientoHorizontal >= DELAY_ENTRE_MOVIMIENTOS) {
 							posicionPiezaJugable.add(movimientoHorizontal, 0);
 
@@ -292,10 +294,10 @@ public class PantallaJuego extends Pantalla {
 				if (Gdx.input.isKeyJustPressed((Input.Keys.M))){
 					if(musicaEstaEncendida){
 						musicaPantallajuego.pause();
-						musicaEstaEncendida =false;
+						musicaEstaEncendida = false;
 					} else {
 						musicaPantallajuego.play();
-						musicaEstaEncendida =true;
+						musicaEstaEncendida = true;
 					}
 				}
 
@@ -335,7 +337,9 @@ public class PantallaJuego extends Pantalla {
 				// ESTABLECE EL estadoAplicacion a GAME_OVER
 				estadoAplicacion = EstadoAplicacion.GAME_OVER;
 
-				// REPRODUCE EL SONIDO DE GAMEOVER
+				// REPRODUCE EL SONIDO DE GAMEOVER Y PARA LA MUSICA DEL JUEGO
+				musicaPantallajuego.stop();
+				musicaEstaEncendida = false;
 				sonidoGameOver.play();
 
 				// GUARDA LA PUNTUACION AL ARCHIVO puntuaciones.bin
@@ -434,7 +438,7 @@ public class PantallaJuego extends Pantalla {
 
 	@Override
 	public void dispose() {
-
+		musicaPantallajuego.dispose();
 	}
 
 	private void fijarPiezaAlTablero(float delta) {
@@ -449,23 +453,26 @@ public class PantallaJuego extends Pantalla {
 			// SI LA PIEZA SE COLOCA EN UNA POSICION y > 19 LA PARTIDA TERMINA
 			seTerminoPartida = tableroJuego.colocarPieza(posicionPiezaJugable, piezaJugable);
 
-			// CALCULA LA PUNTUACION OBTENIDA
-			int lineasEliminadas;
-			if ((lineasEliminadas = tableroJuego.detectarFilasCompletas()) > 0) {
-				puntucionTotal += sumarPuntosCompletarLinea(lineasEliminadas);
-				sonidoFilaCompleta.play();
+			// SI LA PARTIDA NO TERMINO, HACE LAS SIGUIENTES ACCIONES:
+			if (!seTerminoPartida) {
+				// CALCULA LA PUNTUACION OBTENIDA
+				int lineasEliminadas;
+				if ((lineasEliminadas = tableroJuego.detectarFilasCompletas()) > 0) {
+					puntucionTotal += sumarPuntosCompletarLinea(lineasEliminadas);
+					sonidoFilaCompleta.play();
+				}
+				puntucionTotal += sumarPuntosColocarPieza(tiempoNecesitadoParaColocar);
+
+				// ACTUALIZA EL MULTIPLICADOR DE VELOCIDAD A LA QUE LA PIEZA BAJA
+				multiplicadorVelocidad 		= 1 + puntucionTotal / 25000f;
+
+				// SACA LA SIGUIENTE PIEZA, LA POSICIONA ARRIBA DEL TABLERO Y ESTABLECE UNA SERIE DE VARIABLES A SU VALOR POR DEFECTO
+				jugarSiguientePieza();
+				posicionPiezaJugable		= posicionInicioPiezaJugable.cpy();
+				tiempoNecesitadoParaColocar = 0;
+				tiempoParaFijarATablero		= 0;
+				seIntercambioPiezaJugable	= false;
 			}
-			puntucionTotal += sumarPuntosColocarPieza(tiempoNecesitadoParaColocar);
-
-			// ACTUALIZA EL MULTIPLICADOR DE VELOCIDAD A LA QUE LA PIEZA BAJA
-			multiplicadorVelocidad 		= 1 + puntucionTotal / 25000f;
-
-			// SACA LA SIGUIENTE PIEZA, LA POSICIONA ARRIBA DEL TABLERO Y ESTABLECE UNA SERIE DE VARIABLES A SU VALOR POR DEFECTO
-			jugarSiguientePieza();
-			posicionPiezaJugable		= posicionInicioPiezaJugable.cpy();
-			tiempoNecesitadoParaColocar = 0;
-			tiempoParaFijarATablero		= 0;
-			seIntercambioPiezaJugable	= false;
 		}
 	}
 

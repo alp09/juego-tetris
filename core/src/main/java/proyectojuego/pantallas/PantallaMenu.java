@@ -41,8 +41,8 @@ public class PantallaMenu extends Pantalla {
 		musicaPantallaMenu = assetManager.get("sounds/musicaMenu.ogg");
 		musicaPantallaMenu.setVolume(0.25f);
 		musicaPantallaMenu.setLooping(true);
-		musicaPantallaMenu.play();
 		musicaEstaEncendida = true;
+		musicaPantallaMenu.play();
 
         // CARGA LAS TEXTURAS Y LAS POSICIONA
         textureAtlas = assetManager.get("ui/texturas.atlas", TextureAtlas.class);
@@ -127,7 +127,9 @@ public class PantallaMenu extends Pantalla {
 
     @Override
     public void gestionarInput(float delta) {
-		if (Gdx.input.isKeyJustPressed((Input.Keys.M))){
+
+		// HABILITA / DESHABILITA LA MUSICA EN MITAD DE LA PARTIDA
+		if (Gdx.input.isKeyJustPressed((Input.Keys.M))) {
 			if(musicaEstaEncendida){
 				musicaPantallaMenu.pause();
 				musicaEstaEncendida = false;
@@ -136,6 +138,7 @@ public class PantallaMenu extends Pantalla {
 				musicaEstaEncendida = true;
 			}
 		}
+
     }
 
     @Override
@@ -174,5 +177,6 @@ public class PantallaMenu extends Pantalla {
     @Override
     public void dispose() {
 		stage.dispose();
+		musicaPantallaMenu.dispose();
     }
 }
