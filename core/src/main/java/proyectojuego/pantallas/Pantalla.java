@@ -14,6 +14,7 @@ public abstract class Pantalla implements Screen {
 
 	protected EstadoAplicacion	estadoAplicacion;
 	protected Preferences 		preferenciasUsuario;
+	protected Preferences		controlesUsuario;
 	protected Juego				juego;
 	protected FitViewport		fitViewport;
 	protected AssetManager		assetManager;

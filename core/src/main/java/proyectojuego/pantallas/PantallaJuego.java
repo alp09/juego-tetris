@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import proyectojuego.EstadoAplicacion;
 import proyectojuego.Juego;
+import proyectojuego.ListaControles;
 import proyectojuego.jugabilidad.Pieza;
 import proyectojuego.jugabilidad.Tablero;
 
@@ -45,8 +46,8 @@ public class PantallaJuego extends Pantalla {
 	private float 				tiempoNecesitadoParaColocar;		// Tiempo necesitado por el jugador para colocar la pieza
 
 	// Variables usadas para las puntuciones
-	private final int			PUNTOS_COLOCAR_PIEZA	= 100;		// Puntuacion base por colocar una pieza
-	private final int			PUNTOS_COMPLETAR_LINEA	= 1000;		// Puntuacion base por completar una linea
+	private final int			PUNTOS_COLOCAR_PIEZA	= 50;		// Puntuacion base por colocar una pieza
+	private final int			PUNTOS_COMPLETAR_LINEA	= 500;		// Puntuacion base por completar una linea
 	private int 				puntucionTotal;						// Almacena la puntuacion obtenida durante la partida
 	private boolean				seTerminoPartida = false;			// Determina si la partida termino
 
@@ -180,7 +181,7 @@ public class PantallaJuego extends Pantalla {
 		if (estadoAplicacion != EstadoAplicacion.GAME_OVER) {
 
 			// LLAMA AL METODO QUE CORRESPONDE DEPENDIENDO DEL ESTADO DE LA APLICACION
-			if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+			if (Gdx.input.isKeyJustPressed(controlesUsuario.getInteger(ListaControles.PAUSAR.getNombreControl()))) {
 				if (estadoAplicacion == EstadoAplicacion.EJECUTANDO) {
 					this.pause();
 				} else {
@@ -189,7 +190,7 @@ public class PantallaJuego extends Pantalla {
 			}
 
 			// RESETEA LA PARTIDA
-			if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+			if (Gdx.input.isKeyJustPressed(controlesUsuario.getInteger(ListaControles.REINICIAR.getNombreControl()))) {
 				this.nuevaPartida();
 			}
 
@@ -197,7 +198,7 @@ public class PantallaJuego extends Pantalla {
 			if (estadoAplicacion == EstadoAplicacion.EJECUTANDO) {
 
 				// GUARDA LA PIEZA JUGABLE O LA CAMBIA POR LA PIEZA GUARDADA
-				if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
+				if (Gdx.input.isKeyJustPressed(controlesUsuario.getInteger(ListaControles.GUARDAR_PIEZA.getNombreControl()))) {
 
 					// EVITA QUE EL JUGADOR CAMBIE CONSTANTEMENTE DE PIEZA, RESETEANDO posicionPiezaJugable
 					if (!seIntercambioPiezaJugable) {
@@ -219,7 +220,8 @@ public class PantallaJuego extends Pantalla {
 				}
 
 				// MUEVE LA PIEZA A LA IZQUIERDA O DERECHA (MUTUAMENTE EXCLUSIVO)
-				if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+				if (Gdx.input.isKeyPressed(controlesUsuario.getInteger(ListaControles.MOVER_IZQUIERDA.getNombreControl())) ||
+					Gdx.input.isKeyPressed(controlesUsuario.getInteger(ListaControles.MOVER_DERECHA.getNombreControl()))) {
 
 					// AQUI SE DISTINGUE SI SE ESTA MOVIENDO A LA IZQUIERDA O DERECHA
 					int 	movimientoHorizontal;
@@ -259,7 +261,7 @@ public class PantallaJuego extends Pantalla {
 				}
 
 				// MUEVE LA PIEZA HACIA ABAJO - FUNCIONA IGUAL QUE EL DE MOVIMIENTO HORIZONTAL SIN EL DELAY INICIAL
-				if (Gdx.input.isKeyPressed(Input.Keys.DOWN))	{
+				if (Gdx.input.isKeyPressed(controlesUsuario.getInteger(ListaControles.BAJAR_PIEZA.getNombreControl()))) {
 					if (tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable)) {
 						if (tiempoDesdeMovimientoVertical >= DELAY_ENTRE_MOVIMIENTOS) {
 							posicionPiezaJugable.add(0, -1);
@@ -272,7 +274,7 @@ public class PantallaJuego extends Pantalla {
 				}
 
 				// ENCAJA LA PIEZA JUSTO DEBAJO INSTANTÁNEAMENTE
-				if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+				if (Gdx.input.isKeyJustPressed(controlesUsuario.getInteger(ListaControles.COLOCAR_PIEZA.getNombreControl()))) {
 					while (tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable)) {
 						posicionPiezaJugable.y -= 1;
 					}
@@ -281,17 +283,17 @@ public class PantallaJuego extends Pantalla {
 				}
 
 				// ROTA LA PIEZA EN EL SENTIDO DE LAS AGUJAS DEL REJOJ
-				if (Gdx.input.isKeyJustPressed(Input.Keys.E) && tableroJuego.puedeRotarSentidoReloj(posicionPiezaJugable, piezaJugable)) {
+				if (Gdx.input.isKeyJustPressed(controlesUsuario.getInteger(ListaControles.ROTAR_SENTIDO_RELOJ.getNombreControl())) && tableroJuego.puedeRotarSentidoReloj(posicionPiezaJugable, piezaJugable)) {
 					piezaJugable.rotarSentidoReloj();
 				}
 
 				// ROTA LA PIEZA EN EL SENTIDO OPUESTO A LAS AGUJAS DEL RELOJ
-				if (Gdx.input.isKeyJustPressed(Input.Keys.Q) && tableroJuego.puedeRotarSentidoContrarioReloj(posicionPiezaJugable, piezaJugable)) {
+				if (Gdx.input.isKeyJustPressed(controlesUsuario.getInteger(ListaControles.ROTAR_SENTIDO_CONTRARIO_RELOJ.getNombreControl())) && tableroJuego.puedeRotarSentidoContrarioReloj(posicionPiezaJugable, piezaJugable)) {
 					piezaJugable.rotarSentidoContraReloj();
 				}
 
 				// HABILITA / DESHABILITA LA MUSICA EN MITAD DE LA PARTIDA
-				if (Gdx.input.isKeyJustPressed((Input.Keys.M))){
+				if (Gdx.input.isKeyJustPressed(controlesUsuario.getInteger(ListaControles.CONTROLAR_MUSICA.getNombreControl()))){
 					if(musicaEstaEncendida){
 						musicaPantallajuego.pause();
 						musicaEstaEncendida = false;

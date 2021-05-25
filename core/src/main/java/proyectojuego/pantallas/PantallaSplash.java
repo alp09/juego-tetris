@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import proyectojuego.ListaControles;
 import proyectojuego.ListaPreferencias;
 
 public class PantallaSplash extends Pantalla {
@@ -48,17 +49,49 @@ public class PantallaSplash extends Pantalla {
 		sonidoSplash.play();
 		sonidoSplash.setLooping(1,true);
 
-		// SE CARGAN LOS CONTROLES
-		preferenciasUsuario = Gdx.app.getPreferences("preferenciasUsuario.prefs");
+		// SE CARGAN LOS CONTROLES Y PREFERENCIAS
+		preferenciasUsuario = Gdx.app.getPreferences("preferenciasUsuario.xml");
+		controlesUsuario = Gdx.app.getPreferences("controlesUsuario.xml");
+		Object prueba = null;
 
-		// COMPRUEBA CADA PREFERENCIA
-		for (ListaPreferencias preferencia: ListaPreferencias.values()) {
-
-			// SI NO EXISTE UNA ENTRADA PARA ESA PREFERENCIA
-			if (!preferenciasUsuario.contains(preferencia.getNombrePreferencia())) {
-
+		// COMPRUEBA SI EXISTE UN ARCHIVO CONTROLES
+		if (preferenciasUsuario.get().isEmpty()) {
+			// CREA EL ARCHIVO CON LOS VALORES POR DEFECTO
+			for (ListaPreferencias preferencias: ListaPreferencias.values()) {
+				preferenciasUsuario.putBoolean(preferencias.getNombrePreferencia(), preferencias.getValorDefecto());
+			}
+		} else {
+			// COMPRUEBA CADA CONTROL
+			for (ListaPreferencias preferencias: ListaPreferencias.values()) {
+				prueba = preferenciasUsuario.get().get(preferencias.getNombrePreferencia());
+				// SI NO CONTIENE UNA ENTRADA SOBRE ESA PREFERENCIA O ESTA VACIA LA CREA
+				if (!preferenciasUsuario.contains(preferencias.getNombrePreferencia()) || prueba == null) {
+					preferenciasUsuario.putBoolean(preferencias.getNombrePreferencia(), preferencias.getValorDefecto());
+					prueba = null;
+				}
 			}
 		}
+
+		// COMPRUEBA SI EXISTE UN ARCHIVO CONTROLES
+		if (controlesUsuario.get().isEmpty()) {
+			// CREA EL ARCHIVO CON LOS VALORES POR DEFECTO
+			for (ListaControles control: ListaControles.values()) {
+				controlesUsuario.putInteger(control.getNombreControl(), control.getValorDefecto());
+			}
+		} else {
+			// COMPRUEBA CADA CONTROL
+			for (ListaControles control: ListaControles.values()) {
+				prueba = null;
+				// SI NO CONTIENE UNA ENTRADA SOBRE ESA PREFERENCIA O ESTA VACIA LA CREA
+				if (!controlesUsuario.contains(control.getNombreControl())) {
+					controlesUsuario.putInteger(control.getNombreControl(), control.getValorDefecto());
+				}
+			}
+		}
+
+		// GUARDA LOS CAMBIOS
+		preferenciasUsuario.flush();
+		controlesUsuario.flush();
 
 		// AQUI VAN TODOS LOS ASSETS A CARGAR
 		assetManager.load("ui/texturas.atlas", TextureAtlas.class);

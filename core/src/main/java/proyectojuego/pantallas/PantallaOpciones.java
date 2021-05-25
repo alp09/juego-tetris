@@ -16,9 +16,13 @@ public class PantallaOpciones extends Pantalla {
 		musica.setLooping(true);
 		musica.play();
 
-
 	}
 
+
+	@Override
+	public void show() {
+
+	}
 
 	@Override
 	public void gestionarInput(float delta) {
@@ -36,13 +40,8 @@ public class PantallaOpciones extends Pantalla {
 	}
 
 	@Override
-	public void show() {
-
-	}
-
-	@Override
 	public void resize(int width, int height) {
-
+		fitViewport.update(width, height);
 	}
 
 	@Override
@@ -57,11 +56,11 @@ public class PantallaOpciones extends Pantalla {
 
 	@Override
 	public void hide() {
-
+		this.dispose();
 	}
 
 	@Override
 	public void dispose() {
-
+		musica.dispose();
 	}
 }
