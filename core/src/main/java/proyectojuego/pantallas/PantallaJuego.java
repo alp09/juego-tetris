@@ -1,7 +1,6 @@
 package proyectojuego.pantallas;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -16,6 +15,7 @@ import com.badlogic.gdx.utils.Align;
 import proyectojuego.EstadoAplicacion;
 import proyectojuego.Juego;
 import proyectojuego.ListaControles;
+import proyectojuego.jugabilidad.ListaPiezas;
 import proyectojuego.jugabilidad.Pieza;
 import proyectojuego.jugabilidad.Tablero;
 
@@ -29,7 +29,7 @@ public class PantallaJuego extends Pantalla {
 	private static final float	DELAY_ENTRE_MOVIMIENTOS		= .2f;								// El valor indicado aqui será el delay inicial
 	private static final float	MAXIMO_CASILLAS_POR_SEGUNDO	= 1 / 20f;							// 1 / N; siendo N el numero de casillas que podrá moverse la pieza como máximo en un segundo
 
-	private final Tablero		tableroJuego;
+	private Tablero				tableroJuego;
 	private int					direccionUltimoMovimientoHorizontal;							// Guarda cual fue el ultimo movimiento horizontal (-1 = Izquierda o 1 = derecha) para resetear el tiempoDesdeMovimientoHorizontal y asi aplicar el DELAY_ENTRE_MOVIMIENTOS
 	private float				tiempoDesdeMovimientoHorizontal	= 0;							// Guarda el tiempo una tecla de movimiento horizontal ha estado pulsada. Su valor inicial es 0 para aplicarle el delay inicial.
 	private float				tiempoDesdeMovimientoVertical	= DELAY_ENTRE_MOVIMIENTOS;		// Guarda el tiempo una tecla de movimiento vertical ha estado pulsada. Su valor incial es DELAY_ENTRE_MOVIMIENTOS para saltarse el delay inicial en los movimientos verticales
@@ -102,8 +102,7 @@ public class PantallaJuego extends Pantalla {
 		textureAtlas = assetManager.get("ui/texturas.atlas");
 
 		// CREA UNA INSTANCIA DEL TABLERO DE JUEGO
-		tableroJuego = Tablero.getInstance();
-		tableroJuego.limpiarTablero();
+		tableroJuego = new Tablero();
 
 		// CREA LA TABLA Y LOS LABEL QUE CONTENDRÁN LA PUNTUACION, DESPUES ALINEA LA TABLA ABAJO A LA DERECHA
 		skin						= new Skin(Gdx.files.internal("uiskin.json"));
@@ -181,7 +180,7 @@ public class PantallaJuego extends Pantalla {
 		if (estadoAplicacion != EstadoAplicacion.GAME_OVER) {
 
 			// LLAMA AL METODO QUE CORRESPONDE DEPENDIENDO DEL ESTADO DE LA APLICACION
-			if (Gdx.input.isKeyJustPressed(controlesUsuario.getInteger(ListaControles.PAUSAR.getNombreControl()))) {
+			if (Gdx.input.isKeyJustPressed(configurador.controlesUsuario.getInteger(ListaControles.PAUSAR.nombreControl))) {
 				if (estadoAplicacion == EstadoAplicacion.EJECUTANDO) {
 					this.pause();
 				} else {
@@ -190,7 +189,7 @@ public class PantallaJuego extends Pantalla {
 			}
 
 			// RESETEA LA PARTIDA
-			if (Gdx.input.isKeyJustPressed(controlesUsuario.getInteger(ListaControles.REINICIAR.getNombreControl()))) {
+			if (Gdx.input.isKeyJustPressed(configurador.controlesUsuario.getInteger(ListaControles.REINICIAR.nombreControl))) {
 				this.nuevaPartida();
 			}
 
@@ -198,7 +197,7 @@ public class PantallaJuego extends Pantalla {
 			if (estadoAplicacion == EstadoAplicacion.EJECUTANDO) {
 
 				// GUARDA LA PIEZA JUGABLE O LA CAMBIA POR LA PIEZA GUARDADA
-				if (Gdx.input.isKeyJustPressed(controlesUsuario.getInteger(ListaControles.GUARDAR_PIEZA.getNombreControl()))) {
+				if (Gdx.input.isKeyJustPressed(configurador.controlesUsuario.getInteger(ListaControles.GUARDAR_PIEZA.nombreControl))) {
 
 					// EVITA QUE EL JUGADOR CAMBIE CONSTANTEMENTE DE PIEZA, RESETEANDO posicionPiezaJugable
 					if (!seIntercambioPiezaJugable) {
@@ -220,14 +219,14 @@ public class PantallaJuego extends Pantalla {
 				}
 
 				// MUEVE LA PIEZA A LA IZQUIERDA O DERECHA (MUTUAMENTE EXCLUSIVO)
-				if (Gdx.input.isKeyPressed(controlesUsuario.getInteger(ListaControles.MOVER_IZQUIERDA.getNombreControl())) ||
-					Gdx.input.isKeyPressed(controlesUsuario.getInteger(ListaControles.MOVER_DERECHA.getNombreControl()))) {
+				if (Gdx.input.isKeyPressed(configurador.controlesUsuario.getInteger(ListaControles.MOVER_IZQUIERDA.nombreControl)) ||
+					Gdx.input.isKeyPressed(configurador.controlesUsuario.getInteger(ListaControles.MOVER_DERECHA.nombreControl))) {
 
 					// AQUI SE DISTINGUE SI SE ESTA MOVIENDO A LA IZQUIERDA O DERECHA
 					int 	movimientoHorizontal;
 					boolean puedeMoverseHorizontal;
 
-					if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+					if (Gdx.input.isKeyPressed(configurador.controlesUsuario.getInteger(ListaControles.MOVER_IZQUIERDA.nombreControl))) {
 						movimientoHorizontal	= -1;
 						puedeMoverseHorizontal	= tableroJuego.puedeMoverIzquierda(posicionPiezaJugable, piezaJugable);
 					} else {
@@ -261,7 +260,7 @@ public class PantallaJuego extends Pantalla {
 				}
 
 				// MUEVE LA PIEZA HACIA ABAJO - FUNCIONA IGUAL QUE EL DE MOVIMIENTO HORIZONTAL SIN EL DELAY INICIAL
-				if (Gdx.input.isKeyPressed(controlesUsuario.getInteger(ListaControles.BAJAR_PIEZA.getNombreControl()))) {
+				if (Gdx.input.isKeyPressed(configurador.controlesUsuario.getInteger(ListaControles.BAJAR_PIEZA.nombreControl))) {
 					if (tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable)) {
 						if (tiempoDesdeMovimientoVertical >= DELAY_ENTRE_MOVIMIENTOS) {
 							posicionPiezaJugable.add(0, -1);
@@ -274,7 +273,7 @@ public class PantallaJuego extends Pantalla {
 				}
 
 				// ENCAJA LA PIEZA JUSTO DEBAJO INSTANTÁNEAMENTE
-				if (Gdx.input.isKeyJustPressed(controlesUsuario.getInteger(ListaControles.COLOCAR_PIEZA.getNombreControl()))) {
+				if (Gdx.input.isKeyJustPressed(configurador.controlesUsuario.getInteger(ListaControles.COLOCAR_PIEZA.nombreControl))) {
 					while (tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable)) {
 						posicionPiezaJugable.y -= 1;
 					}
@@ -283,17 +282,17 @@ public class PantallaJuego extends Pantalla {
 				}
 
 				// ROTA LA PIEZA EN EL SENTIDO DE LAS AGUJAS DEL REJOJ
-				if (Gdx.input.isKeyJustPressed(controlesUsuario.getInteger(ListaControles.ROTAR_SENTIDO_RELOJ.getNombreControl())) && tableroJuego.puedeRotarSentidoReloj(posicionPiezaJugable, piezaJugable)) {
+				if (Gdx.input.isKeyJustPressed(configurador.controlesUsuario.getInteger(ListaControles.ROTAR_SENTIDO_RELOJ.nombreControl)) && tableroJuego.puedeRotarSentidoReloj(posicionPiezaJugable, piezaJugable)) {
 					piezaJugable.rotarSentidoReloj();
 				}
 
 				// ROTA LA PIEZA EN EL SENTIDO OPUESTO A LAS AGUJAS DEL RELOJ
-				if (Gdx.input.isKeyJustPressed(controlesUsuario.getInteger(ListaControles.ROTAR_SENTIDO_CONTRARIO_RELOJ.getNombreControl())) && tableroJuego.puedeRotarSentidoContrarioReloj(posicionPiezaJugable, piezaJugable)) {
+				if (Gdx.input.isKeyJustPressed(configurador.controlesUsuario.getInteger(ListaControles.ROTAR_SENTIDO_CONTRARIO_RELOJ.nombreControl)) && tableroJuego.puedeRotarSentidoContrarioReloj(posicionPiezaJugable, piezaJugable)) {
 					piezaJugable.rotarSentidoContraReloj();
 				}
 
 				// HABILITA / DESHABILITA LA MUSICA EN MITAD DE LA PARTIDA
-				if (Gdx.input.isKeyJustPressed(controlesUsuario.getInteger(ListaControles.CONTROLAR_MUSICA.getNombreControl()))){
+				if (Gdx.input.isKeyJustPressed(configurador.controlesUsuario.getInteger(ListaControles.CONTROLAR_MUSICA.nombreControl))){
 					if(musicaEstaEncendida){
 						musicaPantallajuego.pause();
 						musicaEstaEncendida = false;
@@ -400,7 +399,7 @@ public class PantallaJuego extends Pantalla {
 			spriteBatch.draw(terceraPieza.spritePieza, posicionTerceraPieza.x, posicionTerceraPieza.y, ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
 
 			// DIBUJA EL TABLERO
-			tableroJuego.dibujarContenidoTablero(spriteBatch, posicionTablero);
+			dibujarContenidoTablero();
 
 			// DIBUJA LA PIEZA JUGABLE
 			for (Vector2 bloquePieza: piezaJugable.getFormaPieza()) {
@@ -478,6 +477,24 @@ public class PantallaJuego extends Pantalla {
 		}
 	}
 
+	private void dibujarContenidoTablero() {
+
+		for (int i = 0; i < tableroJuego.ALTO_TABLERO; i++) {
+			for (int j = 0; j < tableroJuego.ANCHO_TABLERO; j++) {
+				switch (tableroJuego.contenidoTablero[j][i]) {
+					case -1: continue;
+					case  0: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[0].getSpriteBloquePieza()), posicionTablero.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionTablero.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA CIAN
+					case  1: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[1].getSpriteBloquePieza()), posicionTablero.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionTablero.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA AMARILLA
+					case  2: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[2].getSpriteBloquePieza()), posicionTablero.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionTablero.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA MORADA
+					case  3: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[3].getSpriteBloquePieza()), posicionTablero.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionTablero.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA NARANJA
+					case  4: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[4].getSpriteBloquePieza()), posicionTablero.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionTablero.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA AZUL
+					case  5: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[5].getSpriteBloquePieza()), posicionTablero.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionTablero.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA VERDE
+					case  6: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[6].getSpriteBloquePieza()), posicionTablero.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionTablero.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA ROJA
+				}
+			}
+		}
+	}
+
 	private int sumarPuntosColocarPieza(float tiempoDeColocacion) {
 		return (int) (PUNTOS_COLOCAR_PIEZA * (1 + (1 / tiempoDeColocacion)));
 	}
@@ -533,9 +550,9 @@ public class PantallaJuego extends Pantalla {
 
 	public void nuevaPartida() {
 		// Resetea el tablero
-		tableroJuego.limpiarTablero();
-		seTerminoPartida = false;
-		estadoAplicacion = EstadoAplicacion.EJECUTANDO;
+		tableroJuego		= new Tablero();
+		seTerminoPartida	= false;
+		estadoAplicacion	= EstadoAplicacion.EJECUTANDO;
 
 		// Resetea la puntuacion
 		puntucionTotal = 0;

@@ -2,23 +2,17 @@ package proyectojuego;
 
 public enum ListaPreferencias {
 
-	HABILITAR_MUSICA				("HABILITAR_MUSICA", true),
-	HABILITAR_EFECTOS_SONIDO		("HABILITAR_EFECTOS_SONIDO", true);
+	HABILITAR_MUSICA			("Habilitar musica",			true),
+	HABILITAR_EFECTOS_SONIDO	("Habilitar efectos de sonido",	true);
+
+	public final String		nombrePreferencia;
+	public final boolean	valorDefecto;
 
 
-	private final String	nombrePreferencia;
-	private final boolean	valorDefecto;
-
+	// CONSTRUCTOR
 	ListaPreferencias(String nombrePreferencia, boolean valorDefecto) {
-		this.nombrePreferencia = nombrePreferencia;
-		this.valorDefecto = valorDefecto;
-	}
-
-	public String getNombrePreferencia() {
-		return nombrePreferencia;
-	}
-	public boolean getValorDefecto() {
-		return valorDefecto;
+		this.nombrePreferencia	= nombrePreferencia;
+		this.valorDefecto		= valorDefecto;
 	}
 
 }

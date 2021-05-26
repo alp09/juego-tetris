@@ -1,31 +1,28 @@
 package proyectojuego;
 
+import com.badlogic.gdx.Input;
+
 public enum ListaControles {
 
-	CONTROLAR_MUSICA				("CONTROLAR_MUSICA", 41),
-	PAUSAR							("PAUSAR", 44),
-	REINICIAR						("REINICIAR", 46),
-	GUARDAR_PIEZA					("GUARDAR_PIEZA", 51),
-	MOVER_IZQUIERDA					("MOVER_IZQUIERDA", 21),
-	MOVER_DERECHA					("MOVER_DERECHA", 22),
-	BAJAR_PIEZA						("BAJAR_PIEZA", 20),
-	COLOCAR_PIEZA					("COLOCAR_PIEZA", 62),
-	ROTAR_SENTIDO_RELOJ				("ROTAR_SENTIDO_RELOJ", 33),
-	ROTAR_SENTIDO_CONTRARIO_RELOJ	("ROTAR_SENTIDO_CONTRARIO_RELOJ", 45);
+	CONTROLAR_MUSICA				("Controlar musica", Input.Keys.M),
+	PAUSAR							("Pausar", Input.Keys.P),
+	REINICIAR						("Reiniciar", Input.Keys.R),
+	GUARDAR_PIEZA					("Guardar pieza", Input.Keys.W),
+	MOVER_IZQUIERDA					("Mover izquierda", Input.Keys.LEFT),
+	MOVER_DERECHA					("Mover derecha", Input.Keys.RIGHT),
+	BAJAR_PIEZA						("Bajar pieza", Input.Keys.DOWN),
+	COLOCAR_PIEZA					("Colocar pieza", Input.Keys.SPACE),
+	ROTAR_SENTIDO_RELOJ				("Rotar sentido reloj", Input.Keys.E),
+	ROTAR_SENTIDO_CONTRARIO_RELOJ	("Rotar Contrareloj", Input.Keys.Q);
 
-	private final String	nombreControl;
-	private final int		valorDefecto;
+	public final String	nombreControl;
+	public final int		valorDefecto;
 
+
+// CONSTRUCTOR
 	ListaControles(String nombrePreferencia, int valorDefecto) {
-		this.nombreControl = nombrePreferencia;
-		this.valorDefecto = valorDefecto;
-	}
-
-	public String getNombreControl() {
-		return nombreControl;
-	}
-	public int getValorDefecto() {
-		return valorDefecto;
+		this.nombreControl		= nombrePreferencia;
+		this.valorDefecto		= valorDefecto;
 	}
 
 }

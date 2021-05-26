@@ -21,13 +21,13 @@ public class Juego extends Game {
 	private SpriteBatch 		spriteBatch;
 
 
-// CONSTRUCTOR
+	// CONSTRUCTOR
 	public Juego() {
 
 	}
 
 
-// GETTERS
+	// GETTERS
 	public EstadoAplicacion getEstadoAplicacion() {
 		return estadoAplicacion;
 	}
@@ -42,7 +42,7 @@ public class Juego extends Game {
 	}
 
 
-// METODOS
+	// METODOS
 	@Override
 	public void create() {
 		estadoAplicacion	= EstadoAplicacion.EJECUTANDO;

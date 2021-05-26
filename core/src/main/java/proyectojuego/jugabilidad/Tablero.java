@@ -13,28 +13,18 @@ import java.util.List;
 
 public class Tablero {
 
-	private static final TextureAtlas TEXTURE_ATLAS = ((Juego) Gdx.app.getApplicationListener()).getAssetManager().get("ui/texturas.atlas", TextureAtlas.class);
+	public	final int 		ALTO_TABLERO			= 23;		// Se añaden 3 filas más para que la pieza generada no aparezca fuera del tablero.
+	public	final int 		ANCHO_TABLERO			= 10;		// Se usan en la clase PantallaJuego para determinar la posicionInicioPiezaJugable
+	public	final int 		ALTURA_COMIENZO_PIEZA	= 20;		// Fila en la que la piezaJugable comienza
 
-	public	final int 	ALTO_TABLERO			= 23;			// Se añaden 3 filas más para que la pieza generada no aparezca fuera del tablero.
-	public	final int 	ANCHO_TABLERO			= 10;			// Se usan en la clase PantallaJuego para determinar la posicionInicioPiezaJugable
-	public	final int 	ALTURA_COMIENZO_PIEZA	= 20;			// Fila en la que la piezaJugable comienza
+	public	final int[][] 	contenidoTablero;					// El tablero en sí - cada indice contiene un int que define el contenido de esa casilla del tablero
+	private	int				filaOcupadaMasAlta		= 0;
 
-	private	static Tablero tableroJuego;						// Contiene la instancia del Tablero para el patron singleton
 
-	private	int[][] 	contenidoTablero;						// El tablero en sí - cada indice contiene un int que define el contenido de esa casilla del tablero
-	private int			filaOcupadaMasAlta = 0;
-
-	// CONSTRUCTOR PRIVADO
-	private Tablero() {
+	// CONSTRUCTOR
+	public Tablero() {
 		contenidoTablero = new int[ANCHO_TABLERO][ALTO_TABLERO];
-		limpiarTablero();
-	}
-
-
-	// GET INSTANCE - PATRON SINGLETON
-	public static Tablero getInstance() {
-		if (tableroJuego == null) tableroJuego = new Tablero();
-		return tableroJuego;
+		for (int[] columna: contenidoTablero) Arrays.fill(columna, -1);		// Llena la matriz con el valor -1 para indicar los espacios vacios
 	}
 
 
@@ -105,26 +95,6 @@ public class Tablero {
 	}
 
 
-	// METODO DIBUJAR - RECORRE LA MATRIZ Y DIBUJA POR PANTALLA EL CONTENIDO DE ESTA A PARTIR DE posicionComienzoDibujo
-	public void dibujarContenidoTablero(SpriteBatch spriteBatch, Vector2 posicionComienzoDibujo) {
-
-		for (int i = 0; i < ALTO_TABLERO; i++) {
-			for (int j = 0; j < ANCHO_TABLERO; j++) {
-				switch (contenidoTablero[j][i]) {
-					case -1: continue;
-					case  0: spriteBatch.draw(TEXTURE_ATLAS.findRegion(ListaPiezas.values()[0].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionComienzoDibujo.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA CIAN
-					case  1: spriteBatch.draw(TEXTURE_ATLAS.findRegion(ListaPiezas.values()[1].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionComienzoDibujo.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA AMARILLA
-					case  2: spriteBatch.draw(TEXTURE_ATLAS.findRegion(ListaPiezas.values()[2].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionComienzoDibujo.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA MORADA
-					case  3: spriteBatch.draw(TEXTURE_ATLAS.findRegion(ListaPiezas.values()[3].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionComienzoDibujo.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA NARANJA
-					case  4: spriteBatch.draw(TEXTURE_ATLAS.findRegion(ListaPiezas.values()[4].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionComienzoDibujo.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA AZUL
-					case  5: spriteBatch.draw(TEXTURE_ATLAS.findRegion(ListaPiezas.values()[5].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionComienzoDibujo.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA VERDE
-					case  6: spriteBatch.draw(TEXTURE_ATLAS.findRegion(ListaPiezas.values()[6].getSpriteBloquePieza()), posicionComienzoDibujo.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionComienzoDibujo.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA ROJA
-				}
-			}
-		}
-	}
-
-
 	// METODO COLOCAR - ESTABLECE EL INDICE DE contenidoTablero DONDE CAYO LA PIEZA CON EL int CORRESPONDIENTE
 	public boolean colocarPieza(Vector2 posicionPieza, Pieza pieza) {
 
@@ -192,8 +162,5 @@ public class Tablero {
 		return filasEliminadas;
 	}
 
-	public void limpiarTablero() {
-		for (int[] columna: contenidoTablero) Arrays.fill(columna, -1);		// Llena la matriz con el valor -1 para indicar los espacios vacios
-	}
 
 }

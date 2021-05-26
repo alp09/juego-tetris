@@ -7,31 +7,32 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import proyectojuego.Configurador;
 import proyectojuego.EstadoAplicacion;
 import proyectojuego.Juego;
 
 public abstract class Pantalla implements Screen {
 
-	protected EstadoAplicacion	estadoAplicacion;
-	protected Preferences 		preferenciasUsuario;
-	protected Preferences		controlesUsuario;
 	protected Juego				juego;
+	protected EstadoAplicacion	estadoAplicacion;
 	protected FitViewport		fitViewport;
 	protected AssetManager		assetManager;
 	protected SpriteBatch		spriteBatch;
+	protected Configurador		configurador;
 
 
-// CONSTRUCTOR
+	// CONSTRUCTOR
 	public Pantalla() {
 		this.juego 				= (Juego) Gdx.app.getApplicationListener();
 		this.estadoAplicacion	= this.juego.getEstadoAplicacion();
 		this.fitViewport		= this.juego.getFitViewport();
 		this.assetManager		= this.juego.getAssetManager();
 		this.spriteBatch		= this.juego.getSpriteBatch();
+		this.configurador		= Configurador.getInstance();
 	}
 
 
-// METODOS
+	// METODOS
 	@Override
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0, 0, 0, 1);

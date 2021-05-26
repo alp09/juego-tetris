@@ -16,12 +16,16 @@ public enum ListaPiezas {
 	private final String	spritePieza;
 	private final String	spriteBloquePieza;
 
+
+// CONSTRUCTOR
 	ListaPiezas(Vector2[] formaPieza, String spritePieza, String spriteBloquePieza) {
 		this.formaPieza 		= formaPieza;
 		this.spritePieza 		= spritePieza;
 		this.spriteBloquePieza 	= spriteBloquePieza;
 	}
 
+
+// METODOS
 	public Vector2[] getFormaPieza() {
 		Vector2[] copiaFormaPieza = new Vector2[formaPieza.length];
 		for (int i = 0; i < formaPieza.length; i++) {

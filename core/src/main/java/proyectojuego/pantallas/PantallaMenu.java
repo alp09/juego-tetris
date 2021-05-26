@@ -33,7 +33,7 @@ public class PantallaMenu extends Pantalla {
 	private boolean				musicaEstaEncendida;
 
 
-// CONSTRUCTOR
+	// CONSTRUCTOR
     public PantallaMenu() {
         super();
 
@@ -75,7 +75,6 @@ public class PantallaMenu extends Pantalla {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
-				// ToDo: cambiar pantalla opciones
 				juego.setScreen(new PantallaOpciones());
 			}
 		});
@@ -119,7 +118,7 @@ public class PantallaMenu extends Pantalla {
     }
 
 
-// METODOS
+	// METODOS
 	@Override
 	public void show() {
 
