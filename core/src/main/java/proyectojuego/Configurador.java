@@ -51,7 +51,6 @@ public class Configurador {
 	public void guardarCambiosPreferencias() {
 		preferenciasUsuario.flush();
 	}
-
 	public void guardarCambiosControles() {
 		controlesUsuario.flush();
 	}

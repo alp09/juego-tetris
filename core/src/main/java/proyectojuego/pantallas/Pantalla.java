@@ -1,6 +1,7 @@
 package proyectojuego.pantallas;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
@@ -11,7 +12,7 @@ import proyectojuego.Configurador;
 import proyectojuego.EstadoAplicacion;
 import proyectojuego.Juego;
 
-public abstract class Pantalla implements Screen {
+public abstract class Pantalla extends InputAdapter implements Screen {
 
 	protected Juego				juego;
 	protected EstadoAplicacion	estadoAplicacion;
