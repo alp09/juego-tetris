@@ -22,8 +22,8 @@ public class Pieza {
 	public Pieza(ListaPiezas tipoPieza, Vector2[] formaPieza) {
 		this.tipoPieza			= tipoPieza;
 		this.formaPieza			= formaPieza;
-		this.spritePieza		= new Sprite(TEXTURE_ATLAS.findRegion(tipoPieza.getSpritePieza()));
-		this.spriteBloquePieza	= new Sprite(TEXTURE_ATLAS.findRegion(tipoPieza.getSpriteBloquePieza()));
+		this.spritePieza		= new Sprite(TEXTURE_ATLAS.findRegion(tipoPieza.spritePieza));
+		this.spriteBloquePieza	= new Sprite(TEXTURE_ATLAS.findRegion(tipoPieza.spriteBloquePieza));
 	}
 
 	public Pieza(ListaPiezas tipoPieza) {
@@ -35,7 +35,7 @@ public class Pieza {
 	}
 
 
-	 // GETTERS
+	// GETTERS
 	public ListaPiezas getTipoPieza() {
 		return tipoPieza;
 	}
@@ -46,7 +46,6 @@ public class Pieza {
 		}
 		return copiaFormaPieza;
 	}
-
 
 
 	//Rotamos la pieza en el sentido de las agujas del reloj

@@ -13,11 +13,11 @@ public enum ListaPiezas {
 	Z_INVERSA	(new Vector2[] {new Vector2(-1, 0),	new Vector2(0, 0),	new Vector2(0, 1),	new Vector2(1, 1)},	"PiezaRoja",		"BloqueRojo");
 
 	private final Vector2[]	formaPieza;
-	private final String	spritePieza;
-	private final String	spriteBloquePieza;
+	public	final String	spritePieza;
+	public	final String	spriteBloquePieza;
 
 
-// CONSTRUCTOR
+	// CONSTRUCTOR
 	ListaPiezas(Vector2[] formaPieza, String spritePieza, String spriteBloquePieza) {
 		this.formaPieza 		= formaPieza;
 		this.spritePieza 		= spritePieza;
@@ -25,19 +25,13 @@ public enum ListaPiezas {
 	}
 
 
-// METODOS
+	// METODOS
 	public Vector2[] getFormaPieza() {
 		Vector2[] copiaFormaPieza = new Vector2[formaPieza.length];
 		for (int i = 0; i < formaPieza.length; i++) {
 			copiaFormaPieza[i] = formaPieza[i].cpy();
 		}
 		return copiaFormaPieza;
-	}
-	public String getSpritePieza() {
-		return spritePieza;
-	}
-	public String getSpriteBloquePieza() {
-		return spriteBloquePieza;
 	}
 
 }

@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import proyectojuego.Configurador;
 import proyectojuego.Juego;
 import proyectojuego.ListaControles;
 import proyectojuego.ListaPreferencias;
@@ -27,10 +28,18 @@ public class PantallaOpciones extends Pantalla {
 	private InputMultiplexer	inputMultiplexer;			// PERMITE TENER VARIOS InputProcessor - EN ESTE CASO (EN ORDEN): stage Y PantallaOpciones
 	private Integer				teclaPulsada;				// ALMACENA LA ULTIMA TECLA PULSADA - ES RESETEADA A null CUANDO NO HAY NINGUN BOTON MARCADO
 
+	// USADAS PARA COMPROBAR LOS CAMBIOS REALIZADOS
+	private HashMap<String, Boolean> copiaPreferenciasUsuario	= new HashMap<>();
+	private HashMap<String, Integer> copiaControlesUsuario		= new HashMap<>();
+
 
 	// CONSTRUCTOR
 	public PantallaOpciones(){
 		super();
+
+		// CREA UNA COPIA DE LAS PREFERENCIAS Y CONTROLES
+		copiaPreferenciasUsuario = configurador.copiarPrefenrecias(copiaPreferenciasUsuario);
+
 
 		// CARGA LA TEXTURA DE FONDO Y LA POSICIONA
 		TextureAtlas textureAtlas = assetManager.get("ui/texturas.atlas", TextureAtlas.class);
@@ -56,20 +65,22 @@ public class PantallaOpciones extends Pantalla {
 
 		// MODIFICA LOS WIDGET DE PREFERENCIAS - LOS CHECKBOX SE CARGAN CON EL ESTADO DE LA PREFENRECIA ACTUAL
 		etiquetaPreferencias.setAlignment(Align.center);
-		checkBoxMusica.setChecked(configurador.preferenciasUsuario.getBoolean(ListaPreferencias.HABILITAR_MUSICA.nombrePreferencia));
-		checkBoxEfectosSonido.setChecked(configurador.preferenciasUsuario.getBoolean(ListaPreferencias.HABILITAR_EFECTOS_SONIDO.nombrePreferencia));
+		checkBoxMusica.setChecked(configurador.preferenciasUsuario.get(ListaPreferencias.HABILITAR_MUSICA.nombrePreferencia));
+		checkBoxEfectosSonido.setChecked(configurador.preferenciasUsuario.get(ListaPreferencias.HABILITAR_EFECTOS_SONIDO.nombrePreferencia));
 
 		// SI SE CAMBIA EL ESTADO DE LA CHECKBOX, EL VALOR GUARDADO EN EL CONFIGURADOR SE CAMBIA AL OPUESTO (true -> false y viceversa)
 		checkBoxMusica.addCaptureListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				configurador.preferenciasUsuario.putBoolean(ListaPreferencias.HABILITAR_MUSICA.nombrePreferencia, !(configurador.preferenciasUsuario.getBoolean(ListaPreferencias.HABILITAR_MUSICA.nombrePreferencia)));
+				configurador.preferenciasUsuario.put(ListaPreferencias.HABILITAR_MUSICA.nombrePreferencia, !(configurador.preferenciasUsuario.get(ListaPreferencias.HABILITAR_MUSICA.nombrePreferencia)));
+
 			}
 		});
 		checkBoxEfectosSonido.addCaptureListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				configurador.preferenciasUsuario.putBoolean(ListaPreferencias.HABILITAR_EFECTOS_SONIDO.nombrePreferencia, !(configurador.preferenciasUsuario.getBoolean(ListaPreferencias.HABILITAR_EFECTOS_SONIDO.nombrePreferencia)));
+				configurador.preferenciasUsuario.put(ListaPreferencias.HABILITAR_EFECTOS_SONIDO.nombrePreferencia, !(configurador.preferenciasUsuario.get(ListaPreferencias.HABILITAR_EFECTOS_SONIDO.nombrePreferencia)));
+
 			}
 		});
 
@@ -90,12 +101,13 @@ public class PantallaOpciones extends Pantalla {
 		listaBotonesControl		= new ButtonGroup<>();
 
 		// SE AÑADEN AL GRUPO DE BOTONES TANTOS BOTONES COMO ENTRADAS EN ListaControles, ORDENADOS EN EL ORDEN QUE ESTEN DEFINIDOS EN LA CLASE
-		for (ListaControles control: ListaControles.values()) listaBotonesControl.add(new TextButton(Input.Keys.toString(configurador.controlesUsuario.getInteger(control.nombreControl)), skin));
+		for (ListaControles control: ListaControles.values()) listaBotonesControl.add(new TextButton(Input.Keys.toString(configurador.controlesUsuario.get(control.nombreControl)), skin));
 
 		// ESTABLECE LAS PROPIEDADES DEL GRUPO DE BOTONES
 		listaBotonesControl.setMaxCheckCount(1);
 		listaBotonesControl.setMinCheckCount(0);
 		listaBotonesControl.setUncheckLast(true);
+		listaBotonesControl.uncheckAll();
 
 		// MODIFICA LOS WIDGET DE CONTROLES
 		etiquetaControles.setAlignment(Align.center);
@@ -218,7 +230,7 @@ public class PantallaOpciones extends Pantalla {
 
 	// SE MODIFICO LA CLASE Pantalla PARA extends InputHandler, DE ESTA MANERA PODRÁ GESTIONAR LOS INPUTS COMO SE DEFINAN EN ELLA
 	// AQUI SE MODIFICA EL METODO keyDown PARA QUE AL PULSAR UNA TECLA GUARDE EL VALOR Key.Input EN LA VARIABLE teclaPulsada
-	// DESPUES DEVUELVE true PARA CONFIRMAR QUE SE GESTIONO LA ENTRADA Y ASI SE EVITE LLAMAR AL SIGUIENTE InputProcessor AÑADIDO AL InputMultiplexer
+	// DESPUES DEVUELVE true PARA CONFIRMAR QUE SE GESTIONÓ LA ENTRADA Y ASI SE EVITE LLAMAR AL SIGUIENTE InputProcessor AÑADIDO AL InputMultiplexer
 	// AUNQUE EN ESTE CASO, LA PANTALLA ESTA COMO ÚLTIMO InputProcessor
 	@Override
 	public boolean keyDown(int keycode) {
@@ -230,17 +242,18 @@ public class PantallaOpciones extends Pantalla {
 	private void cambiarControl(int teclaNueva) {
 
 		// RECORRE LA LISTA DE CONTROLES DEL USUARIO
-		for (Map.Entry<String, ?> entrada : configurador.controlesUsuario.get().entrySet()) {
+		for (Map.Entry<String, Integer> entrada : configurador.controlesUsuario.entrySet()) {
 
 			// SI SALE EL CONTROL QUE SE ESTA INTENTAND SOBRESCRIBE SU ENTRADA CON LA NUEVA TECLA Y ACTUALIZA EL TEXTO DEL BOTON
 			if (entrada.getKey().equals(ListaControles.values()[listaBotonesControl.getCheckedIndex()].nombreControl)) {
-				configurador.controlesUsuario.putInteger(entrada.getKey(), teclaNueva);
+				configurador.controlesUsuario.put(entrada.getKey(), teclaNueva);
 				listaBotonesControl.getChecked().setText(Input.Keys.toString(teclaNueva));
 			}
 
 			// SI LA TECLA ESTABA ASIGNADA A OTRA TECLA SE DEJA VACIA
-			// ToDo: poruqe no se puede castear a Integer ???! -Abel 01:40
-//			if ((Integer) entrada.getValue() == teclaNueva) configurador.controlesUsuario.putString(entrada.getKey(), "");
+			if (entrada.getValue() == teclaNueva) {
+				configurador.controlesUsuario.put(entrada.getKey(), null);
+			}
 		}
 
 		// DESMARCA EL BOTON SELECCIONADO
