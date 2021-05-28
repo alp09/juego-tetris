@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import proyectojuego.ajustes.ListaPreferencias;
 
 
 public final class PantallaSplash extends Pantalla {
@@ -24,8 +25,11 @@ public final class PantallaSplash extends Pantalla {
 	private float 	progresoAnimacionFadeIn 	= 0;					// LA ANIMACION FADE IN COMIENZA CON EL VALOR ALPHA A 0.
 	private float 	progresoAnimacionFadeOut 	= 1;					// LA ANIMACION FADE OUT COMIENZA CON EL VALOR ALPHA A 1.
 	private float 	tiempoEntreAnimaciones		= 0;					// DEFINE EL TIEMPO QUE HA TRANSCURRIDO DESDE QUE LA ANIMACION FADE IN TERMINÓ.
+	private boolean saltarPantallaSplash;
 
 	private final	Sprite	spritePantallaSplash;
+
+	private boolean			efectosSonidoEstanHabilitados;
 	private	final	Sound	sonidoSplash;
 
 
@@ -44,8 +48,11 @@ public final class PantallaSplash extends Pantalla {
 
 		// ASIGNA Y REPRODUCE LA MUSICA
 		sonidoSplash = assetManager.get("sounds/sonidoSplash.ogg", Sound.class);
-		sonidoSplash.play();
-		sonidoSplash.setLooping(1,true);
+		efectosSonidoEstanHabilitados = configurador.preferenciasUsuario.get(ListaPreferencias.HABILITAR_EFECTOS_SONIDO.nombrePreferencia);
+		if (efectosSonidoEstanHabilitados) {
+			sonidoSplash.play();
+			sonidoSplash.setLooping(1,true);
+		}
 
 		// AQUI VAN TODOS LOS ASSETS A CARGAR
 		assetManager.load("ui/texturas.atlas", TextureAtlas.class);
@@ -55,7 +62,6 @@ public final class PantallaSplash extends Pantalla {
 		assetManager.load("sounds/sonidoGameOver.ogg", Sound.class);
 		assetManager.load("sounds/musicaMenu.ogg", Music.class);
 		assetManager.load("sounds/musicaJuego.ogg", Music.class);
-		assetManager.load("sounds/musicaOpciones.ogg", Music.class);
 
 	}
 
@@ -69,15 +75,19 @@ public final class PantallaSplash extends Pantalla {
 	@Override
 	public void gestionarInput(float delta) {
 
-		if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY) && assetManager.update()) {
-			sonidoSplash.stop();
-			juego.setScreen(new PantallaMenu());
+		if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)) {
+			saltarPantallaSplash = true;
 		}
 
 	}
 
 	@Override
 	public void recalcularPantalla(float delta) {
+
+		if (saltarPantallaSplash && assetManager.update()) {
+			if (efectosSonidoEstanHabilitados) sonidoSplash.stop();
+			juego.setScreen(new PantallaMenu());
+		}
 
 		if (progresoAnimacionFadeIn < 1) {
 			progresoAnimacionFadeIn += delta * MULTIPLICADOR_ANIMACION_FADE_IN;

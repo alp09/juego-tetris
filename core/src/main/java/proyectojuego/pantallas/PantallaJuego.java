@@ -14,7 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import proyectojuego.EstadoAplicacion;
 import proyectojuego.Juego;
-import proyectojuego.ListaControles;
+import proyectojuego.ajustes.ListaControles;
+import proyectojuego.ajustes.ListaPreferencias;
 import proyectojuego.jugabilidad.ListaPiezas;
 import proyectojuego.jugabilidad.Pieza;
 import proyectojuego.jugabilidad.Tablero;
@@ -66,6 +67,7 @@ public final class PantallaJuego extends Pantalla {
 
 	public	TextureAtlas		textureAtlas;						// Contiene información de donde se localizan las texturas en la imagen texturas.png
 	private Pieza				piezaJugable;						// Guarda la pieza que se está jugando
+	private Pieza				piezaFantasma;						// Guarda la pieza fantasma, que aparecerá abajo en el tablero, indicando donde caera la piezaJugable
 	private Pieza				piezaGuardada;						// Guarda la pieza que el jugador guardó
 	private Pieza 				primeraPieza;						// Guarda la primera pieza en la lista de siguientes
 	private Pieza 				segundaPieza;						// Guarda la segunda pieza en la lista de siguientes
@@ -80,6 +82,7 @@ public final class PantallaJuego extends Pantalla {
 
 	private final Vector2		posicionTablero;					// Esquina inferior derecha del tablero
 	private Vector2				posicionPiezaJugable;				// Posicion actual de la pieza
+	private Vector2				posicionPiezaFantasma;				// Posicion actual de la pieza fantasma
 	private final Vector2		posicionInicioPiezaJugable;			// Posicion desde donde la pieza jugable aparece al comienzo
 	private final Vector2		posicionPiezaGuardada;				// Esquina inferior derecha en la UI de la pieza guardada
 	private final Vector2		posicionPrimeraPieza;				// Esquina inferior derecha en la UI de la primera pieza de la lista
@@ -87,8 +90,8 @@ public final class PantallaJuego extends Pantalla {
 	private final Vector2		posicionTerceraPieza;				// Esquina inferior derecha en la UI de la tercera pieza de la lista
 
 	// Variables usadas para los sonidos del juego
-	private boolean 			musicaEstaEncendida;				// Determina si la musica se reproduce
-	private boolean				efectosSondioEstanHabilitados;		// Determina si los efectos de sonido se reproducen
+	private boolean 			musicaEstaHabilitada;				// Determina si la musica se reproduce
+	private boolean				efectosSonidoEstanHabilitados;		// Determina si los efectos de sonido se reproducen
 	private final Music			musicaPantallajuego;				// Almacena la musica de PantallaJuego
 	private final Sound			sonidoPiezaColocada;				// Almacena el efecto de sonido piezaColocada
 	private final Sound 		sonidoFilaCompleta;					// Almacena el efecto de sonido filaCompletada
@@ -138,6 +141,9 @@ public final class PantallaJuego extends Pantalla {
 		// ESTABLECE EL VALOR INICIAL DE CADA PIEZA
 		this.generarNuevasPiezas();
 
+		// ESTABLECE EL VALOR INICIAL DE LA PIEZA FANTASMA, DE ESTA FORMA NO DA NULL EN LA PRIMERA COMPROBACION
+		piezaFantasma = piezaJugable;
+
 		// GUARDA UNAS COORDENADAS QUE SE USARÁN A MENUDO DURANTE LA PARTIDA
 		posicionTablero				= new Vector2(spriteFondoJuego.getX(), spriteFondoJuego.getY());
 		posicionInicioPiezaJugable	= new Vector2(tableroJuego.ANCHO_TABLERO * .5f, tableroJuego.ALTURA_COMIENZO_PIEZA);
@@ -146,6 +152,12 @@ public final class PantallaJuego extends Pantalla {
 		posicionPrimeraPieza		= new Vector2(spriteFondoPrimeraPieza.getX() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoPrimeraPieza.getY() + spriteFondoPrimeraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
 		posicionSegundaPieza		= new Vector2(spriteFondoSegundaPieza.getX() + spriteFondoSegundaPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoSegundaPieza.getY() + spriteFondoSegundaPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
 		posicionTerceraPieza		= new Vector2(spriteFondoTerceraPieza.getX() + spriteFondoTerceraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f, spriteFondoTerceraPieza.getY() + spriteFondoTerceraPieza.getWidth() * .5f - ESCALA_PIEZA_UI * .5f);
+		posicionPiezaFantasma		= posicionPiezaJugable.cpy();
+
+		// ESTABLECE LA POSICION INICIAL DE LA PIEZA FANTASMA
+		while (tableroJuego.puedeBajar(posicionPiezaFantasma, piezaFantasma)) {
+			posicionPiezaFantasma.y -= 1;
+		}
 
 		//CARGA MUSICA Y LOS SONIDOS
 		musicaPantallajuego = assetManager.get("sounds/musicaJuego.ogg");
@@ -153,12 +165,17 @@ public final class PantallaJuego extends Pantalla {
 		sonidoFilaCompleta	= assetManager.get("sounds/sonidoFilaCompleta.ogg");
 		sonidoGameOver		= assetManager.get("sounds/sonidoGameOver.ogg");
 
-		// INICIA LA REPRODUCCION DE SONIDOS
+		// ESTABLECE LAS PROPIEDADES DE LA MUSICA
 		musicaPantallajuego.setVolume(.06f);
 		musicaPantallajuego.setLooping(true);
-		musicaEstaEncendida = true;
-		musicaPantallajuego.play();
-		sonidoPiezaColocada.setVolume(0,1);
+
+		// EMPIEZA LA REPRODUCCION DE MUSICA SI ESTA HABILITADA
+		if (musicaEstaHabilitada = configurador.preferenciasUsuario.get(ListaPreferencias.HABILITAR_MUSICA.nombrePreferencia)) {
+			musicaPantallajuego.play();
+		}
+
+		// ESTABLECE SI EL USUARIO QUIERE O NO EFECTOS DE SONIDO
+		efectosSonidoEstanHabilitados = configurador.preferenciasUsuario.get(ListaPreferencias.HABILITAR_EFECTOS_SONIDO.nombrePreferencia);
 
 		// CREA EL MENSAJE DE PAUSA
 		mensajePantallaPausa = new Label("Pausa", skin);
@@ -255,7 +272,7 @@ public final class PantallaJuego extends Pantalla {
 						}
 						tiempoDesdeMovimientoHorizontal += delta;
 					}
-					// SI LA PIEZA NO SE ESTA MOVIENDO, SE RESETEA LA VARIABLE PARA ASI APLICAR EL DELAY INICIAL LA PROXIMA VEZ
+				// SI LA PIEZA NO SE ESTA MOVIENDO, SE RESETEA LA VARIABLE PARA ASI APLICAR EL DELAY INICIAL LA PROXIMA VEZ
 				} else {
 					tiempoDesdeMovimientoHorizontal = 0;
 				}
@@ -294,13 +311,16 @@ public final class PantallaJuego extends Pantalla {
 
 				// HABILITA / DESHABILITA LA MUSICA EN MITAD DE LA PARTIDA
 				if (Gdx.input.isKeyJustPressed(configurador.controlesUsuario.get(ListaControles.CONTROLAR_MUSICA.nombreControl))){
-					if(musicaEstaEncendida){
+					if (musicaEstaHabilitada){
 						musicaPantallajuego.pause();
-						musicaEstaEncendida = false;
+						musicaEstaHabilitada = false;
+						configurador.preferenciasUsuario.put(ListaPreferencias.HABILITAR_MUSICA.nombrePreferencia, false);
 					} else {
 						musicaPantallajuego.play();
-						musicaEstaEncendida = true;
+						musicaEstaHabilitada = true;
+						configurador.preferenciasUsuario.put(ListaPreferencias.HABILITAR_MUSICA.nombrePreferencia, true);
 					}
+					configurador.guardarCambiosPreferencias();
 				}
 
 			}
@@ -330,6 +350,9 @@ public final class PantallaJuego extends Pantalla {
 			// SI LA PIEZA NO PUEDE BAJAR, COMIENZO EL CONTADOR PARA FIJARSE AL TABLERO
 			if (!tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable)) fijarPiezaAlTablero(delta);
 
+			// MANTIENE ACTUALIZADA LA PIEZA FANTASMA PARA QUE SEA IGUAL QUE LA PIEZA JUGABLE
+			actualizaPiezaFantasma();
+
 			// ACTUALIZA EL LABEL CON LA PUNTUACION ACTUAL
 			indicadorPuntuacionTotal.setText(Integer.toString(puntucionTotal));
 
@@ -340,9 +363,11 @@ public final class PantallaJuego extends Pantalla {
 				estadoAplicacion = EstadoAplicacion.GAME_OVER;
 
 				// REPRODUCE EL SONIDO DE GAMEOVER Y PARA LA MUSICA DEL JUEGO
-				musicaPantallajuego.stop();
-				musicaEstaEncendida = false;
-				sonidoGameOver.play();
+				if (musicaEstaHabilitada) {
+					musicaPantallajuego.stop();
+					musicaEstaHabilitada = false;
+				}
+				if (efectosSonidoEstanHabilitados) sonidoGameOver.play();
 
 				// GUARDA LA PUNTUACION AL ARCHIVO puntuaciones.bin
 				this.guardarPuntuacion();
@@ -369,6 +394,7 @@ public final class PantallaJuego extends Pantalla {
 			}
 		}
 	}
+
 
 	@Override
 	public void dibujarPantalla(float delta) {
@@ -401,6 +427,12 @@ public final class PantallaJuego extends Pantalla {
 
 			// DIBUJA EL TABLERO
 			dibujarContenidoTablero();
+
+			// DIBUJA LA PIEZA FANTASMA
+			for (Vector2 bloquePieza: piezaFantasma.getFormaPieza()) {
+				piezaFantasma.spriteBloquePieza.setPosition(spriteFondoJuego.getX() + (posicionPiezaFantasma.x + bloquePieza.x) * PIXELES_BLOQUE_UI, spriteFondoJuego.getY() + (posicionPiezaFantasma.y + bloquePieza.y) * PIXELES_BLOQUE_UI);
+				piezaFantasma.spriteBloquePieza.draw(spriteBatch, .3f);
+			}
 
 			// DIBUJA LA PIEZA JUGABLE
 			for (Vector2 bloquePieza: piezaJugable.getFormaPieza()) {
@@ -450,7 +482,7 @@ public final class PantallaJuego extends Pantalla {
 		if (tiempoParaFijarATablero >= TIEMPO_COLOCACION) {
 
 			//SONIDO DE CHOQUE ENTRE PIEZAS
-			sonidoPiezaColocada.play();
+			if (efectosSonidoEstanHabilitados) sonidoPiezaColocada.play();
 
 			// SI LA PIEZA SE COLOCA EN UNA POSICION y > 19 LA PARTIDA TERMINA
 			seTerminoPartida = tableroJuego.colocarPieza(posicionPiezaJugable, piezaJugable);
@@ -461,7 +493,7 @@ public final class PantallaJuego extends Pantalla {
 				int lineasEliminadas;
 				if ((lineasEliminadas = tableroJuego.detectarFilasCompletas()) > 0) {
 					puntucionTotal += sumarPuntosCompletarLinea(lineasEliminadas);
-					sonidoFilaCompleta.play();
+					if (efectosSonidoEstanHabilitados) sonidoFilaCompleta.play();
 				}
 				puntucionTotal += sumarPuntosColocarPieza(tiempoNecesitadoParaColocar);
 
@@ -549,7 +581,7 @@ public final class PantallaJuego extends Pantalla {
 
 	}
 
-	public void nuevaPartida() {
+	private void nuevaPartida() {
 		// Resetea el tablero
 		tableroJuego		= new Tablero();
 		seTerminoPartida	= false;
@@ -560,12 +592,32 @@ public final class PantallaJuego extends Pantalla {
 		puntucionTotal			= 0;
 
 		// Inicia la musica de nuevo
-		musicaPantallajuego.play();
-		musicaEstaEncendida		= true;
+		if (musicaEstaHabilitada = configurador.preferenciasUsuario.get(ListaPreferencias.HABILITAR_MUSICA.nombrePreferencia)) {
+			musicaPantallajuego.play();
+		}
 
 		// Genera nuevas piezas y restablece la pieza jugable
 		posicionPiezaJugable = posicionInicioPiezaJugable.cpy();
 		this.generarNuevasPiezas();
+	}
+
+	// ESTE METODO ES LLAMADO EN CADA EJECUCION DEL RENDER
+	// COMPRUEBA QUE LA FORMA DE LA piezaJugable NO HAYA CAMBIADO Y DE HACERLO LA COPIA
+	// DESPUES COMPRUEBA SI LA piezaJugable SE HA MOVIDO Y DE HACERLO COPIA SU POSICION Y CALCULA LA CAIDA DE NUEVO
+	private void actualizaPiezaFantasma() {
+
+		// COMPRUEBA SI LA PIEZAFANTASMA ES IGUAL QUE LA PIEZA JUGABLE
+		if (!piezaFantasma.equals(piezaJugable)) piezaFantasma = piezaJugable;
+
+		// SI LA POSICION HA VARIADO, LA COPIA PARA VOLVER A CALCULAR DONDE CAERÍA
+		if (!posicionPiezaFantasma.equals(posicionPiezaJugable)) {
+			posicionPiezaFantasma = posicionPiezaJugable.cpy();
+
+			// MANTIENE ACTUALIZADA LA POSICION DE LA PIEZA FANTASMA
+			while (tableroJuego.puedeBajar(posicionPiezaFantasma, piezaFantasma)) {
+				posicionPiezaFantasma.y -= 1;
+			}
+		}
 	}
 
 }

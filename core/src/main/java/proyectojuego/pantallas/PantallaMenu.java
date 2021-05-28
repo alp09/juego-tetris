@@ -11,6 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import proyectojuego.Juego;
+import proyectojuego.ajustes.ListaControles;
+import proyectojuego.ajustes.ListaPreferencias;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -30,8 +32,8 @@ public final class PantallaMenu extends Pantalla {
 	private final TextButton	botonJugar;
 	private final TextButton	botonOpciones;
 
+	private boolean				musicaEstaHabilitada;
 	private Music				musicaPantallaMenu;
-	private boolean				musicaEstaEncendida;
 
 
 	// CONSTRUCTOR
@@ -42,8 +44,7 @@ public final class PantallaMenu extends Pantalla {
 		musicaPantallaMenu = assetManager.get("sounds/musicaMenu.ogg");
 		musicaPantallaMenu.setVolume(0.25f);
 		musicaPantallaMenu.setLooping(true);
-		musicaEstaEncendida = true;
-		musicaPantallaMenu.play();
+		if (musicaEstaHabilitada = configurador.preferenciasUsuario.get(ListaPreferencias.HABILITAR_MUSICA.nombrePreferencia)) musicaPantallaMenu.play();
 
         // CARGA LAS TEXTURAS Y LAS POSICIONA
         textureAtlas = assetManager.get("ui/texturas.atlas", TextureAtlas.class);
@@ -129,14 +130,17 @@ public final class PantallaMenu extends Pantalla {
     public void gestionarInput(float delta) {
 
 		// HABILITA / DESHABILITA LA MUSICA EN MITAD DE LA PARTIDA
-		if (Gdx.input.isKeyJustPressed((Input.Keys.M))) {
-			if(musicaEstaEncendida){
+		if (Gdx.input.isKeyJustPressed(configurador.controlesUsuario.get(ListaControles.CONTROLAR_MUSICA.nombreControl))){
+			if (musicaEstaHabilitada){
 				musicaPantallaMenu.pause();
-				musicaEstaEncendida = false;
+				musicaEstaHabilitada = false;
+				configurador.preferenciasUsuario.put(ListaPreferencias.HABILITAR_MUSICA.nombrePreferencia, false);
 			} else {
 				musicaPantallaMenu.play();
-				musicaEstaEncendida = true;
+				musicaEstaHabilitada = true;
+				configurador.preferenciasUsuario.put(ListaPreferencias.HABILITAR_MUSICA.nombrePreferencia, true);
 			}
+			configurador.guardarCambiosPreferencias();
 		}
 
     }

@@ -6,6 +6,9 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import proyectojuego.Juego;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 
 public final class Pieza {
 
@@ -37,6 +40,23 @@ public final class Pieza {
 	// USADO EN PantallaJuego PARA CREAR NUEVAS PIEZAS
 	public Pieza() {
 		this(ListaPiezas.values()[(int) (Math.random() * (ListaPiezas.values().length))]);
+	}
+
+
+	//EQUALS & HASHCODE
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Pieza pieza = (Pieza) o;
+		return tipoPieza == pieza.tipoPieza && Arrays.equals(formaPieza, pieza.formaPieza);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = Objects.hash(tipoPieza);
+		result = 31 * result + Arrays.hashCode(formaPieza);
+		return result;
 	}
 
 

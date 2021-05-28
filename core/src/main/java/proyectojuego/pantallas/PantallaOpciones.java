@@ -10,8 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import proyectojuego.Juego;
-import proyectojuego.ListaControles;
-import proyectojuego.ListaPreferencias;
+import proyectojuego.ajustes.ListaControles;
+import proyectojuego.ajustes.ListaPreferencias;
 
 import java.util.*;
 
