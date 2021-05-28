@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class Configurador {
 
@@ -16,8 +17,8 @@ public class Configurador {
 
 	private static Configurador configurador 	= null;
 
-	public HashMap<String, Boolean> preferenciasUsuario = new HashMap<>();
-	public HashMap<String, Integer> controlesUsuario	= new HashMap<>();
+	public LinkedHashMap<String, Boolean> preferenciasUsuario	= new LinkedHashMap<>();
+	public LinkedHashMap<String, Integer> controlesUsuario		= new LinkedHashMap<>();
 
 	// CONSTRUCTOR
 	private Configurador() {
@@ -29,7 +30,7 @@ public class Configurador {
 		try (BufferedReader lector = new BufferedReader(new FileReader(ARCHIVO_PREFERENCIAS))) {
 
 			Gson lectorJson = new GsonBuilder().create();
-			Type tipoObjeto = new TypeToken<HashMap<String, Boolean>>() {}.getType();
+			Type tipoObjeto = new TypeToken<LinkedHashMap<String, Boolean>>() {}.getType();
 			preferenciasUsuario = lectorJson.fromJson(lector, tipoObjeto);
 
 		} catch (JsonSyntaxException ex) {
@@ -40,7 +41,7 @@ public class Configurador {
 			System.out.println("Error en la lectura del archivo.");
 		}
 
-		// COMPRUEBA QUE LAS PREFERENCIAS SEAN CORRECTAS
+		// COMPRUEBA QUE LAS PREFERENCIAS EXISTAN Y TENGAN UN VALOR ASIGNADO
 		for (ListaPreferencias preferencia: ListaPreferencias.values()) {
 			if (preferenciasUsuario.get(preferencia.nombrePreferencia) == null) {
 					preferenciasUsuario.put(preferencia.nombrePreferencia, preferencia.valorDefecto);
@@ -52,7 +53,7 @@ public class Configurador {
 		try (BufferedReader lector = new BufferedReader(new FileReader(ARCHIVO_CONTROLES))) {
 
 			Gson lectorJson = new GsonBuilder().create();
-			Type tipoObjeto = new TypeToken<HashMap<String, Integer>>() {}.getType();
+			Type tipoObjeto = new TypeToken<LinkedHashMap<String, Integer>>() {}.getType();
 			controlesUsuario = lectorJson.fromJson(lector, tipoObjeto);
 
 		} catch (JsonSyntaxException ex) {
@@ -63,16 +64,13 @@ public class Configurador {
 			System.out.println("Error en la lectura del archivo.");
 		}
 
-		// COMPRUEBA QUE LAS PREFERENCIAS SEAN CORRECTAS
+		// COMPRUEBA QUE LOS CONTROLES EXISTAN Y TENGAN UN VALOR ASIGNADO
 		for (ListaControles control: ListaControles.values()) {
 			if (controlesUsuario.get(control.nombreControl) == null) {
 				controlesUsuario.put(control.nombreControl, control.valorDefecto);
 				seHizoCambiosControles = true;
 			}
 		}
-
-		System.out.println(seHizoCambiosPreferencias);
-		System.out.println(seHizoCambiosControles);
 
 		if (seHizoCambiosPreferencias) guardarCambiosPreferencias();
 		if (seHizoCambiosControles) guardarCambiosControles();
@@ -121,11 +119,16 @@ public class Configurador {
 		}
 	}
 
-	public HashMap<String, Boolean> copiarPrefenrecias(HashMap<String, Boolean> copiaPreferencias) {
+	public LinkedHashMap<String, Boolean> copiarPrefenrecias() {
 		String preferenciasJson = new Gson().toJson(preferenciasUsuario);
-		Type tipoObjeto = new TypeToken<HashMap<String, Boolean>>() {}.getType();
-		copiaPreferencias = new Gson().fromJson(preferenciasJson, tipoObjeto);
-		return copiaPreferencias;
+		Type tipoObjeto 		= new TypeToken<LinkedHashMap<String, Boolean>>() {}.getType();
+		return new Gson().fromJson(preferenciasJson, tipoObjeto);
+	}
+
+	public LinkedHashMap<String, Integer> copiarControles() {
+		String preferenciasJson = new Gson().toJson(controlesUsuario);
+		Type tipoObjeto 		= new TypeToken<LinkedHashMap<String, Integer>>() {}.getType();
+		return new Gson().fromJson(preferenciasJson, tipoObjeto);
 	}
 
 }

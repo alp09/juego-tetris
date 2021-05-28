@@ -1,8 +1,10 @@
 package proyectojuego.pantallas;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -29,8 +31,8 @@ public class PantallaOpciones extends Pantalla {
 	private Integer				teclaPulsada;				// ALMACENA LA ULTIMA TECLA PULSADA - ES RESETEADA A null CUANDO NO HAY NINGUN BOTON MARCADO
 
 	// USADAS PARA COMPROBAR LOS CAMBIOS REALIZADOS
-	private HashMap<String, Boolean> copiaPreferenciasUsuario	= new HashMap<>();
-	private HashMap<String, Integer> copiaControlesUsuario		= new HashMap<>();
+	private LinkedHashMap<String, Boolean>	copiaPreferenciasUsuario;
+	private LinkedHashMap<String, Integer>	copiaControlesUsuario;
 
 
 	// CONSTRUCTOR
@@ -38,8 +40,8 @@ public class PantallaOpciones extends Pantalla {
 		super();
 
 		// CREA UNA COPIA DE LAS PREFERENCIAS Y CONTROLES
-		copiaPreferenciasUsuario = configurador.copiarPrefenrecias(copiaPreferenciasUsuario);
-
+		copiaPreferenciasUsuario	= configurador.copiarPrefenrecias();
+		copiaControlesUsuario		= configurador.copiarControles();
 
 		// CARGA LA TEXTURA DE FONDO Y LA POSICIONA
 		TextureAtlas textureAtlas = assetManager.get("ui/texturas.atlas", TextureAtlas.class);
@@ -138,22 +140,54 @@ public class PantallaOpciones extends Pantalla {
 		tablaFinal.row().height(spriteFondoJuego.getHeight() * .8f);
 		tablaFinal.add(listaFinal).colspan(2);
 
-		// CREA LOS BOTONES PARA GUARDAR LOS CAMBIOS Y SALIR
+		// CREA EL BOTON PARA GUARDAR. ESTE BOTON COMPRUEBA SI SE HICIERON CAMBIOS EN LAS OPCIONES
+		// EN CASO DE HABERLOS, LOS GUARDA. EN CASO DE FALTAR CONTROLES POR ASIGNAR TECLA, ABORTA EL GUARDADO
 		TextButton botonGuardar = new TextButton("Guardar", skin);
 		botonGuardar.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
-				// ToDo: Guardar cambios
+				accionBotonGuardar();
 			}
 		});
 
+		// CREA EL BOTON PARA SALIR.
 		TextButton botonSalir = new TextButton("Salir", skin);
 		botonSalir.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				super.clicked(event, x, y);
-				// ToDo: comprobar si se hicieron cambios y salir
+				if (seHicieronCambiosPreferencias() || seHicieronCambiosControles()) {
+					Dialog ventanaCambiosDetectados = new Dialog("CAMBIOS DETECTADOS", skin) {
+						@Override
+						protected void result(Object object) {
+
+							// INDICA SI AL FINAL DE LA EJECUCCION SE CAMBIARÁ DE PANTALLA
+							boolean abortarSalida = false;
+
+							// SI ELIGE "SI", SE EJECUTA EL CODIGO DEL BOTON GUARDAR
+							if ((Boolean) object) {
+								// EN CASO DE ERROR SE PONE LA VARIABLE A true PARA MAS ADELANTE EVITAR QUE SALGA DE PantallaOpciones
+								abortarSalida = !accionBotonGuardar();
+
+							// SI ELIGE "NO", RESETEA LOS LINKEDHASHMAPS QUE HAYAN CAMBIADO AL VALOR ANTERIOR
+							} else {
+								if (seHicieronCambiosPreferencias())	configurador.preferenciasUsuario = copiaPreferenciasUsuario;
+								if (seHicieronCambiosControles())		configurador.controlesUsuario	 = copiaControlesUsuario;
+							}
+
+							// SI NO HUBO ERRORES CAMBIA DE PANTALLA
+							if (!abortarSalida) juego.setScreen(new PantallaMenu());
+						}
+					};
+					ventanaCambiosDetectados.setPosition(Juego.ANCHO_JUEGO * .5f - ventanaCambiosDetectados.getWidth() * .5f, Juego.ALTO_JUEGO * .5f - ventanaCambiosDetectados.getHeight() * .5f);
+					ventanaCambiosDetectados.text("Se detectaron cambios, ¿Quiere guardarlos?");
+					ventanaCambiosDetectados.button("SI", true);
+					ventanaCambiosDetectados.button("NO", false);
+					ventanaCambiosDetectados.show(stage);
+				} else {
+					juego.setScreen(new PantallaMenu());
+				}
 			}
 		});
 
@@ -169,6 +203,7 @@ public class PantallaOpciones extends Pantalla {
 	}
 
 
+	// METODOS
 	@Override
 	public void show() {
 
@@ -227,7 +262,6 @@ public class PantallaOpciones extends Pantalla {
 
 	}
 
-
 	// SE MODIFICO LA CLASE Pantalla PARA extends InputHandler, DE ESTA MANERA PODRÁ GESTIONAR LOS INPUTS COMO SE DEFINAN EN ELLA
 	// AQUI SE MODIFICA EL METODO keyDown PARA QUE AL PULSAR UNA TECLA GUARDE EL VALOR Key.Input EN LA VARIABLE teclaPulsada
 	// DESPUES DEVUELVE true PARA CONFIRMAR QUE SE GESTIONÓ LA ENTRADA Y ASI SE EVITE LLAMAR AL SIGUIENTE InputProcessor AÑADIDO AL InputMultiplexer
@@ -241,23 +275,97 @@ public class PantallaOpciones extends Pantalla {
 	// UNA VEZ HAYA UN BOTON MARCADO Y SE PULSE UNA TECLA, SE LLAMA A ESTE MÉTODO CON LA TECLA PULSADA
 	private void cambiarControl(int teclaNueva) {
 
+		// USADO PARA SABER EL CONTROL POR EL QUE VA EL BUCLE, PUESTO QUE LOS MAPS NO ESTAN INDEXADOS
+		// EMPIEZA EN -1 PARA QUE NADA MAS ENTRAR EN EL BUCLE COMIENCE EN 0 (COMO LOS ARRAYS)
+		int index = -1;
+
 		// RECORRE LA LISTA DE CONTROLES DEL USUARIO
 		for (Map.Entry<String, Integer> entrada : configurador.controlesUsuario.entrySet()) {
 
-			// SI SALE EL CONTROL QUE SE ESTA INTENTAND SOBRESCRIBE SU ENTRADA CON LA NUEVA TECLA Y ACTUALIZA EL TEXTO DEL BOTON
+			// ANTES DE NADA HAY QUE MANTENER EL INDICE ACTUALIZADO
+			index++;
+
+			// SI SALE EL CONTROL QUE SE ESTA INTENTANDO CAMBIAR, SOBRESCRIBE SU ENTRADA CON LA NUEVA TECLA Y ACTUALIZA EL TEXTO DEL BOTON
 			if (entrada.getKey().equals(ListaControles.values()[listaBotonesControl.getCheckedIndex()].nombreControl)) {
 				configurador.controlesUsuario.put(entrada.getKey(), teclaNueva);
 				listaBotonesControl.getChecked().setText(Input.Keys.toString(teclaNueva));
+				listaBotonesControl.getChecked().setColor(Color.WHITE);
+
+			// SI teclaNueva ESTABA ASIGNADA A OTRA TECLA SE DEJA SU ENTRADA A null Y SE ACTUALIZA EL TEXTO DEL BOTON
+			} else if (entrada.getValue() != null && entrada.getValue() == teclaNueva) {
+				configurador.controlesUsuario.put(entrada.getKey(), null);
+				listaBotonesControl.getButtons().get(index).setText("");
+				listaBotonesControl.getButtons().get(index).setColor(Color.GRAY);
 			}
 
-			// SI LA TECLA ESTABA ASIGNADA A OTRA TECLA SE DEJA VACIA
-			if (entrada.getValue() == teclaNueva) {
-				configurador.controlesUsuario.put(entrada.getKey(), null);
-			}
 		}
 
 		// DESMARCA EL BOTON SELECCIONADO
 		listaBotonesControl.uncheckAll();
+	}
+
+	// DETECTA DIFERENCIAS ENTRE LA copiaPreferenciasUsuario Y EL configurador.preferenciasUsuario
+	private boolean seHicieronCambiosPreferencias() {
+		return (!configurador.preferenciasUsuario.equals(copiaPreferenciasUsuario));
+	}
+
+	// DETECTA DIFERENCIAS ENTRE LA copiaControlesUsuario Y EL configurador.controlesUsuario
+	private boolean seHicieronCambiosControles() {
+		return (!configurador.controlesUsuario.equals(copiaControlesUsuario));
+	}
+
+	// COMPRUEBA SI HAY TECLAS SIN UN VALOR ASIGNADO
+	private boolean hayTeclasSinAsignar() {
+
+		boolean hayControlesSinAsignacion = false;
+		for (Map.Entry<String, Integer> entrada: configurador.controlesUsuario.entrySet()) {
+			if (entrada.getValue() == null) {
+				hayControlesSinAsignacion = true;
+				break;
+			}
+		}
+
+		return hayControlesSinAsignacion;
+	}
+
+	// LLAMA AL METODO configurador.guardarCambiosPreferencias() PARA QUE SOBRESCRIBA EL ARCHIVO json CON LAS NUEVAS PREFERENCIAS
+	// ADEMAS ACTUALIZA LA COPIA DE PREFERENCIAS DE USUARIO CON LAS NUEVAS PREFERENCIAS
+	private void guardarCambiosPreferencias() {
+		configurador.guardarCambiosPreferencias();
+		copiaPreferenciasUsuario = configurador.copiarPrefenrecias();
+	}
+
+	// LLAMA AL METODO configurador.guardarCambiosControles() PARA QUE SOBRESCRIBA EL ARCHIVO json CON LOS NUEVOS CONTROLES
+	// ADEMAS ACTUALIZA LA COPIA DE CONTROLES DE USUARIO CON LOS NUEVOS CONTROLES
+	private void guardarCambiosControles() {
+		configurador.guardarCambiosControles();
+		copiaControlesUsuario = configurador.copiarControles();
+	}
+
+	// ESTE ES EL CODIGO CON TODAS LAS ACCIONES QUE REALIZA EL BOTON DE GUARDAR AL SER PULSADO
+	// PUESTO QUE SE USA TAMBIEN EN EL BOTON DE SALIR, LO PASO A UN METODO
+	// DEVUELVE true SI NO SE PRODUJO NINGUN ERROR Y false EN CASO DE HABERLO
+	private boolean accionBotonGuardar() {
+
+		boolean guardadoExitoso = true;
+
+		if (seHicieronCambiosPreferencias()) guardarCambiosPreferencias();
+		if (seHicieronCambiosControles()) {
+			if (hayTeclasSinAsignar()) {
+
+				guardadoExitoso = false;
+				Dialog ventanaTeclasSinAsignar = new Dialog("ERROR AL GUARDAR CONTROLES", skin);
+				ventanaTeclasSinAsignar.setPosition(Juego.ANCHO_JUEGO * .5f - ventanaTeclasSinAsignar.getWidth() * .5f, Juego.ALTO_JUEGO * .5f - ventanaTeclasSinAsignar.getHeight() * .5f);
+				ventanaTeclasSinAsignar.text("Asigna una tecla a todos los controles.");
+				ventanaTeclasSinAsignar.button("OK");
+				ventanaTeclasSinAsignar.show(stage);
+
+			} else {
+				guardarCambiosControles();
+			}
+		}
+
+		return guardadoExitoso;
 	}
 
 }
