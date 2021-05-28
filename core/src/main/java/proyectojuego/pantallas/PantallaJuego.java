@@ -23,7 +23,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class PantallaJuego extends Pantalla {
+
+public final class PantallaJuego extends Pantalla {
 
 	// Variables usadas en los controles del juego
 	private static final float	DELAY_ENTRE_MOVIMIENTOS		= .2f;								// El valor indicado aqui será el delay inicial
@@ -94,7 +95,7 @@ public class PantallaJuego extends Pantalla {
 	private final Sound			sonidoGameOver;						// Almacena el efecto de sonido GameOver
 
 
-// CONSTRUCTOR
+	// CONSTRUCTOR
 	public PantallaJuego() {
 		super();
 
@@ -167,7 +168,7 @@ public class PantallaJuego extends Pantalla {
 	}
 
 
-// METODOS
+	// METODOS
 	@Override
 	public void show() {
 

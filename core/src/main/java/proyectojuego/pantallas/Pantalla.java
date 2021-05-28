@@ -12,6 +12,7 @@ import proyectojuego.Configurador;
 import proyectojuego.EstadoAplicacion;
 import proyectojuego.Juego;
 
+
 public abstract class Pantalla extends InputAdapter implements Screen {
 
 	protected Juego				juego;

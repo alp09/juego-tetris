@@ -1,17 +1,12 @@
 package proyectojuego.jugabilidad;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
-import proyectojuego.Juego;
-import proyectojuego.pantallas.PantallaJuego;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Tablero {
+
+public final class Tablero {
 
 	public	final int 		ALTO_TABLERO			= 23;		// Se añaden 3 filas más para que la pieza generada no aparezca fuera del tablero.
 	public	final int 		ANCHO_TABLERO			= 10;		// Se usan en la clase PantallaJuego para determinar la posicionInicioPiezaJugable

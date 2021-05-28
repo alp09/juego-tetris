@@ -1,5 +1,6 @@
 package proyectojuego;
 
+
 public enum ListaPreferencias {
 
 	HABILITAR_MUSICA			("Habilitar musica",			true),

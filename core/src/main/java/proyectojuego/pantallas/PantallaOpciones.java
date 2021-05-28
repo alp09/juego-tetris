@@ -4,20 +4,19 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
-import proyectojuego.Configurador;
 import proyectojuego.Juego;
 import proyectojuego.ListaControles;
 import proyectojuego.ListaPreferencias;
 
 import java.util.*;
 
-public class PantallaOpciones extends Pantalla {
+
+public final class PantallaOpciones extends Pantalla {
 
 	private final Sprite		spriteFondoJuego;			// CONTIENE EL SPRITE QUE SE MUESTRA DE FONDO
 
@@ -305,11 +304,13 @@ public class PantallaOpciones extends Pantalla {
 	}
 
 	// DETECTA DIFERENCIAS ENTRE LA copiaPreferenciasUsuario Y EL configurador.preferenciasUsuario
+	// DEVUELVE true EN CASO DE HABER ALGUNA DIFERENCIA Y false SI NO LA HAY
 	private boolean seHicieronCambiosPreferencias() {
 		return (!configurador.preferenciasUsuario.equals(copiaPreferenciasUsuario));
 	}
 
 	// DETECTA DIFERENCIAS ENTRE LA copiaControlesUsuario Y EL configurador.controlesUsuario
+	// DEVUELVE true EN CASO DE HABER ALGUNA DIFERENCIA Y false SI NO LA HAY
 	private boolean seHicieronCambiosControles() {
 		return (!configurador.controlesUsuario.equals(copiaControlesUsuario));
 	}

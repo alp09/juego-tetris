@@ -2,6 +2,7 @@ package proyectojuego;
 
 import com.badlogic.gdx.Input;
 
+
 public enum ListaControles {
 
 	MOVER_IZQUIERDA					("Mover izquierda", 		Input.Keys.LEFT),
@@ -19,7 +20,7 @@ public enum ListaControles {
 	public final Integer	valorDefecto;
 
 
-// CONSTRUCTOR
+	// CONSTRUCTOR
 	ListaControles(String nombrePreferencia, Integer valorDefecto) {
 		this.nombreControl		= nombrePreferencia;
 		this.valorDefecto		= valorDefecto;

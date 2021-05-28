@@ -2,6 +2,7 @@ package proyectojuego.jugabilidad;
 
 import com.badlogic.gdx.math.Vector2;
 
+
 public enum ListaPiezas {
 
 	PALO		(new Vector2[] {new Vector2(0, -1),	new Vector2(0, 0),	new Vector2(0, 1),	new Vector2(0, 2)},	"PiezaCian",		"BloqueCian"),

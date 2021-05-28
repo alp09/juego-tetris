@@ -2,23 +2,20 @@ package proyectojuego.pantallas;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import proyectojuego.Configurador;
-import proyectojuego.ListaControles;
-import proyectojuego.ListaPreferencias;
 
-public class PantallaSplash extends Pantalla {
 
-	/*
-		AL USAR EL DELTA, LA ANIMACION DURA 1s PUESTO QUE VA SUMANDO ms A progresoAnimacion HASTA LLEGAR AL TOPE (1).
-		SE PODRIA MODIFICAR MULTIPLICANDO progresoAnimacion, POR EJEMPLO, AL MULTIPLICARLO POR .5, TARDARÍA 2s EN LLEGAR AL TOPE DE 1.
-	 */
+public final class PantallaSplash extends Pantalla {
+
+
+	// AL USAR EL DELTA, LA ANIMACION DURA 1s PUESTO QUE VA SUMANDO ms A progresoAnimacion HASTA LLEGAR AL TOPE (1).
+	// SE PODRIA MODIFICAR MULTIPLICANDO progresoAnimacion, POR EJEMPLO, AL MULTIPLICARLO POR .5, TARDARÍA 2s EN LLEGAR AL TOPE DE 1.
+
 	public static final float TIEMPO_MINIMO_ENTRE_ANIMACIONES	= 2;	// TIEMPO EN SEGUNDOS MINIMO ENTRE LAS ANIMACIONES
 	public static final float MULTIPLICADOR_ANIMACION_FADE_IN	= 1;	// <1 --> ANIMACION MAS LENTA
 	public static final float MULTIPLICADOR_ANIMACION_FADE_OUT	= 1;	//	1 --> VELOCIDAD NORMAL
@@ -29,10 +26,10 @@ public class PantallaSplash extends Pantalla {
 	private float 	tiempoEntreAnimaciones		= 0;					// DEFINE EL TIEMPO QUE HA TRANSCURRIDO DESDE QUE LA ANIMACION FADE IN TERMINÓ.
 
 	private final	Sprite	spritePantallaSplash;
-	private			Sound	sonidoSplash;
+	private	final	Sound	sonidoSplash;
 
 
-// CONSTRUCTOR
+	// CONSTRUCTOR
 	public PantallaSplash() {
 		super();
 
@@ -63,7 +60,7 @@ public class PantallaSplash extends Pantalla {
 	}
 
 
-// METODOS
+	// METODOS
 	@Override
 	public void show() {
 

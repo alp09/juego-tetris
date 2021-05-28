@@ -15,7 +15,8 @@ import proyectojuego.Juego;
 import java.io.*;
 import java.util.ArrayList;
 
-public class PantallaMenu extends Pantalla {
+
+public final class PantallaMenu extends Pantalla {
 
 	public static final int 	PUNTUACIONES_MAXIMAS_MOSTRADAS = 5;
 	private ArrayList<Integer>	listaMejoresPuntuaciones = new ArrayList<>();
