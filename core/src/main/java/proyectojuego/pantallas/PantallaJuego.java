@@ -373,7 +373,7 @@ public final class PantallaJuego extends Pantalla {
 				this.guardarPuntuacion();
 
 				// CREA EL CUADRO DE DIALOGO MOSTRADO EN EL GAMEOVER
-				stage = new Stage();
+				stage = new Stage(this.fitViewport);
 				Gdx.input.setInputProcessor(stage);
 
 				ventanaGameOver = new Dialog("GAME OVER", skin) {
@@ -385,7 +385,7 @@ public final class PantallaJuego extends Pantalla {
 						}
 					}
 				};
-				ventanaGameOver.setPosition(posicionTablero.x + spriteFondoJuego.getWidth() * .5f - ventanaGameOver.getWidth() * .5f, posicionTablero.y + spriteFondoJuego.getHeight() * .5f - ventanaGameOver.getHeight() * .5f);
+				ventanaGameOver.setPosition(Juego.ANCHO_JUEGO * .5f - ventanaGameOver.getWidth() * .5f, Juego.ALTO_JUEGO - ventanaGameOver.getHeight() * .5f);
 				ventanaGameOver.text("Puntuacion obtenida: " + puntucionTotal);
 				ventanaGameOver.button("VOLVER A JUGAR", 0);
 				ventanaGameOver.button("SALIR", 1);
