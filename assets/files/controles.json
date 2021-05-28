@@ -1,0 +1,12 @@
+{
+  "Mover izquierda": 21,
+  "Mover derecha": 22,
+  "Bajar pieza": 20,
+  "Colocar pieza": 62,
+  "Rotar sentido reloj": 33,
+  "Rotar Contrareloj": 45,
+  "Guardar pieza": 51,
+  "Pausar": 44,
+  "Reiniciar": 46,
+  "Controlar musica": 41
+}
