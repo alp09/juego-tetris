@@ -28,33 +28,35 @@ import java.util.Collections;
 public final class PantallaJuego extends Pantalla {
 
 	// Variables usadas en los controles del juego
-	private static final float	DELAY_ENTRE_MOVIMIENTOS		= .2f;								// El valor indicado aqui será el delay inicial
-	private static final float	MAXIMO_CASILLAS_POR_SEGUNDO	= 1 / 20f;							// 1 / N; siendo N el numero de casillas que podrá moverse la pieza como máximo en un segundo
+	private final float			DELAY_ENTRE_MOVIMIENTOS		= .2f;									// El valor indicado aqui será el delay inicial
+	private final float 		VELOCIDAD_MAXIMA_HORIZONTAL = 1 / 20f;								// 1 / N; siendo N el numero de casillas que podrá moverse la pieza como máximo en un segundo
 
 	private Tablero				tableroJuego;
-	private int					direccionUltimoMovimientoHorizontal;							// Guarda cual fue el ultimo movimiento horizontal (-1 = Izquierda o 1 = derecha) para resetear el tiempoDesdeMovimientoHorizontal y asi aplicar el DELAY_ENTRE_MOVIMIENTOS
-	private float				tiempoDesdeMovimientoHorizontal	= 0;							// Guarda el tiempo una tecla de movimiento horizontal ha estado pulsada. Su valor inicial es 0 para aplicarle el delay inicial.
-	private float				tiempoDesdeMovimientoVertical	= DELAY_ENTRE_MOVIMIENTOS;		// Guarda el tiempo una tecla de movimiento vertical ha estado pulsada. Su valor incial es DELAY_ENTRE_MOVIMIENTOS para saltarse el delay inicial en los movimientos verticales
-	private boolean 			seIntercambioPiezaJugable		= false;						// Guarda si se guardo una pieza para asi prevenir que la que se esta jugando pueda ser guardada de nuevo
+	private int					direccionUltimoMovimientoHorizontal;								// Guarda cual fue el ultimo movimiento horizontal (-1 = Izquierda o 1 = derecha) para resetear el tiempoDesdeMovimientoHorizontal y asi aplicar el DELAY_ENTRE_MOVIMIENTOS
+	private float				tiempoDesdeMovimientoHorizontal	= 0;								// Guarda el tiempo una tecla de movimiento horizontal ha estado pulsada. Su valor inicial es 0 para aplicarle el delay inicial.
+	private float				tiempoDesdeMovimientoVertical	= DELAY_ENTRE_MOVIMIENTOS;			// Guarda el tiempo una tecla de movimiento vertical ha estado pulsada. Su valor incial es DELAY_ENTRE_MOVIMIENTOS para saltarse el delay inicial en los movimientos verticales
+	private boolean 			seIntercambioPiezaJugable		= false;							// Guarda si se guardo una pieza para asi prevenir que la que se esta jugando pueda ser guardada de nuevo
 
 	// Variables usadas en las actualizaciones del juego
-	private final float			DELAY_MAXIMO_BAJADA = .05f;			// Establece el tiempo mínimo entre bajada y bajada: Usado para capar la dificultad del juego
-	private final float			DELAY_ENTRE_BAJADA	= 1;			// Establece el delay en el que una pieza baja automaticamente
-	private final float			TIEMPO_COLOCACION	= .4f;			// Contiene el tiempo necesario que debe transcurrir para que una pieza se coloque en el tablero
+	private final float			DELAY_ENTRE_BAJADA_BASE			= 1;								// Establece el tiempo base entre bajada y bajada de las piezas. Es la velocidad inicial a la que bajan las piezas
+	private final float			DELAY_MINIMO_ENTRE_BAJADA		= .05f;								// Establece el tiempo mínimo entre bajada y bajada: Usado para capar la dificultad del juego
+	private final float			TIEMPO_COLOCACION				= .4f;								// Contiene el tiempo necesario que debe transcurrir para que una pieza se coloque en el tablero
 
-	private float				multiplicadorVelocidad	= 1;		// Multiplicador del DELAY_ENTRE_BAJADA: Con el tiempo aumenta para que la velocidad a la que bajan las piezas aumente
-	private float				tiempoDesdeUltimaBajada = 0;		// Guarda el tiempo desde la ultima vez que la pieza bajo
-	private float				tiempoParaFijarATablero = 0;		// Guarda el tiempo que la pieza ha pasado sin poder bajar mas casillas
-	private float 				tiempoNecesitadoParaColocar;		// Tiempo necesitado por el jugador para colocar la pieza
+	private float				delayEntreBajada				= DELAY_ENTRE_BAJADA_BASE;			// Contiene la cantidad de tiempo que debe transcurrir para que la pieza baje.
+	private float				tiempoDesdeUltimaBajada 		= 0;								// Guarda el tiempo desde la ultima vez que la pieza bajo
+	private float				tiempoParaFijarATablero 		= 0;								// Guarda el tiempo que la pieza ha pasado sin poder bajar mas casillas
+	private float 				tiempoNecesitadoParaColocar;										// Tiempo necesitado por el jugador para colocar la pieza en el tablero
+
 
 	// Variables usadas para las puntuciones
-	private final int			PUNTOS_COLOCAR_PIEZA	= 50;		// Puntuacion base por colocar una pieza
-	private final int			PUNTOS_COMPLETAR_LINEA	= 500;		// Puntuacion base por completar una linea
+	private boolean				seTerminoPartida		= false;	// Determina si la partida termino
+	private final int			PUNTOS_COLOCAR_PIEZA	= 10;		// Puntuacion base por colocar una pieza
+	private final int			PUNTOS_COMPLETAR_LINEA	= 100;		// Puntuacion base por completar una linea
 	private int 				puntucionTotal;						// Almacena la puntuacion obtenida durante la partida
-	private boolean				seTerminoPartida = false;			// Determina si la partida termino
+
 
 	// Variables usadas en la UI del juego
-	public	static final int	PIXELES_BLOQUE_UI		= 32;		// Tamaño en px de un bloque - Se usa establecer un espacio entre las coordenadas cuando se va a dibujar un bloque
+	public	final int			PIXELES_BLOQUE_UI		= 32;		// Tamaño en px de un bloque - Se usa establecer un espacio entre las coordenadas cuando se va a dibujar un bloque
 	private final int 			ESCALA_PIEZA_UI			= 96;		// Tamaño en px de las piezas mostradas en los laterales
 
 	private final Skin			skin;								// Skin que contiene los estilos del texto puntuacionTotal
@@ -226,14 +228,17 @@ public final class PantallaJuego extends Pantalla {
 
 						// EN CASO DE QUE HAYA UNA PIEZA GUARDADA, LAS INTERCAMBIA
 						} else {
-							Pieza piezaAuxiliar = piezaGuardada;
-							piezaGuardada		= piezaJugable;
-							piezaJugable		= piezaAuxiliar;
+							Pieza piezaAuxiliar		= piezaGuardada;
+							piezaGuardada			= piezaJugable;
+							piezaJugable			= piezaAuxiliar;
 						}
-						posicionPiezaJugable	= posicionInicioPiezaJugable.cpy();
+
+						// RESTABLECE LA POSICION DE LA PIEZA JUGABLE A LA POSICION DE INICIO
+						posicionPiezaJugable		= posicionInicioPiezaJugable.cpy();
+
+						// INDICA QUE SE GUARDO LA PIEZA - SE RESETEA UNA VEZ SE COLOQUE EN EL TABLERO UNA PIEZA
+						seIntercambioPiezaJugable	= true;
 					}
-					// INDICA QUE SE GUARDO LA PIEZA - SE RESETEA UNA VEZ SE COLOQUE EN EL TABLERO UNA PIEZA
-					seIntercambioPiezaJugable	= true;
 				}
 
 				// MUEVE LA PIEZA A LA IZQUIERDA O DERECHA (MUTUAMENTE EXCLUSIVO)
@@ -268,7 +273,7 @@ public final class PantallaJuego extends Pantalla {
 							posicionPiezaJugable.add(movimientoHorizontal, 0);
 
 							// SE LE RESTA AL tiempoDesdeMovimientoHorizontal UNA PEQUEÑA CANTIDAD DE TIEMPO PARA EVITAR QUE ENTRE EN EL if ANTERIOR EN CADA LLAMADA AL RENDER
-							tiempoDesdeMovimientoHorizontal -= MAXIMO_CASILLAS_POR_SEGUNDO;
+							tiempoDesdeMovimientoHorizontal -= VELOCIDAD_MAXIMA_HORIZONTAL;
 						}
 						tiempoDesdeMovimientoHorizontal += delta;
 					}
@@ -282,7 +287,7 @@ public final class PantallaJuego extends Pantalla {
 					if (tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable)) {
 						if (tiempoDesdeMovimientoVertical >= DELAY_ENTRE_MOVIMIENTOS) {
 							posicionPiezaJugable.add(0, -1);
-							tiempoDesdeMovimientoVertical -= MAXIMO_CASILLAS_POR_SEGUNDO;
+							tiempoDesdeMovimientoVertical -= VELOCIDAD_MAXIMA_HORIZONTAL;
 						}
 						tiempoDesdeMovimientoVertical += delta;
 					}
@@ -334,12 +339,20 @@ public final class PantallaJuego extends Pantalla {
 		if (estadoAplicacion == EstadoAplicacion.EJECUTANDO) {
 
 			// BAJA LA PIEZA AUTOMÁTICAMENTE Y LA FIJA PASADO UN TIEMPO
-			if (tiempoDesdeUltimaBajada > Math.max(DELAY_ENTRE_BAJADA / multiplicadorVelocidad, DELAY_MAXIMO_BAJADA)) {
+			if (tiempoDesdeUltimaBajada > Math.max(delayEntreBajada, DELAY_MINIMO_ENTRE_BAJADA)) {
+
+				// SI LA PIEZA PUEDE BAJAR, DESCIENDE UNA CASILLA Y SE RESETEAN LAS VARIABLES tiempoDesdeUltimaBajada Y tiempoParaFijarATablero
 				if (tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable)) {
 					posicionPiezaJugable.add(0, -1);
 					tiempoDesdeUltimaBajada = 0;
 					tiempoParaFijarATablero = 0;
+
+				// SI LA PIEZA NO PUEDE BAJAR, COMIENZA EL CONTADOR PARA FIJARSE AL TABLERO
+				} else {
+					fijarPiezaAlTablero(delta);
 				}
+
+			// SI AUN NO HA TRANSCURRIDO EL TIEMPO SUFICIENTE, SE LE SUMA EL DELTA
 			} else {
 				tiempoDesdeUltimaBajada += delta;
 			}
@@ -347,14 +360,8 @@ public final class PantallaJuego extends Pantalla {
 			// MANTIENE ACTUALIZADO EL TIEMPO QUE LLEVA LA PIEZA JUGABLE EN JUEGO (USADO PARA CALCULAR PUNTUACION POR COLOCAR PIEZA)
 			tiempoNecesitadoParaColocar += delta;
 
-			// SI LA PIEZA NO PUEDE BAJAR, COMIENZO EL CONTADOR PARA FIJARSE AL TABLERO
-			if (!tableroJuego.puedeBajar(posicionPiezaJugable, piezaJugable)) fijarPiezaAlTablero(delta);
-
 			// MANTIENE ACTUALIZADA LA PIEZA FANTASMA PARA QUE SEA IGUAL QUE LA PIEZA JUGABLE
 			actualizaPiezaFantasma();
-
-			// ACTUALIZA EL LABEL CON LA PUNTUACION ACTUAL
-			indicadorPuntuacionTotal.setText(Integer.toString(puntucionTotal));
 
 			// CUANDO LA PARTIDA ACABA
 			if (seTerminoPartida) {
@@ -392,6 +399,7 @@ public final class PantallaJuego extends Pantalla {
 				ventanaGameOver.show(stage);
 
 			}
+
 		}
 	}
 
@@ -413,7 +421,7 @@ public final class PantallaJuego extends Pantalla {
 			spriteFondoJuego.draw(spriteBatch);
 			spriteGridZonaJuego.draw(spriteBatch);
 
-			// DIBUJA EL FONDO DE LA PIEZA GUARDADA Y LA PIEZA EN SÍ CAMBIAR piezaPrueba POR LA PIEZA QUE ESTE GUARDADA
+			// DIBUJA EL FONDO DE LA PIEZA GUARDADA Y LA PIEZA EN SÍ
 			spriteFondoPiezaGuardada.draw(spriteBatch);
 			if (piezaGuardada != null) spriteBatch.draw(piezaGuardada.spritePieza, posicionPiezaGuardada.x, posicionPiezaGuardada.y, ESCALA_PIEZA_UI, ESCALA_PIEZA_UI);
 
@@ -497,8 +505,15 @@ public final class PantallaJuego extends Pantalla {
 				}
 				puntucionTotal += sumarPuntosColocarPieza(tiempoNecesitadoParaColocar);
 
+				// ACTUALIZA EL LABEL CON LA PUNTUACION ACTUAL
+				indicadorPuntuacionTotal.setText(Integer.toString(puntucionTotal));
+
 				// ACTUALIZA EL MULTIPLICADOR DE VELOCIDAD A LA QUE LA PIEZA BAJA
-				multiplicadorVelocidad 		= 1 + puntucionTotal / 25000f;
+				// Funcion Lineal -> f(x) = a * x + b
+				// 			- a ES LA PENDIENTE; USANDO ESTA PENDIENTE SE ALCANZA EL DELAY_MINIMO_ENTRE_BAJADA A LOS 10.000ptos
+				//			- x ES LA puntuacionTotal
+				// 			- b ES EL PUNTO EN EL QUE LA FUNCION CRUZA EL EJE y (EN ESTE CASO SERIA EL DELAY_ENTRE_BAJADA_BASE)
+				if (delayEntreBajada > DELAY_MINIMO_ENTRE_BAJADA) delayEntreBajada = -.000095f * puntucionTotal + DELAY_ENTRE_BAJADA_BASE;
 
 				// SACA LA SIGUIENTE PIEZA, LA POSICIONA ARRIBA DEL TABLERO Y ESTABLECE UNA SERIE DE VARIABLES A SU VALOR POR DEFECTO
 				jugarSiguientePieza();
@@ -516,13 +531,13 @@ public final class PantallaJuego extends Pantalla {
 			for (int j = 0; j < tableroJuego.ANCHO_TABLERO; j++) {
 				switch (tableroJuego.contenidoTablero[j][i]) {
 					case -1: continue;
-					case  0: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[0].spriteBloquePieza), posicionTablero.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionTablero.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA CIAN
-					case  1: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[1].spriteBloquePieza), posicionTablero.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionTablero.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA AMARILLA
-					case  2: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[2].spriteBloquePieza), posicionTablero.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionTablero.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA MORADA
-					case  3: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[3].spriteBloquePieza), posicionTablero.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionTablero.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA NARANJA
-					case  4: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[4].spriteBloquePieza), posicionTablero.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionTablero.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA AZUL
-					case  5: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[5].spriteBloquePieza), posicionTablero.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionTablero.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA VERDE
-					case  6: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[6].spriteBloquePieza), posicionTablero.x + j * PantallaJuego.PIXELES_BLOQUE_UI, posicionTablero.y + i * PantallaJuego.PIXELES_BLOQUE_UI);	break;	// PIEZA ROJA
+					case  0: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[0].spriteBloquePieza), posicionTablero.x + j * PIXELES_BLOQUE_UI, posicionTablero.y + i * PIXELES_BLOQUE_UI);	break;	// PIEZA CIAN
+					case  1: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[1].spriteBloquePieza), posicionTablero.x + j * PIXELES_BLOQUE_UI, posicionTablero.y + i * PIXELES_BLOQUE_UI);	break;	// PIEZA AMARILLA
+					case  2: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[2].spriteBloquePieza), posicionTablero.x + j * PIXELES_BLOQUE_UI, posicionTablero.y + i * PIXELES_BLOQUE_UI);	break;	// PIEZA MORADA
+					case  3: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[3].spriteBloquePieza), posicionTablero.x + j * PIXELES_BLOQUE_UI, posicionTablero.y + i * PIXELES_BLOQUE_UI);	break;	// PIEZA NARANJA
+					case  4: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[4].spriteBloquePieza), posicionTablero.x + j * PIXELES_BLOQUE_UI, posicionTablero.y + i * PIXELES_BLOQUE_UI);	break;	// PIEZA AZUL
+					case  5: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[5].spriteBloquePieza), posicionTablero.x + j * PIXELES_BLOQUE_UI, posicionTablero.y + i * PIXELES_BLOQUE_UI);	break;	// PIEZA VERDE
+					case  6: spriteBatch.draw(textureAtlas.findRegion(ListaPiezas.values()[6].spriteBloquePieza), posicionTablero.x + j * PIXELES_BLOQUE_UI, posicionTablero.y + i * PIXELES_BLOQUE_UI);	break;	// PIEZA ROJA
 				}
 			}
 		}
@@ -588,7 +603,6 @@ public final class PantallaJuego extends Pantalla {
 		estadoAplicacion	= EstadoAplicacion.EJECUTANDO;
 
 		// Resetea la puntuacion y la velocidad de la pieza
-		multiplicadorVelocidad	= 1;
 		puntucionTotal			= 0;
 
 		// Inicia la musica de nuevo
