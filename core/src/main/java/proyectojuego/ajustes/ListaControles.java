@@ -16,14 +16,14 @@ public enum ListaControles {
 	REINICIAR						("Reiniciar", 			Input.Keys.R),
 	CONTROLAR_MUSICA				("Controlar musica", 	Input.Keys.M);
 
-	public final String		nombreControl;
+	public final String nombreControl;
 	public final Integer	valorDefecto;
 
 
 	// CONSTRUCTOR
-	ListaControles(String nombrePreferencia, Integer valorDefecto) {
-		this.nombreControl		= nombrePreferencia;
-		this.valorDefecto		= valorDefecto;
+	ListaControles(String nombreControl, Integer valorDefecto) {
+		this.nombreControl	= nombreControl;
+		this.valorDefecto	= valorDefecto;
 	}
 
 }

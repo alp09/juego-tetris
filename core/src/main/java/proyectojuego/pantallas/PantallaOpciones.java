@@ -39,7 +39,7 @@ public final class PantallaOpciones extends Pantalla {
 		super();
 
 		// CREA UNA COPIA DE LAS PREFERENCIAS Y CONTROLES
-		copiaPreferenciasUsuario	= configurador.copiarPrefenrecias();
+		copiaPreferenciasUsuario	= configurador.copiarPreferencias();
 		copiaControlesUsuario		= configurador.copiarControles();
 
 		// CARGA LA TEXTURA DE FONDO Y LA POSICIONA
@@ -332,14 +332,14 @@ public final class PantallaOpciones extends Pantalla {
 	// LLAMA AL METODO configurador.guardarCambiosPreferencias() PARA QUE SOBRESCRIBA EL ARCHIVO json CON LAS NUEVAS PREFERENCIAS
 	// ADEMAS ACTUALIZA LA COPIA DE PREFERENCIAS DE USUARIO CON LAS NUEVAS PREFERENCIAS
 	private void guardarCambiosPreferencias() {
-		configurador.guardarCambiosPreferencias();
-		copiaPreferenciasUsuario = configurador.copiarPrefenrecias();
+		configurador.guardarPreferencias();
+		copiaPreferenciasUsuario = configurador.copiarPreferencias();
 	}
 
 	// LLAMA AL METODO configurador.guardarCambiosControles() PARA QUE SOBRESCRIBA EL ARCHIVO json CON LOS NUEVOS CONTROLES
 	// ADEMAS ACTUALIZA LA COPIA DE CONTROLES DE USUARIO CON LOS NUEVOS CONTROLES
 	private void guardarCambiosControles() {
-		configurador.guardarCambiosControles();
+		configurador.guardarControles();
 		copiaControlesUsuario = configurador.copiarControles();
 	}
 

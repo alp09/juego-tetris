@@ -3,10 +3,10 @@ package proyectojuego.ajustes;
 
 public enum ListaPreferencias {
 
-	HABILITAR_MUSICA			("Habilitar musica",			true),
+	HABILITAR_MUSICA			("Habilitar musica",				true),
 	HABILITAR_EFECTOS_SONIDO	("Habilitar efectos de sonido",	true);
 
-	public final String		nombrePreferencia;
+	public final String nombrePreferencia;
 	public final boolean	valorDefecto;
 
 

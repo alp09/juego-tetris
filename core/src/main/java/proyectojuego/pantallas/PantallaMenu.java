@@ -1,7 +1,6 @@
 package proyectojuego.pantallas;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -140,7 +139,7 @@ public final class PantallaMenu extends Pantalla {
 				musicaEstaHabilitada = true;
 				configurador.preferenciasUsuario.put(ListaPreferencias.HABILITAR_MUSICA.nombrePreferencia, true);
 			}
-			configurador.guardarCambiosPreferencias();
+			configurador.guardarPreferencias();
 		}
 
     }

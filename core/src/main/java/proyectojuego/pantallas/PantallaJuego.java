@@ -325,7 +325,7 @@ public final class PantallaJuego extends Pantalla {
 						musicaEstaHabilitada = true;
 						configurador.preferenciasUsuario.put(ListaPreferencias.HABILITAR_MUSICA.nombrePreferencia, true);
 					}
-					configurador.guardarCambiosPreferencias();
+					configurador.guardarPreferencias();
 				}
 
 			}
